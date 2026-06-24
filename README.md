@@ -280,8 +280,3 @@ Most static analysis frameworks are massive — LLVM, Soot, CodeQL. ModernPDE is
 
 If you're learning program analysis, this is a working reference. If you're building something bigger, these modules are clean enough to lift directly.
 
----
-
-## License
-
-MIT — use it, fork it, learn from it.
