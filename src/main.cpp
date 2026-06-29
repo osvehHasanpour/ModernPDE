@@ -10,9 +10,135 @@
 #include "CFGPDE.h"
 #include "Metrics.h"
 #include "Benchmark.h"
+#include <fstream>
+#include <string>
+#include "Lexer.h"
+#include "Parser.h"
+#include "CFGBuilder.h"
+using namespace ModernPDE;
 
-int main()
+
+int main(int argc, char* argv[])
 {
+    std::cout << "argc = " << argc << std::endl;
+    if (argc > 1)
+{
+    std::ifstream file(argv[1]);
+
+    if (!file)
+    {
+        std::cerr << "Cannot open file: "
+                  << argv[1]
+                  << std::endl;
+        return 1;
+    }
+
+    std::string line;
+
+    int lineCount = 0;
+
+    while(std::getline(file,line))
+    {
+        lineCount++;
+    }
+
+    std::cout
+    << "\n====================================\n";
+
+    std::cout
+    << "INPUT FILE\n";
+
+    std::cout
+    << "====================================\n";
+
+    std::cout
+    << "File : "
+    << argv[1]
+    << "\n";
+
+    std::cout
+    << "Lines: "
+    << lineCount
+    << "\n\n";
+}
+ /////////////////////////////////////////////////////
+// LEXER TEST
+/////////////////////////////////////////////////////
+
+ModernPDE::Lexer lexer;
+
+if(argc > 1)
+{
+    if(lexer.tokenizeFile(argv[1]))
+    {
+        std::cout
+        << "====================================\n";
+
+        std::cout
+        << "LEXER\n";
+
+        std::cout
+        << "====================================\n";
+
+        std::cout
+        << "Lexer OK\n";
+
+        std::cout
+        << "Token Count : "
+        << lexer.tokens().size()
+        << "\n\n";
+    }
+    else
+    {
+        std::cout
+        << "Lexer Failed\n";
+    }
+}
+/////////////////////////////////////////////////////
+// PARSER
+/////////////////////////////////////////////////////
+
+Parser parser(lexer.tokens());
+
+parser.parse();
+
+std::cout
+<< "====================================\n";
+
+std::cout
+<< "PARSER\n";
+
+std::cout
+<< "====================================\n";
+
+std::cout
+<< "Functions : "
+<< parser.functionCount()
+<< "\n";
+
+std::cout
+<< "Global Variables : "
+<< parser.globalVariableCount()
+<< "\n\n";
+
+std::cout
+<< "====================================\n";
+
+std::cout
+<< "CFG\n";
+
+std::cout
+<< "====================================\n";
+
+CFGBuilder builder;
+
+CFG cfg =
+builder.build(parser.getRoot());
+
+cfg.print();
+
+std::cout << "\n";
+
 /////////////////////////////////////////////////////
 // PHASE 1
 /////////////////////////////////////////////////////
@@ -614,5 +740,48 @@ Benchmark::run(5000);
 Benchmark::run(10000);
 
 Benchmark::run(50000);
+/////////////////////////////////////////////////////
+// PHASE 5.9 RANDOM STRESS TEST
+/////////////////////////////////////////////////////
+
+if (argc == 1)
+{
+    std::cout
+    << "\n====================================\n"
+    << "PHASE 5.9 : RANDOM STRESS TEST\n"
+    << "====================================\n";
+
+    PDE randomPDE;
+
+    std::srand(123456);
+
+    for (int i = 1; i <= 700; i++)
+    {
+        std::string var = "var_" + std::to_string(i);
+
+        randomPDE.defineVariable(var);
+
+        int paths = 5 + std::rand() % 16;
+
+        for (int p = 0; p < paths; p++)
+            randomPDE.addExecutionPath(var);
+
+        int uses = std::rand() % (paths + 1);
+
+        for (int u = 0; u < uses; u++)
+            randomPDE.useVariable(var);
+    }
+
+    randomPDE.printResults();
+}
+else
+{
+    std::cout
+    << "\n====================================\n"
+    << "REAL FILE MODE\n"
+    << "====================================\n"
+    << "Random Stress Test skipped.\n";
+}
+std::cout << "\nEND OF PROGRAM\n";
 return 0;
 }
