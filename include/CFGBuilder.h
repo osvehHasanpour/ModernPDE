@@ -1,10 +1,7 @@
-#ifndef MODERNPDE_CFGBUILDER_H
-#define MODERNPDE_CFGBUILDER_H
+#pragma once
 
 #include "CFG.h"
 #include "Parser.h"
-
-#include <stack>
 
 namespace ModernPDE
 {
@@ -12,16 +9,11 @@ namespace ModernPDE
 class CFGBuilder
 {
 public:
-
     CFGBuilder();
 
     CFG build(ASTNode* root);
 
 private:
-
-    //----------------------------------------------------
-    // Core
-    //----------------------------------------------------
 
     void buildTranslationUnit(ASTNode* root);
 
@@ -34,10 +26,6 @@ private:
     int buildStatement(
         ASTNode* stmt,
         int currentBlock);
-
-    //----------------------------------------------------
-    // Statements
-    //----------------------------------------------------
 
     int buildIf(
         ASTNode* node,
@@ -63,15 +51,7 @@ private:
         ASTNode* node,
         int currentBlock);
 
-    //----------------------------------------------------
-    // Expressions
-    //----------------------------------------------------
-
     void visitExpression(ASTNode* expr);
-
-    //----------------------------------------------------
-    // Helpers
-    //----------------------------------------------------
 
     int createBlock();
 
@@ -83,22 +63,15 @@ private:
         int block,
         ASTNode* node);
 
-    //----------------------------------------------------
-    // State
-    //----------------------------------------------------
+private:
 
     CFG cfg_;
 
     int entryBlock_;
-
     int exitBlock_;
 
     int currentFunctionEntry_;
-
     int currentFunctionExit_;
-
 };
 
 }
-
-#endif

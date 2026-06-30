@@ -121,6 +121,10 @@ std::cout
 << parser.globalVariableCount()
 << "\n\n";
 
+/////////////////////////////////////////////////////
+// CFG
+/////////////////////////////////////////////////////
+
 std::cout
 << "====================================\n";
 
@@ -134,10 +138,133 @@ CFGBuilder builder;
 
 CFG cfg =
 builder.build(parser.getRoot());
+std::cout << "\nCFG Statistics\n";
+std::cout << "Blocks : " << cfg.size() << "\n";
+
+int edgeCount = 0;
+for (const auto& b : cfg.getBlocks())
+    edgeCount += b.succs.size();
+
+std::cout << "Edges  : " << edgeCount << "\n";
 
 cfg.print();
 
 std::cout << "\n";
+std::cout
+<< "\n====================================\n";
+std::cout
+<< "CFG VALIDATION\n";
+std::cout
+<< "====================================\n";
+
+int blockCount = cfg.size();
+
+int isolatedBlocks = 0;
+int entryBlocks = 0;
+int exitBlocks = 0;
+
+for(const auto& block : cfg.getBlocks())
+{
+    edgeCount += block.succs.size();
+
+    if(block.preds.empty())
+        entryBlocks++;
+
+    if(block.succs.empty())
+        exitBlocks++;
+
+    if(block.preds.empty() &&
+       block.succs.empty())
+        isolatedBlocks++;
+}
+
+std::cout
+<< "Functions Parsed      : "
+<< parser.functionCount()
+<< "\n";
+
+std::cout
+<< "CFG Blocks            : "
+<< blockCount
+<< "\n";
+
+std::cout
+<< "CFG Edges             : "
+<< edgeCount
+<< "\n";
+
+std::cout
+<< "Entry Blocks          : "
+<< entryBlocks
+<< "\n";
+
+std::cout
+<< "Exit Blocks           : "
+<< exitBlocks
+<< "\n";
+
+std::cout
+<< "Isolated Blocks       : "
+<< isolatedBlocks
+<< "\n";
+
+std::cout
+<< "Connectivity          : ";
+
+if(isolatedBlocks==0)
+    std::cout<<"PASS\n";
+else
+    std::cout<<"WARNING\n";
+std::cout
+<< "\nCFG BLOCK LIST\n";
+for(const auto& block : cfg.getBlocks())
+{
+    std::cout
+    << "Block "
+    << block.id
+    << "\n";
+
+    std::cout
+    << "  Preds : ";
+
+    for(auto p : block.preds)
+        std::cout << p << " ";
+
+    std::cout << "\n";
+
+    std::cout
+    << "  Succs : ";
+
+    for(auto s : block.succs)
+        std::cout << s << " ";
+
+    std::cout << "\n";
+
+    std::cout
+    << "  Instructions : "
+    << block.instructions.size()
+    << "\n\n";
+}
+std::cout
+<< "CFG SANITY CHECK\n";
+
+bool ok=true;
+
+for(const auto& b:cfg.getBlocks())
+{
+    for(auto s:b.succs)
+    {
+        if(!cfg.hasBlock(s))
+        {
+            ok=false;
+        }
+    }
+}
+
+if(ok)
+    std::cout<<"PASS : All edges valid\n";
+else
+    std::cout<<"FAIL : Broken edge found\n";
 
 /////////////////////////////////////////////////////
 // PHASE 1
@@ -435,7 +562,6 @@ std::cout
 std::cout
 << "====================================\n";
 
-CFG cfg;
 
 int start =
     cfg.createBlock();
@@ -512,9 +638,7 @@ std::cout
 
 PathEnumeration pe;
 
-pe.enumerate(
-    cfg,
-    start);
+pe.enumerate(cfg,0);
 
 pe.print();
 /////////////////////////////////////////////////////
@@ -782,6 +906,35 @@ else
     << "====================================\n"
     << "Random Stress Test skipped.\n";
 }
+std::cout
+<< "\n====================================\n";
+std::cout
+<< "PRACTICAL ANALYSIS\n";
+std::cout
+<< "====================================\n";
+
+std::cout
+<< "Functions detected : "
+<< parser.functionCount()
+<< "\n";
+
+std::cout
+<< "CFG Blocks         : "
+<< cfg.size()
+<< "\n";
+
+std::cout
+<< "DU Chains          : "
+<< "Generated\n";
+
+std::cout
+<< "Path Enumeration   : "
+<< "Completed\n";
+
+std::cout
+<< "PDE Classification : "
+<< "Completed\n";
+
 std::cout << "\nEND OF PROGRAM\n";
 return 0;
 }
