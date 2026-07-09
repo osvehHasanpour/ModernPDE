@@ -2,6 +2,11 @@
 
 #include <iostream>
 
+std::size_t PathEnumeration::pathCount() const
+{
+    return paths.size();
+}
+
 void PathEnumeration::enumerate(
     const CFG& cfg,
     int startBlock)

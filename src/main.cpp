@@ -15,11 +15,186 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "CFGBuilder.h"
+#include "FieldSensitiveAnalysis.h"
+#include "IR.h"
 using namespace ModernPDE;
+
+static Instruction makeAlloc(
+    int id,
+    const std::string& var,
+    const std::string& site)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Alloc;
+    inst.result = var;
+    inst.uses.insert(site);
+
+    return inst;
+}
+
+static Instruction makeCopy(
+    int id,
+    const std::string& lhs,
+    const std::string& rhs)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Copy;
+    inst.result = lhs;
+    inst.uses.insert(rhs);
+
+    return inst;
+}
+
+static Instruction makeFieldStore(
+    int id,
+    const std::string& base,
+    const std::string& field,
+    const std::string& value)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::FieldStore;
+    inst.result = base + "." + field;
+    inst.uses.insert(value);
+
+    return inst;
+}
+
+static Instruction makeFieldLoad(
+    int id,
+    const std::string& dst,
+    const std::string& base,
+    const std::string& field)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::FieldLoad;
+    inst.result = dst;
+    inst.uses.insert(base + "." + field);
+
+    return inst;
+}
+
+static Instruction makeEscapeCall(
+    int id,
+    const std::string& ptr)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Call;
+    inst.result = "@escape";
+    inst.uses.insert(ptr);
+
+    return inst;
+}
+
+static FunctionIR buildFieldSensitiveSample()
+{
+    FunctionIR function;
+
+    function.name = "fieldDemo";
+
+    function.instructions.push_back(
+        makeAlloc(0, "o1", "Point#0"));
+
+    function.instructions.push_back(
+        makeAlloc(1, "o2", "Point#1"));
+
+    function.instructions.push_back(
+        makeCopy(2, "p", "o1"));
+
+    function.instructions.push_back(
+        makeFieldStore(3, "o1", "x", "10"));
+
+    function.instructions.push_back(
+        makeFieldStore(4, "p", "y", "20"));
+
+    function.instructions.push_back(
+        makeFieldLoad(5, "r", "o2", "x"));
+
+    function.instructions.push_back(
+        makeFieldStore(6, "o2", "z", "30"));
+
+    function.instructions.push_back(
+        makeEscapeCall(7, "o1"));
+
+    function.instructions.push_back(
+        makeFieldStore(8, "o1", "w", "5"));
+
+    function.instructions.push_back(
+        makeFieldLoad(9, "t", "p", "y"));
+
+    return function;
+}
+
+static void runFieldSensitiveDemo()
+{
+    std::cout
+        << "\n====================================\n";
+
+    std::cout
+        << "PHASE 6 : FIELD-SENSITIVE ANALYSIS\n";
+
+    std::cout
+        << "====================================\n";
+
+    FunctionIR sample =
+        buildFieldSensitiveSample();
+
+    std::cout
+        << "Function : "
+        << sample.name
+        << "\n";
+
+    std::cout
+        << "Instructions : "
+        << sample.instructions.size()
+        << "\n\n";
+
+    FieldSensitiveAnalysis analysis;
+
+    analysis.run(sample);
+
+    std::cout
+        << "\nExpected highlights:\n";
+
+    std::cout
+        << "  insn 3  (o1.x=10)  -> partialDead (object escapes; x never read locally)\n";
+
+    std::cout
+        << "  insn 4  (p.y=20)   -> live (y read via alias)\n";
+
+    std::cout
+        << "  insn 6  (o2.z=30)  -> dead (z never read)\n";
+
+    std::cout
+        << "  insn 8  (o1.w=5)   -> partialDead (escaped object)\n";
+
+    std::cout
+        << "  Point#0 != Point#1 (distinct abstract objects)\n";
+}
 
 
 int main(int argc, char* argv[])
 {
+    if(argc >= 2 &&
+       std::string(argv[1]) == "--field-sensitive")
+    {
+        runFieldSensitiveDemo();
+
+        std::cout
+            << "\nEND OF FIELD-SENSITIVE DEMO\n";
+
+        return 0;
+    }
+
     std::cout << "argc = " << argc << std::endl;
     if (argc > 1)
 {
@@ -934,6 +1109,11 @@ std::cout
 std::cout
 << "PDE Classification : "
 << "Completed\n";
+
+if(argc == 1)
+{
+    runFieldSensitiveDemo();
+}
 
 std::cout << "\nEND OF PROGRAM\n";
 return 0;

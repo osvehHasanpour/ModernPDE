@@ -13,7 +13,11 @@ enum class InstType
     Div,
     Call,
     Branch,
-    Return
+    Return,
+    Alloc,
+    Copy,
+    FieldStore,
+    FieldLoad
 };
 
 struct Instruction
