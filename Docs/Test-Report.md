@@ -157,17 +157,6 @@ Compiling `tinyexpr.c` directly with `g++` fails due to C++/C `const`/`void*` st
 
 ---
 
-## Files Intentionally Left Untouched
-
-| File | Reason |
-|------|--------|
-| `src/IR.cpp` | **Empty** — per project rule, empty files are not filled in even if tests reference IR helpers |
-| `include/SCCP.H` | Header-only stub; no `.cpp` implementation exists |
-| `src/ModernPDE.cpp` | Stub placeholders (`std::cout` only); not covered by automated tests |
-| `tests/Benchmark.cpp` | Incomplete fragment; not a valid test target |
-
----
-
 ## Proposed New Test Files (implemented)
 
 All previously proposed test files are now implemented and registered in `tests/CMakeLists.txt`:
