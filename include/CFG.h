@@ -40,6 +40,8 @@ public:
 
     std::size_t size() const;
 
+    std::size_t edgeCount() const;
+
 private:
 
     std::vector<BasicBlock> blocks;

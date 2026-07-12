@@ -75,6 +75,22 @@ modernpde_test_executable(
 )
 modernpde_add_test(cfg_path_test)
 
+modernpde_test_executable(
+    cfg_phase5_test
+    cfg_phase5_test.cpp
+    ${MODERNPDE_SRC}/Lexer.cpp
+    ${MODERNPDE_SRC}/Parser.cpp
+    ${MODERNPDE_SRC}/CFGBuilder.cpp
+    ${MODERNPDE_SRC}/CFG.cpp
+    ${MODERNPDE_SRC}/DUChain.cpp
+    ${MODERNPDE_SRC}/PathEnumeration.cpp
+    ${MODERNPDE_SRC}/CFGValidation.cpp
+    ${MODERNPDE_SRC}/CFGStatistics.cpp
+    ${MODERNPDE_SRC}/CFGPDE.cpp
+    ${MODERNPDE_SRC}/PDE.cpp
+)
+modernpde_add_test(cfg_phase5_test)
+
 # ---------------------------------------------------------------------------
 # Existing challenge / integration tests
 # ---------------------------------------------------------------------------
