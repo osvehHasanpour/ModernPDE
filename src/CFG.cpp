@@ -25,6 +25,14 @@ void CFG::addEdge(
         return;
     }
 
+    for(int succ : blocks[from].succs)
+    {
+        if(succ == to)
+        {
+            return;
+        }
+    }
+
     blocks[from]
         .succs
         .push_back(to);
@@ -74,6 +82,18 @@ CFG::getBlocks() const
 std::size_t CFG::size() const
 {
     return blocks.size();
+}
+
+std::size_t CFG::edgeCount() const
+{
+    std::size_t count = 0;
+
+    for(const auto& block : blocks)
+    {
+        count += block.succs.size();
+    }
+
+    return count;
 }
 
 void CFG::print() const

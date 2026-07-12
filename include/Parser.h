@@ -21,7 +21,11 @@ enum class ASTNodeType
 
     IfStatement,
     WhileStatement,
+    DoWhileStatement,
     ForStatement,
+    SwitchStatement,
+    BreakStatement,
+    ContinueStatement,
     ReturnStatement,
 
     Expression,
@@ -34,6 +38,8 @@ struct ASTNode
     ASTNodeType type;
 
     std::string name;
+
+    int line = 0;
 
     std::vector<ASTNode*> children;
 
@@ -88,17 +94,42 @@ private:
     void parseVariable(
         const std::string& name);
 
-    void parseCompound();
+    void parseCompound(
+        ASTNode* compound);
 
-    void parseStatement();
+    ASTNode* parseStatement();
 
-    void parseIf();
+    ASTNode* parseIfStatement();
 
-    void parseWhile();
+    ASTNode* parseWhileStatement();
 
-    void parseFor();
+    ASTNode* parseDoWhileStatement();
 
-    void parseReturn();
+    ASTNode* parseForStatement();
+
+    ASTNode* parseSwitchStatement();
+
+    ASTNode* parseBreakStatement();
+
+    ASTNode* parseContinueStatement();
+
+    ASTNode* parseReturnStatement();
+
+    ASTNode* parseCompoundStatement();
+
+    ASTNode* parseLocalDeclaration();
+
+    ASTNode* parseExpressionStatement();
+
+    std::string collectBalanced(
+        char open,
+        char close);
+
+    std::string collectUntilSemicolon();
+
+    void skipStatement();
+
+    void skipCaseLabel();
 
 private:
 

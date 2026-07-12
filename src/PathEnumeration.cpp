@@ -7,26 +7,54 @@ std::size_t PathEnumeration::pathCount() const
     return paths.size();
 }
 
+const std::vector<
+    std::vector<int>>&
+PathEnumeration::getPaths() const
+{
+    return paths;
+}
+
+std::size_t PathEnumeration::backEdgeCount() const
+{
+    return backEdgeCount_;
+}
+
 void PathEnumeration::enumerate(
     const CFG& cfg,
     int startBlock)
 {
     paths.clear();
+    backEdgeCount_ = 0;
+
+    if(!cfg.hasBlock(startBlock))
+    {
+        return;
+    }
 
     std::vector<int> currentPath;
+    std::unordered_set<int> onPath;
 
     dfs(
         cfg,
         startBlock,
-        currentPath);
+        currentPath,
+        onPath);
 }
 
 void PathEnumeration::dfs(
     const CFG& cfg,
     int current,
-    std::vector<int>& currentPath)
+    std::vector<int>& currentPath,
+    std::unordered_set<int>& onPath)
 {
+    if(onPath.count(current) != 0)
+    {
+        backEdgeCount_++;
+        return;
+    }
+
     currentPath.push_back(current);
+    onPath.insert(current);
 
     const BasicBlock* block =
         cfg.getBlock(current);
@@ -34,27 +62,28 @@ void PathEnumeration::dfs(
     if(block == nullptr)
     {
         currentPath.pop_back();
+        onPath.erase(current);
         return;
     }
 
     if(block->succs.empty())
     {
-        paths.push_back(
-            currentPath);
-
-        currentPath.pop_back();
-        return;
+        paths.push_back(currentPath);
     }
-
-    for(int next : block->succs)
+    else
     {
-        dfs(
-            cfg,
-            next,
-            currentPath);
+        for(int next : block->succs)
+        {
+            dfs(
+                cfg,
+                next,
+                currentPath,
+                onPath);
+        }
     }
 
     currentPath.pop_back();
+    onPath.erase(current);
 }
 
 void PathEnumeration::print() const
@@ -67,6 +96,16 @@ void PathEnumeration::print() const
 
     std::cout
     << "====================\n";
+
+    std::cout
+    << "Paths      : "
+    << paths.size()
+    << "\n";
+
+    std::cout
+    << "Back edges : "
+    << backEdgeCount_
+    << "\n";
 
     int index = 1;
 

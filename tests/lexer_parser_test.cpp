@@ -87,7 +87,7 @@ int main()
         { "tests/cfg.cpp",               1 },
         { "tests/oop.cpp",               1 },
         { "tests/partial.cpp",           1 },
-        { "tests/recursion.cpp",         1 },
+        { "tests/recursion.cpp",         2 },
         { "tests/template.cpp",          1 },
         { "tests/mutual_recursive.cpp",  3 },
     };

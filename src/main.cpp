@@ -15,6 +15,8 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "CFGBuilder.h"
+#include "CFGValidation.h"
+#include "CFGStatistics.h"
 #include "FieldSensitiveAnalysis.h"
 #include "IR.h"
 using namespace ModernPDE;
@@ -312,19 +314,43 @@ std::cout
 CFGBuilder builder;
 
 CFG cfg =
-builder.build(parser.getRoot());
-std::cout << "\nCFG Statistics\n";
-std::cout << "Blocks : " << cfg.size() << "\n";
+    builder.build(parser.getRoot());
 
-int edgeCount = 0;
-for (const auto& b : cfg.getBlocks())
-    edgeCount += b.succs.size();
+std::vector<CFGFunctionBounds> fnBounds;
 
-std::cout << "Edges  : " << edgeCount << "\n";
+for(const auto& function : builder.functions())
+{
+    CFGFunctionBounds bounds;
+    bounds.name       = function.name;
+    bounds.entryBlock = function.entryBlock;
+    bounds.exitBlock  = function.exitBlock;
+    fnBounds.push_back(bounds);
+}
+
+PathEnumeration pe;
+
+pe.enumerate(
+    cfg,
+    builder.entryBlock());
+
+CFGStatistics::Stats stats =
+    CFGStatistics::compute(
+        cfg,
+        builder.entryBlock(),
+        pe.pathCount());
+
+CFGStatistics::print(stats);
+
+auto fnStats =
+    CFGStatistics::computePerFunction(
+        cfg,
+        fnBounds,
+        pe);
+
+CFGStatistics::printPerFunction(fnStats);
 
 cfg.print();
 
-std::cout << "\n";
 std::cout
 << "\n====================================\n";
 std::cout
@@ -332,66 +358,17 @@ std::cout
 std::cout
 << "====================================\n";
 
-int blockCount = cfg.size();
+CFGValidation::Report validation =
+    CFGValidation::validate(
+        cfg,
+        builder.entryBlock(),
+        fnBounds);
 
-int isolatedBlocks = 0;
-int entryBlocks = 0;
-int exitBlocks = 0;
+CFGValidation::print(validation);
 
-for(const auto& block : cfg.getBlocks())
-{
-    edgeCount += block.succs.size();
-
-    if(block.preds.empty())
-        entryBlocks++;
-
-    if(block.succs.empty())
-        exitBlocks++;
-
-    if(block.preds.empty() &&
-       block.succs.empty())
-        isolatedBlocks++;
-}
-
-std::cout
-<< "Functions Parsed      : "
-<< parser.functionCount()
-<< "\n";
-
-std::cout
-<< "CFG Blocks            : "
-<< blockCount
-<< "\n";
-
-std::cout
-<< "CFG Edges             : "
-<< edgeCount
-<< "\n";
-
-std::cout
-<< "Entry Blocks          : "
-<< entryBlocks
-<< "\n";
-
-std::cout
-<< "Exit Blocks           : "
-<< exitBlocks
-<< "\n";
-
-std::cout
-<< "Isolated Blocks       : "
-<< isolatedBlocks
-<< "\n";
-
-std::cout
-<< "Connectivity          : ";
-
-if(isolatedBlocks==0)
-    std::cout<<"PASS\n";
-else
-    std::cout<<"WARNING\n";
 std::cout
 << "\nCFG BLOCK LIST\n";
+
 for(const auto& block : cfg.getBlocks())
 {
     std::cout
@@ -403,7 +380,9 @@ for(const auto& block : cfg.getBlocks())
     << "  Preds : ";
 
     for(auto p : block.preds)
+    {
         std::cout << p << " ";
+    }
 
     std::cout << "\n";
 
@@ -411,7 +390,9 @@ for(const auto& block : cfg.getBlocks())
     << "  Succs : ";
 
     for(auto s : block.succs)
+    {
         std::cout << s << " ";
+    }
 
     std::cout << "\n";
 
@@ -420,26 +401,6 @@ for(const auto& block : cfg.getBlocks())
     << block.instructions.size()
     << "\n\n";
 }
-std::cout
-<< "CFG SANITY CHECK\n";
-
-bool ok=true;
-
-for(const auto& b:cfg.getBlocks())
-{
-    for(auto s:b.succs)
-    {
-        if(!cfg.hasBlock(s))
-        {
-            ok=false;
-        }
-    }
-}
-
-if(ok)
-    std::cout<<"PASS : All edges valid\n";
-else
-    std::cout<<"FAIL : Broken edge found\n";
 
 /////////////////////////////////////////////////////
 // PHASE 1
@@ -737,36 +698,16 @@ std::cout
 std::cout
 << "====================================\n";
 
+std::cout
+<< "Entry block : "
+<< builder.entryBlock()
+<< "\n";
 
-int start =
-    cfg.createBlock();
+std::cout
+<< "Exit block  : "
+<< builder.exitBlock()
+<< "\n";
 
-int thenBlock =
-    cfg.createBlock();
-
-int elseBlock =
-    cfg.createBlock();
-
-int mergeBlock =
-    cfg.createBlock();
-
-cfg.addEdge(
-    start,
-    thenBlock);
-
-cfg.addEdge(
-    start,
-    elseBlock);
-
-cfg.addEdge(
-    thenBlock,
-    mergeBlock);
-
-cfg.addEdge(
-    elseBlock,
-    mergeBlock);
-
-cfg.print();
 /////////////////////////////////////////////////////
 // PHASE 5 : DU CHAINS
 /////////////////////////////////////////////////////
@@ -782,19 +723,9 @@ std::cout
 
 DUChainAnalysis du;
 
-du.addDefinition("x",1);
-du.addUse("x",2);
-
-du.addDefinition("x",3);
-du.addUse("x",4);
-
-du.addDefinition("y",5);
-du.addUse("y",6);
-
-du.addDefinition("z",7);
-du.addUse("z",10);
-
-du.buildChains();
+du.buildFromCFG(
+    cfg,
+    builder.blockStatements());
 
 du.print();
 
@@ -810,10 +741,6 @@ std::cout
 
 std::cout
 << "====================================\n";
-
-PathEnumeration pe;
-
-pe.enumerate(cfg,0);
 
 pe.print();
 /////////////////////////////////////////////////////
@@ -831,29 +758,11 @@ std::cout
 
 CFGPDE integrated;
 
-// variable used on all paths
-integrated.registerVariable(
-    "playerHealth",
-    2,
-    2);
-
-// variable used only one path
-integrated.registerVariable(
-    "bonusDamage",
-    2,
-    1);
-
-// variable never used
-integrated.registerVariable(
-    "unusedTemp",
-    2,
-    0);
-
-// bigger example
-integrated.registerVariable(
-    "questReward",
-    10,
-    7);
+integrated.analyzeFromCFG(
+    cfg,
+    pe,
+    du,
+    builder.entryBlock());
 
 integrated.analyze();
 std::cout
