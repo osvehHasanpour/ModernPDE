@@ -8,12 +8,16 @@
  *   "uses/paths" → tinyexpr evaluates → PDE classifies → assert
  *
  * Build (from ModernPDE root):
- *   g++ -std=c++17 -I include -I ../tinyexpr-master \
- *       tests/tinyexpr_pde_test.cpp \
- *       src/PDE.cpp src/Metrics.cpp \
- *       ../tinyexpr-master/tinyexpr.c \
- *       -lm -o tinyexpr_pde_test
+ *   gcc  -O2 -c ../tinyexpr-master/tinyexpr.c -o build/tinyexpr.o
+ *   g++  -std=c++17 -O2 \
+ *        -I include -I ../tinyexpr-master \
+ *        tests/tinyexpr_pde_test.cpp \
+ *        src/PDE.cpp src/Metrics.cpp \
+ *        build/tinyexpr.o -lm -o tinyexpr_pde_test
  *   ./tinyexpr_pde_test
+ *
+ * Note: compile tinyexpr.c with gcc (C), not g++. CMake builds it
+ *       automatically via tests/CMakeLists.txt when tinyexpr is present.
  */
 
 #include "PDE.h"

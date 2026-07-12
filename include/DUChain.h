@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -37,6 +38,8 @@ public:
     void buildChains();
 
     void print();
+
+    std::size_t chainCount() const;
 
 private:
 

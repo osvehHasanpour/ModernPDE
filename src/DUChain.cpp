@@ -84,3 +84,8 @@ void DUChainAnalysis::print()
         << ")\n";
     }
 }
+
+std::size_t DUChainAnalysis::chainCount() const
+{
+    return chains.size();
+}

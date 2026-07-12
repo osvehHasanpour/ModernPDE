@@ -13,3 +13,6 @@ file(GLOB SOURCES
 add_executable(ModernPDE
     ${SOURCES}
 )
+
+enable_testing()
+add_subdirectory(tests)
