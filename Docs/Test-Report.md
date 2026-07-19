@@ -175,17 +175,7 @@ Checks function count and `cfg.size() > 0`.
 
 ---
 
-## Running the Main Binary on Samples
-
-After building:
-
-```bash
-# Full pipeline on a control-flow sample
-./build/ModernPDE tests/cfg_while.cpp
-
-# Phase 6 only
-./build/ModernPDE --field-sensitive
-```
+## Proposed New Test Files (implemented)
 
 ---
 
