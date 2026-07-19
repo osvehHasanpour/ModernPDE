@@ -59,6 +59,25 @@ modernpde_test_executable(
 modernpde_add_test(callgraph_test)
 
 modernpde_test_executable(
+    interprocedural_dataflow_test
+    interprocedural_dataflow_test.cpp
+    ${MODERNPDE_SRC}/CallGraph.cpp
+    ${MODERNPDE_SRC}/InterproceduralDataFlow.cpp
+)
+modernpde_add_test(interprocedural_dataflow_test)
+
+modernpde_test_executable(
+    test_interprocedural
+    test_interprocedural.cpp
+    ${MODERNPDE_SRC}/CFG.cpp
+    ${MODERNPDE_SRC}/CallGraph.cpp
+    ${MODERNPDE_SRC}/DUChain.cpp
+    ${MODERNPDE_SRC}/FieldSensitiveAnalysis.cpp
+    ${MODERNPDE_SRC}/InterproceduralDataFlow.cpp
+)
+modernpde_add_test(test_interprocedural)
+
+modernpde_test_executable(
     cha_virtual_test
     cha_virtual_test.cpp
     ${MODERNPDE_SRC}/ClassHierarchy.cpp

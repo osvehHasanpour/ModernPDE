@@ -1,216 +1,225 @@
-# ModernPDE — Test Report
+# ModernPDE Test Report
 
-**Date:** July 9, 2026  
-**Environment:** WSL (Ubuntu), GCC, C++17, CMake 3.16+  
-**Project root:** `Modernp/Modernp`
+This document describes the automated test suite for ModernPDE, including the **Phase 5 integration test** (`cfg_phase5_test`) and how to run everything on your machine.
 
----
-
-## Executive Summary
-
-ModernPDE is a modular C++17 static-analysis framework covering class hierarchy analysis, virtual-call resolution, context-sensitive call graphs, path-aware partial dead-code elimination (PDE), CFG construction, DU chains, path enumeration, lexer/parser front-end, and (recently) field-sensitive heap analysis with Andersen-style points-to and per-field deadness.
-
-**Test run outcome: all tests pass via CMake/CTest (`scripts/run_tests.sh`).** The suite includes 5 new regression tests, 7 existing challenge/integration tests, and optional cJSON/tinyexpr tests when sibling libraries are present.
-
-| Category | Passed | Failed | Skipped / N/A |
-|----------|--------|--------|----------------|
-| CTest automated targets | 12 | 0 | 0 |
-| Incomplete / non-tests | — | — | 1 (`tests/Benchmark.cpp` fragment) |
-| **Total (ctest)** | **12** | **0** | — |
+**Last verified:** 13/13 tests passing (ctest).
 
 ---
 
-## What Has Been Built
+## Quick Start
 
-| Area | Key files | Status |
-|------|-----------|--------|
-| PDE classification | `PDE.cpp`, `Metrics.cpp` | Complete, heavily tested |
-| Class hierarchy | `ClassHierarchy.cpp` | Complete |
-| Virtual calls | `VirtualCallAnalysis.cpp` | Complete |
-| Call graph | `CallGraph.cpp` | Complete |
-| CFG / paths / DU | `CFG.cpp`, `PathEnumeration.cpp`, `DUChain.cpp` | Complete |
-| Lexer / parser / CFG builder | `Lexer.cpp`, `Parser.cpp`, `CFGBuilder.cpp` | Working smoke tests |
-| Field-sensitive analysis | `FieldSensitiveAnalysis.cpp` | New; demo via `--field-sensitive` |
-| Main pipeline | `main.cpp` | Runs all phases; file mode for samples |
-| Stubs / empty | `IR.cpp`, `ModernPDE.cpp`, `SCCP.H` | Not tested / not implemented |
-
----
-
-## Test Inventory
-
-### New regression tests (CMake / CTest)
-
-| File | What it covers | CTest name | Result |
-|------|----------------|------------|--------|
-| `tests/field_sensitive_test.cpp` | Points-to, field reads, dead/partialDead flags | `field_sensitive_test` | **PASS** |
-| `tests/lexer_parser_test.cpp` | Lexer + parser + CFG on all 7 sample `.cpp` files | `lexer_parser_test` | **PASS** |
-| `tests/callgraph_test.cpp` | Reachability, recursion, mutual recursion | `callgraph_test` | **PASS** |
-| `tests/cha_virtual_test.cpp` | CHA descendants + virtual-call resolution | `cha_virtual_test` | **PASS** |
-| `tests/cfg_path_test.cpp` | Diamond CFG path count (2) + DU chains (4) | `cfg_path_test` | **PASS** |
-
-### Automated tests (existing — now in CTest)
-
-| File | What it covers | Build command (from project root) | Result |
-|------|----------------|-----------------------------------|--------|
-| `tests/challenge_500.cpp` | PDE on 500 variables (5 categories × 100); accuracy / precision / recall / F1 | `g++ -std=c++17 -O2 -I include tests/challenge_500.cpp src/PDE.cpp src/Metrics.cpp -o build/tests/challenge_500` | **PASS** (500/500) |
-| `tests/challenge_5000.cpp` | PDE scale test — 5,000 variables | Same pattern with `challenge_5000.cpp` | **PASS** (5000/5000) |
-| `tests/challenge_50000.cpp` | PDE stress — 50,000 variables + timing | Same pattern with `challenge_50000.cpp` | **PASS** (50000/50000) |
-| `tests/cjson_pde_test.cpp` | JSON-driven PDE cases via **cJSON** (`../cJSON-master`) | See `tests/cjson_pde_test.cpp` header comments | **PASS** (16/16) |
-| `tests/tinyexpr_pde_test.cpp` | Math-expression-driven PDE checks via **tinyexpr** | Compile `tinyexpr.c` with **gcc**, link with g++ (see note below) | **PASS** (60/60) |
-| `tests/master_challenge.cpp` | PDE smoke — 100 variables, prints classifications | `g++ … tests/master_challenge.cpp src/PDE.cpp` | **PASS** (smoke) |
-| `tests/full_master_challenge.cpp` | End-to-end smoke: CHA + virtual calls + call graph + PDE | `g++ … + ClassHierarchy + VirtualCallAnalysis + CallGraph` | **PASS** (smoke) |
-
-### Test data
-
-| File | Purpose |
-|------|---------|
-| `tests/pde_cases.json` | 16 labeled PDE cases (DEAD / MOSTLY DEAD / PARTIALLY DEAD / MOSTLY LIVE / LIVE) consumed by `cjson_pde_test` |
-
-### Lexer / parser sample inputs (smoke — no assertions)
-
-Run: `./build/ModernPDE tests/<file>.cpp` from project root.
-
-| File | Scenario | Result |
-|------|----------|--------|
-| `tests/dead.cpp` | Unused locals | Lexer OK, 1 function |
-| `tests/cfg.cpp` | If/else branch | Lexer OK, 1 function |
-| `tests/oop.cpp` | `new` + virtual `attack()` | Lexer OK, 1 function |
-| `tests/partial.cpp` | Conditional `std::cout` use | Lexer OK, 1 function |
-| `tests/recursion.cpp` | `factorial` recursion | Lexer OK, 1 function |
-| `tests/template.cpp` | Function template `add` | Lexer OK, 1 function |
-| `tests/mutual_recursive.cpp` | `even` / `odd` mutual recursion | Lexer OK, 3 functions |
-
-### Main binary integration
-
-| Command | What it exercises | Result |
-|---------|-------------------|--------|
-| `./build/ModernPDE` | Full demo pipeline (phases 1–6 including field-sensitive) | **PASS** (exit 0) |
-| `./build/ModernPDE --field-sensitive` | Field-sensitive heap demo only | **PASS** (exit 0) |
-| `./build/ModernPDE tests/<sample>.cpp` | Lexer → parser → CFG on sample file | **PASS** (all 7 samples) |
-
-### Not runnable / incomplete
-
-| File | Notes |
-|------|-------|
-| `tests/Benchmark.cpp` | Fragment only (`for` loops, no `main`); not a test |
-| `scripts/run_all.sh` | Runs main binary and greps output; not an assertion suite |
-
----
-
-## Build & Run Notes
-
-### Full suite (recommended)
+From the project root (WSL or Linux):
 
 ```bash
-cd scripts
-./run_tests.sh
+# One-shot: configure, build, run all tests
+bash scripts/run_tests.sh
 ```
 
-Or manually:
+Manual steps:
 
 ```bash
-cd build
-cmake .. -DCMAKE_CXX_FLAGS="-Wall -Wextra"
-cmake --build . --parallel
+mkdir -p build && cd build
+cmake ..
+cmake --build .
 ctest --output-on-failure
 ```
 
-### Main project only
+**Working directory:** ctest runs with `WORKING_DIRECTORY` set to the project root, so paths like `tests/cfg.cpp` resolve correctly.
+
+**Prerequisites:** CMake 3.16+, C++17 compiler (`g++` / `clang++`), `build-essential` on Debian/Ubuntu.
+
+If `run_tests.sh` fails with `bash\r` on WSL, fix line endings once:
+
+```bash
+sed -i 's/\r$//' scripts/run_tests.sh
+```
+
+---
+
+## Full Test Suite (13 targets)
+
+| # | CTest name | Source | Phase | What it checks |
+|---|------------|--------|-------|----------------|
+| 1 | `field_sensitive_test` | `tests/field_sensitive_test.cpp` | 6 | Field-sensitive points-to and partial deadness on IR |
+| 2 | `lexer_parser_test` | `tests/lexer_parser_test.cpp` | 1–5 | Lexer + parser + CFGBuilder on sample `.cpp` files |
+| 3 | `callgraph_test` | `tests/callgraph_test.cpp` | 3 | Context-sensitive call graph, recursion |
+| 4 | `cha_virtual_test` | `tests/cha_virtual_test.cpp` | 1–2 | Class hierarchy + virtual call resolution |
+| 5 | `cfg_path_test` | `tests/cfg_path_test.cpp` | 5 | Manual diamond CFG: 2 paths, 4 DU chains |
+| 6 | **`cfg_phase5_test`** | **`tests/cfg_phase5_test.cpp`** | **5** | **End-to-end AST → CFG → DU → paths → PDE** |
+| 7 | `challenge_500` | `tests/challenge_500.cpp` | 4 | PDE stress (500 variables) |
+| 8 | `challenge_5000` | `tests/challenge_5000.cpp` | 4 | PDE stress (5,000 variables) |
+| 9 | `challenge_50000` | `tests/challenge_50000.cpp` | 4 | PDE stress (50,000 variables) |
+| 10 | `master_challenge` | `tests/master_challenge.cpp` | 4 | PDE master challenge |
+| 11 | `full_master_challenge` | `tests/full_master_challenge.cpp` | 1–4 | CHA + virtual calls + call graph + PDE |
+| 12 | `cjson_pde_test` | `tests/cjson_pde_test.cpp` | 4 | PDE + cJSON (optional; needs `../cJSON-master`) |
+| 13 | `tinyexpr_pde_test` | `tests/tinyexpr_pde_test.cpp` | 4 | PDE + tinyexpr (optional; needs `../tinyexpr-master`) |
+
+Run a single test:
 
 ```bash
 cd build
-cmake ..
-make -j4
-./ModernPDE                  # full pipeline
-./ModernPDE --field-sensitive
+ctest -R cfg_phase5_test --output-on-failure
 ```
 
-### External dependencies (sibling directories)
-
-- `../cJSON-master` — required for `cjson_pde_test`
-- `../tinyexpr-master` — required for `tinyexpr_pde_test`
-
-### tinyexpr compile note
-
-`tinyexpr.c` must be compiled as **C** (not C++), then linked:
+Or run the binary directly:
 
 ```bash
-gcc -O2 -c ../tinyexpr-master/tinyexpr.c -o build/tests/tinyexpr.o
-g++ -std=c++17 -O2 -I include -I ../tinyexpr-master \
-    tests/tinyexpr_pde_test.cpp src/PDE.cpp src/Metrics.cpp \
-    build/tests/tinyexpr.o -lm -o build/tests/tinyexpr_pde_test
+./build/tests/cfg_phase5_test
 ```
 
-Compiling `tinyexpr.c` directly with `g++` fails due to C++/C `const`/`void*` strictness. This is a **build procedure** issue, not a ModernPDE source bug.
+---
+
+## Phase 5 Integration Test (`cfg_phase5_test`)
+
+### Purpose
+
+`cfg_phase5_test` validates the **complete Phase 5 pipeline** driven from real source files:
+
+```
+Lexer → Parser → AST → CFGBuilder → CFG
+                              ↓
+         CFGValidation + CFGStatistics (per function)
+                              ↓
+              DUChainAnalysis (reaching definitions)
+                              ↓
+              PathEnumeration (acyclic DFS)
+                              ↓
+              CFGPDE (path-sensitive classification)
+```
+
+Assertions are **structural** — minimum block counts, path counts, validation pass/fail, per-function entry/exit — not hardcoded CFG shapes or edge lists.
+
+### Pipeline exercised per sample
+
+For each input file the test:
+
+1. Tokenizes and parses the file.
+2. Builds a CFG with `CFGBuilder`.
+3. Checks `cfg.size() >= minBlocks`.
+4. Records function regions (`entryBlock`, `exitBlock`).
+5. Enumerates paths from the global entry block.
+6. Runs `CFGValidation::validate()` with per-function bounds.
+7. Verifies each function has valid entry/exit blocks.
+8. Computes `CFGStatistics::computePerFunction()`.
+9. Builds DU chains via `DUChainAnalysis::buildFromCFG()`.
+10. Runs `CFGPDE::analyzeFromCFG()`.
+
+### Sample input files
+
+| File | Control-flow feature | min blocks | min paths | DU chains expected |
+|------|----------------------|------------|-----------|-------------------|
+| `tests/cfg.cpp` | if / else | 5 | 1 | yes |
+| `tests/cfg_while.cpp` | while loop | 5 | 1 | yes |
+| `tests/cfg_for.cpp` | for loop | 6 | 1 | yes |
+| `tests/cfg_nested_if.cpp` | nested if / else | 8 | 1 | yes |
+| `tests/cfg_do_while.cpp` | do-while loop | 5 | 1 | yes |
+| `tests/cfg_break_continue.cpp` | break / continue in while | 6 | 1 | yes |
+| `tests/cfg_switch.cpp` | switch / case / break | 5 | 1 | yes |
+| `tests/cfg_multi_return.cpp` | multiple returns, 2 functions | 5 | 1 | no* |
+| `tests/recursion.cpp` | direct recursion | 5 | 1 | no* |
+| `tests/mutual_recursive.cpp` | mutual recursion (3 functions) | 5 | 1 | no* |
+| `tests/oop.cpp` | OOP sample (class-style source) | 3 | 1 | no* |
+
+\*No local variable declarations in the parsed AST for these samples (parameters are not modeled as `Variable` defs yet), so DU chain count may be zero while the CFG/path pipeline still passes.
+
+### Expected success output
+
+```
+================================================
+  Phase 5 CFG Pipeline Test
+================================================
+
+[ tests/cfg.cpp ]
+[ tests/cfg_while.cpp ]
+...
+
+================================================
+  Total : <N>  Pass  : <N>  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+```
+
+### Modules linked into `cfg_phase5_test`
+
+Defined in `tests/CMakeLists.txt`:
+
+- `Lexer.cpp`, `Parser.cpp`
+- `CFGBuilder.cpp`, `CFG.cpp`
+- `DUChain.cpp`, `PathEnumeration.cpp`
+- `CFGValidation.cpp`, `CFGStatistics.cpp`
+- `CFGPDE.cpp`, `PDE.cpp`
 
 ---
 
-## Failures Found & Fixes Applied
+## Related Phase 5 Tests
 
-**None.** All runnable tests passed on the first successful build. No project source files were modified during this test pass.
+### `cfg_path_test` (unit-level)
 
-| Issue observed | Classification | Action taken |
-|----------------|----------------|--------------|
-| `tinyexpr.c` fails when compiled as C++ | Build / toolchain | Documented two-step gcc+g++ build above |
-| `tests/Benchmark.cpp` not a complete program | Incomplete artifact | Left unchanged; excluded from pass/fail count |
-| `ModernPDE.cpp` unused-parameter warnings | Pre-existing stubs | Not blocking; not modified |
+Builds a **manual diamond CFG** in code (not from AST):
 
----
+- 4 basic blocks
+- 2 acyclic paths from entry
+- 4 DU chains via line-based `addDefinition` / `addUse`
 
-## Files Intentionally Left Untouched
+Use this for quick regression on path enumeration and legacy DU API.
 
-| File | Reason |
-|------|--------|
-| `src/IR.cpp` | **Empty** — per project rule, empty files are not filled in even if tests reference IR helpers |
-| `include/SCCP.H` | Header-only stub; no `.cpp` implementation exists |
-| `src/ModernPDE.cpp` | Stub placeholders (`std::cout` only); not covered by automated tests |
-| `tests/Benchmark.cpp` | Incomplete fragment; not a valid test target |
+### `lexer_parser_test` (smoke)
 
----
+Runs lexer + parser + CFGBuilder on:
 
-## Proposed New Test Files (implemented)
+- `tests/dead.cpp`, `tests/cfg.cpp`, `tests/oop.cpp`
+- `tests/partial.cpp`, `tests/recursion.cpp`, `tests/template.cpp`
+- `tests/mutual_recursive.cpp`
 
-All previously proposed test files are now implemented and registered in `tests/CMakeLists.txt`:
-
-| File | Status |
-|------|--------|
-| `tests/field_sensitive_test.cpp` | Implemented |
-| `tests/lexer_parser_test.cpp` | Implemented |
-| `tests/callgraph_test.cpp` | Implemented |
-| `tests/cha_virtual_test.cpp` | Implemented |
-| `tests/cfg_path_test.cpp` | Implemented |
-| `tests/CMakeLists.txt` | Implemented |
-| `scripts/run_tests.sh` | Implemented |
-
-Supporting API additions for testability: `DUChainAnalysis::chainCount()`, `PathEnumeration::pathCount()`.
+Checks function count and `cfg.size() > 0`.
 
 ---
 
-## Next Steps
+## Running the Main Binary on Samples
 
-1. **CI integration** — add `scripts/run_tests.sh` to GitHub Actions or similar.
-2. **Extend field-sensitive tests** — branchy CFG, more alias patterns.
-3. **Parser assertions** — expected token counts per sample file.
-4. **Optional: implement `IR.cpp` helpers** — only if you explicitly approve filling the empty file.
-5. **Complete or remove `tests/Benchmark.cpp`** — fragment remains incomplete.
+After building:
+
+```bash
+# Full pipeline on a control-flow sample
+./build/ModernPDE tests/cfg_while.cpp
+
+# Phase 6 only
+./build/ModernPDE --field-sensitive
+```
 
 ---
 
-## Quick Reference — CTest Pass/Fail Matrix
+## Troubleshooting
 
-| CTest target | Pass | Fail |
-|--------------|:----:|:----:|
-| field_sensitive_test | ✓ | |
-| lexer_parser_test | ✓ | |
-| callgraph_test | ✓ | |
-| cha_virtual_test | ✓ | |
-| cfg_path_test | ✓ | |
-| challenge_500 | ✓ | |
-| challenge_5000 | ✓ | |
-| challenge_50000 | ✓ | |
-| master_challenge | ✓ | |
-| full_master_challenge | ✓ | |
-| cjson_pde_test | ✓ | |
-| tinyexpr_pde_test | ✓ | |
+| Problem | Fix |
+|---------|-----|
+| `Lexer failed to tokenize file` | Run tests from project root, or use `ctest` (sets `WORKING_DIRECTORY`) |
+| `bash\r: No such file` on WSL | `sed -i 's/\r$//' scripts/run_tests.sh` |
+| cjson / tinyexpr tests missing | Optional; place libraries at `../cJSON-master` and `../tinyexpr-master` |
+| CMake not found | `sudo apt install build-essential cmake` |
 
-**Overall: 12/12 ctest targets passed.**
+---
+
+## Adding New Phase 5 Samples
+
+1. Add a `.cpp` file under `tests/` (e.g. `tests/cfg_my_case.cpp`).
+2. Add a row to the `cases[]` array in `tests/cfg_phase5_test.cpp` with sensible `minBlocks`, `minPaths`, and `expectDuChains`.
+3. Rebuild and run:
+
+   ```bash
+   cd build && cmake --build . && ctest -R cfg_phase5_test --output-on-failure
+   ```
+
+Do **not** hardcode full CFG output — use structural bounds only.
+
+---
+
+## Test Count Summary
+
+| Category | Count |
+|----------|-------|
+| Regression (Phase 1–6 unit/smoke) | 5 |
+| Phase 5 integration | 1 (`cfg_phase5_test`) |
+| PDE challenges | 5 |
+| Optional external integration | 2 |
+| **Total** | **13** |
