@@ -31,6 +31,25 @@ function(modernpde_add_test TARGET)
 endfunction()
 
 # ---------------------------------------------------------------------------
+# Phase 8 Tests
+# ---------------------------------------------------------------------------
+
+modernpde_test_executable(
+    phase8_test
+    phase8_test.cpp
+    ${MODERNPDE_SRC}/Phase8Optimizer.cpp
+    ${MODERNPDE_SRC}/CFGCache.cpp
+    ${MODERNPDE_SRC}/DUAnalysisCache.cpp
+    ${MODERNPDE_SRC}/WorklistDataflow.cpp
+    ${MODERNPDE_SRC}/DominatorAnalysis.cpp
+    ${MODERNPDE_SRC}/PathEnumerationLazy.cpp
+    ${MODERNPDE_SRC}/CFG.cpp
+    ${MODERNPDE_SRC}/DUChain.cpp
+    ${MODERNPDE_SRC}/PDE.cpp
+)
+modernpde_add_test(phase8_test)
+
+# ---------------------------------------------------------------------------
 # New regression tests
 # ---------------------------------------------------------------------------
 
