@@ -48,11 +48,18 @@ private:
 
     const CFG* cfg = nullptr;
     std::vector<int> currentPath;
-    std::unordered_set<int> onPath;
+    // nextChildIdx[i] = index of the next not-yet-tried successor of currentPath[i].
+    // Kept alongside currentPath so that backtracking resumes where it left off
+    // instead of forgetting which siblings were already explored.
+    std::vector<std::size_t> nextChildIdx;
     bool done = true;
 
+    /// Advance the DFS to the next full root-to-leaf path.
+    /// If `backtrackFirst` is true, the current (already-emitted) leaf path
+    /// is popped before searching continues. Returns false once enumeration
+    /// is exhausted.
+    bool advance(bool backtrackFirst);
     void findNextPath();
-    void dfsNext(int current);
 };
 
 /// Lazy path enumeration: generates paths on-demand instead of enumerating all upfront

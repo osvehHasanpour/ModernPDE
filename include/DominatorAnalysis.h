@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CFG.h"
+#include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

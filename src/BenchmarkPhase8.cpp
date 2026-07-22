@@ -18,9 +18,9 @@ void BenchmarkPhase8::runComparison(
     const DUChainAnalysis& phase7Du,
     int variableCount)
 {
-    addReportLine("="*80);
+    addReportLine(std::string(80, '='));
     addReportLine("PHASE 8 OPTIMIZATION - COMPARATIVE BENCHMARK");
-    addReportLine("="*80);
+    addReportLine(std::string(80, '='));
     addReportLine("");
 
     // Phase 7 baseline
@@ -45,12 +45,12 @@ void BenchmarkPhase8::runComparison(
 
 void BenchmarkPhase8::runScalability()
 {
-    addReportLine("="*80);
+    addReportLine(std::string(80, '='));
     addReportLine("PHASE 8 SCALABILITY TEST");
-    addReportLine("="*80);
+    addReportLine(std::string(80, '='));
     addReportLine("");
     addReportLine("Variable Count | Phase 7 (ms) | Phase 8 (ms) | Speedup");
-    addReportLine("-" * 60);
+    addReportLine(std::string(60, '-'));
 
     std::vector<int> counts = {100, 500, 1000, 5000, 10000};
     for(int count : counts)

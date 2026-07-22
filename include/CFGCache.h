@@ -9,6 +9,17 @@
 namespace Phase8
 {
 
+/// Hash functor for pair<int,int> keys (std::hash has no built-in
+/// specialization for std::pair, so unordered_map needs this explicitly).
+struct PairIntHash
+{
+    std::size_t operator()(const std::pair<int, int>& p) const noexcept
+    {
+        return std::hash<long long>{}((static_cast<long long>(p.first) << 32) ^
+                                       static_cast<unsigned int>(p.second));
+    }
+};
+
 /// Result of a CFG traversal from a specific block
 struct TraversalResult
 {
@@ -71,7 +82,7 @@ private:
     std::unordered_map<int, TraversalResult> traversalCache;
     std::unordered_map<int, std::unordered_set<int>> predecessorClosures;
     std::unordered_map<int, std::unordered_set<int>> successorClosures;
-    std::unordered_map<std::pair<int, int>, bool, std::hash<std::pair<int, int>>> reachabilityCache;
+    std::unordered_map<std::pair<int, int>, bool, PairIntHash> reachabilityCache;
     std::unordered_set<int> invalidatedBlocks;
     mutable CacheStats stats;
 

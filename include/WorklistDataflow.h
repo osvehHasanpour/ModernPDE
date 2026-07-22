@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CFG.h"
+#include <cstdint>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>

@@ -40,6 +40,7 @@ echo "------"
 echo ""
 echo "Running Phase 8 Full Pipeline..."
 echo "------"
+mkdir -p ../results
 ./ModernPDE_Phase8 ../results/phase8_benchmark.txt
 
 echo ""

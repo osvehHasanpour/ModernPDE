@@ -1,5 +1,6 @@
 #include "PathEnumerationLazy.h"
 #include "Phase8Optimizer.h"
+#include <algorithm>
 #include <iostream>
 
 namespace Phase8
@@ -11,8 +12,11 @@ PathIterator::PathIterator(const CFG* cfg, int start)
     if(cfg && cfg->hasBlock(start))
     {
         currentPath.push_back(start);
-        onPath.insert(start);
-        findNextPath();
+        nextChildIdx.push_back(0);
+        if(!advance(/*backtrackFirst=*/false))
+        {
+            done = true;
+        }
     }
     else
     {
@@ -38,73 +42,74 @@ void PathIterator::findNextPath()
     if(done)
         return;
 
-    if(!cfg || currentPath.empty())
+    if(!advance(/*backtrackFirst=*/true))
     {
         done = true;
-        return;
+        currentPath.clear();
+        nextChildIdx.clear();
     }
+}
 
-    int current = currentPath.back();
-    const BasicBlock* block = cfg->getBlock(current);
+// Iterative DFS that always drives the path forward to a full root-to-leaf
+// path. `nextChildIdx` remembers, per level, which successor to try next,
+// so a level is never re-explored after backtracking through it (the
+// earlier onPath-based version lost that memory once a node was popped,
+// which made it re-walk the same branches forever). Successors already on
+// the current path are skipped to avoid looping forever on CFG back edges.
+bool PathIterator::advance(bool backtrackFirst)
+{
+    if(!cfg)
+        return false;
 
-    if(!block || block->succs.empty())
+    if(backtrackFirst)
     {
-        // Backtrack
-        bool foundBacktrack = false;
-        while(!currentPath.empty())
+        // We just emitted currentPath ending at a leaf; pop it and resume
+        // searching for the next path from its parent.
+        if(!currentPath.empty())
         {
-            int top = currentPath.back();
             currentPath.pop_back();
-            onPath.erase(top);
-
-            if(!currentPath.empty())
-            {
-                int pred = currentPath.back();
-                const BasicBlock* predBlock = cfg->getBlock(pred);
-                if(predBlock)
-                {
-                    for(int succ : predBlock->succs)
-                    {
-                        if(onPath.count(succ) == 0 && succ != top)
-                        {
-                            currentPath.push_back(succ);
-                            onPath.insert(succ);
-                            foundBacktrack = true;
-                            break;
-                        }
-                    }
-                }
-
-                if(foundBacktrack)
-                    break;
-            }
-        }
-
-        if(!foundBacktrack)
-        {
-            done = true;
+            nextChildIdx.pop_back();
         }
     }
-    else
+
+    while(!currentPath.empty())
     {
-        // Find next unvisited successor
-        bool found = false;
-        for(int succ : block->succs)
+        int node = currentPath.back();
+        const BasicBlock* block = cfg->getBlock(node);
+
+        if(!block || block->succs.empty())
         {
-            if(onPath.count(succ) == 0)
+            // Leaf: currentPath is a complete root-to-leaf path.
+            return true;
+        }
+
+        std::size_t& idx = nextChildIdx.back();
+        bool descended = false;
+        while(idx < block->succs.size())
+        {
+            int succ = block->succs[idx];
+            ++idx;
+
+            // Skip successors already on the path to avoid infinite loops
+            // on CFG back edges (cycles).
+            if(std::find(currentPath.begin(), currentPath.end(), succ) == currentPath.end())
             {
                 currentPath.push_back(succ);
-                onPath.insert(succ);
-                found = true;
+                nextChildIdx.push_back(0);
+                descended = true;
                 break;
             }
         }
 
-        if(!found)
+        if(!descended)
         {
-            findNextPath();  // Recurse to backtrack
+            // Exhausted every successor at this level; backtrack.
+            currentPath.pop_back();
+            nextChildIdx.pop_back();
         }
     }
+
+    return false; // Enumeration exhausted.
 }
 
 void PathEnumerationLazy::initialize(const CFG& cfg, int startBlock)
