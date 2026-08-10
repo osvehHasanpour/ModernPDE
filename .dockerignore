@@ -1,0 +1,16 @@
+build/
+.venv/
+results/
+.git/
+.vscode/
+.idea/
+*.o
+ModernPDE
+ModernPDE_Phase8
+**/__pycache__/
+*.pyc
+Docs/*.pdf
+phase8_test
+**/.DS_Store
+Thumbs.db
+

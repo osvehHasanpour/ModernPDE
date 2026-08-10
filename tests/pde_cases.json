@@ -1,0 +1,22 @@
+{
+  "test_suite": "ModernPDE cJSON Integration",
+  "version": "1.0",
+  "cases": [
+    {"name": "x_dead",        "paths": 20, "uses": 0,  "expected": "DEAD"           },
+    {"name": "x_mostlydead",  "paths": 20, "uses": 2,  "expected": "MOSTLY DEAD"    },
+    {"name": "x_partial",     "paths": 20, "uses": 8,  "expected": "PARTIALLY DEAD" },
+    {"name": "x_mostlylive",  "paths": 20, "uses": 18, "expected": "MOSTLY LIVE"    },
+    {"name": "x_live",        "paths": 20, "uses": 20, "expected": "LIVE"           },
+    {"name": "a_boundary_lo", "paths": 4,  "uses": 1,  "expected": "PARTIALLY DEAD" },
+    {"name": "a_boundary_hi", "paths": 4,  "uses": 3,  "expected": "MOSTLY LIVE"    },
+    {"name": "b_dead",        "paths": 50, "uses": 0,  "expected": "DEAD"           },
+    {"name": "b_mostlydead",  "paths": 50, "uses": 5,  "expected": "MOSTLY DEAD"    },
+    {"name": "b_partial",     "paths": 50, "uses": 20, "expected": "PARTIALLY DEAD" },
+    {"name": "b_mostlylive",  "paths": 50, "uses": 45, "expected": "MOSTLY LIVE"    },
+    {"name": "b_live",        "paths": 50, "uses": 50, "expected": "LIVE"           },
+    {"name": "c_solo_path",   "paths": 1,  "uses": 0,  "expected": "DEAD"           },
+    {"name": "c_solo_used",   "paths": 1,  "uses": 1,  "expected": "LIVE"           },
+    {"name": "d_large_dead",  "paths": 100,"uses": 0,  "expected": "DEAD"           },
+    {"name": "d_large_live",  "paths": 100,"uses": 100,"expected": "LIVE"           }
+  ]
+}

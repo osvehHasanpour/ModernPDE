@@ -1,0 +1,26 @@
+services:
+  modernpde:
+    build: .
+    image: modernpde:latest
+    volumes:
+      - ./results:/app/results
+      - ./tests:/app/tests:ro
+    command: ["ModernPDE_Phase8", "/app/results/phase8_benchmark.txt"]
+
+  analyze:
+    image: modernpde:latest
+    volumes:
+      - ./results:/app/results
+      - ./tests:/app/tests:ro
+    command: ["ModernPDE", "/app/tests/cfg.cpp"]
+
+  benchmark:
+    image: modernpde:latest
+    volumes:
+      - ./results:/app/results
+      - ./tests:/app/tests:ro
+    entrypoint: ["/bin/bash", "/app/scripts/docker_benchmark.sh"]
+
+  test:
+    image: modernpde:latest
+    command: ["phase8_test"]

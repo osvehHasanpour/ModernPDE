@@ -1,0 +1,55 @@
+# Build
+build/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+*.o
+ModernPDE
+
+# Results
+results/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results (keep structure, ignore generated data)
+results/latest/
+results/runs/
+results/benchmarks/*.csv
+results/archive/
+!results/README.md
+!results/reports/
+.venv/
+venv/
+.venv/
+venv/
+build/
+*.o
+ModernPDE
+ModernPDE_Phase8
+phase8_test
+project.zip
+*.pdf
+results/runs/
+results/latest/
+results/archive/
+.venv/
+venv/
+build/
+*.o
+ModernPDE
+ModernPDE_Phase8
+phase8_test
+*_test
+project.zip
+project/
+*.pdf
+results/runs/
+results/latest/
+results/archive/
