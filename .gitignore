@@ -53,3 +53,17 @@ project/
 results/runs/
 results/latest/
 results/archive/
+.venv/
+venv/
+build/
+*.o
+ModernPDE
+ModernPDE_Phase8
+phase8_test
+*_test
+project.zip
+project/
+*.pdf
+results/runs/
+results/latest/
+results/archive/
