@@ -67,3 +67,13 @@ project/
 results/runs/
 results/latest/
 results/archive/
+
+# Benchmark build artifacts
+build-benchmark/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Benchmark generated results
+benchmarks/results/
