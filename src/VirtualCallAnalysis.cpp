@@ -10,17 +10,30 @@ void VirtualCallAnalysis::registerMethod(
 
 std::vector<std::string>
 VirtualCallAnalysis::getMethods(
-    const std::string& className)
+    const std::string& className) const
 {
-    return methods[className];
+    const auto found = methods.find(className);
+
+    if(found == methods.end())
+    {
+        return {};
+    }
+
+    return found->second;
 }
 
 bool VirtualCallAnalysis::hasMethod(
     const std::string& className,
-    const std::string& methodName)
+    const std::string& methodName) const
 {
-    for(const auto& method :
-        methods[className])
+    const auto found = methods.find(className);
+
+    if(found == methods.end())
+    {
+        return false;
+    }
+
+    for(const auto& method : found->second)
     {
         if(method == methodName)
         {
@@ -35,7 +48,7 @@ std::vector<std::string>
 VirtualCallAnalysis::resolveVirtualCall(
     const std::string& baseClass,
     const std::string& methodName,
-    ClassHierarchy& CHA)
+    const ClassHierarchy& CHA) const
 {
     std::vector<std::string> targets;
 

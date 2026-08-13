@@ -18,6 +18,10 @@ void BenchmarkPhase8::runComparison(
     const DUChainAnalysis& phase7Du,
     int variableCount)
 {
+    (void)phase7Pde;
+    (void)phase7Cfg;
+    (void)phase7Du;
+
     addReportLine(std::string(80, '='));
     addReportLine("PHASE 8 OPTIMIZATION - COMPARATIVE BENCHMARK");
     addReportLine(std::string(80, '='));
@@ -201,10 +205,17 @@ std::string BenchmarkPhase8::generateReport() const
 void BenchmarkPhase8::saveReport(const std::string& filename) const
 {
     std::ofstream file(filename);
-    if(file.is_open())
+    if(!file)
     {
-        file << generateReport();
-        file.close();
+        std::cerr << "Failed to write report: " << filename << "\n";
+        return;
+    }
+
+    file << generateReport();
+
+    if(!file)
+    {
+        std::cerr << "Failed while writing report: " << filename << "\n";
     }
 }
 

@@ -182,10 +182,12 @@ if(EXISTS "${CJSON_DIR}/cJSON.c")
         PRIVATE
         ${CJSON_DIR}
     )
-    target_link_libraries(
-        cjson_pde_test
-        m
-    )
+    if(NOT MSVC)
+        target_link_libraries(
+            cjson_pde_test
+            m
+        )
+    endif()
     modernpde_add_test(cjson_pde_test)
 else()
     message(STATUS "cJSON not found at ${CJSON_DIR} — skipping cjson_pde_test")
@@ -211,10 +213,12 @@ if(EXISTS "${TINYEXPR_DIR}/tinyexpr.c")
         PRIVATE
         ${TINYEXPR_DIR}
     )
-    target_link_libraries(
-        tinyexpr_pde_test
-        m
-    )
+    if(NOT MSVC)
+        target_link_libraries(
+            tinyexpr_pde_test
+            m
+        )
+    endif()
     modernpde_add_test(tinyexpr_pde_test)
 else()
     message(STATUS "tinyexpr not found at ${TINYEXPR_DIR} — skipping tinyexpr_pde_test")

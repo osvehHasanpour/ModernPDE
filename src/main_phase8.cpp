@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::cerr << "✗ Failed to save report\n";
+        std::cerr << "Failed to save report: " << reportPath << "\n";
     }
 
     std::cout << "\n" << std::string(80, '=') << "\n";

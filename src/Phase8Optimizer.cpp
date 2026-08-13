@@ -24,6 +24,8 @@ void BenchmarkState::recordTraversal(int nodeCount, int edgeCount)
 
 void BenchmarkState::recordDUAnalysis(int defCount, int useCount, int chainCount)
 {
+    (void)useCount;
+
     metrics.definitionsProcessed += defCount;
     metrics.duChainsAnalyzed += chainCount;
 }

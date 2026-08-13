@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 
 #include "ClassHierarchy.h"
@@ -18,7 +19,9 @@
 #include "CFGValidation.h"
 #include "CFGStatistics.h"
 #include "FieldSensitiveAnalysis.h"
+#include "FaintAnalysis.h"
 #include "IR.h"
+#include "SCCP.h"
 using namespace ModernPDE;
 
 static Instruction makeAlloc(
@@ -79,6 +82,55 @@ static Instruction makeFieldLoad(
     inst.type = InstType::FieldLoad;
     inst.result = dst;
     inst.uses.insert(base + "." + field);
+
+    return inst;
+}
+
+static Instruction makeAssign(
+    int id,
+    const std::string& dst,
+    const std::string& src)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Assign;
+    inst.result = dst;
+    inst.uses.insert(src);
+
+    return inst;
+}
+
+static Instruction makeAdd(
+    int id,
+    const std::string& dst,
+    const std::string& lhs,
+    const std::string& rhs)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Add;
+    inst.result = dst;
+    inst.uses.insert(lhs);
+    inst.uses.insert(rhs);
+
+    return inst;
+}
+
+static Instruction makeMul(
+    int id,
+    const std::string& dst,
+    const std::string& lhs,
+    const std::string& rhs)
+{
+    Instruction inst;
+
+    inst.id = id;
+    inst.type = InstType::Mul;
+    inst.result = dst;
+    inst.uses.insert(lhs);
+    inst.uses.insert(rhs);
 
     return inst;
 }
@@ -183,6 +235,79 @@ static void runFieldSensitiveDemo()
         << "  Point#0 != Point#1 (distinct abstract objects)\n";
 }
 
+static FunctionIR buildSccpSample()
+{
+    FunctionIR function;
+
+    function.name = "sccpDemo";
+
+    function.instructions.push_back(
+        makeAssign(0, "c2", "2"));
+
+    function.instructions.push_back(
+        makeAssign(1, "c3", "3"));
+
+    function.instructions.push_back(
+        makeAdd(2, "sum", "c2", "c3"));
+
+    function.instructions.push_back(
+        makeMul(3, "prod", "sum", "c2"));
+
+    function.instructions.push_back(
+        makeAssign(4, "unused", "99"));
+
+    function.instructions.push_back(
+        makeCopy(5, "out", "prod"));
+
+    function.instructions.push_back(
+        makeEscapeCall(6, "out"));
+
+    return function;
+}
+
+static void runSccpDemo()
+{
+    std::cout
+        << "\n====================================\n";
+
+    std::cout
+        << "PHASE 7 : SCCP + FAINT ANALYSIS\n";
+
+    std::cout
+        << "====================================\n";
+
+    FunctionIR sample =
+        buildSccpSample();
+
+    std::cout
+        << "Function : "
+        << sample.name
+        << "\n";
+
+    sample.print();
+
+    SCCP sccp;
+    sccp.run(sample);
+    sccp.print();
+
+    std::cout
+        << "\nAfter SCCP:\n";
+
+    sample.print();
+
+    FaintAnalysis faint;
+    faint.run(sample);
+
+    std::cout
+        << "\nExpected highlights:\n";
+
+    std::cout
+        << "  c2, c3, sum, prod, out are constants (2, 3, 5, 10, 10)\n";
+
+    std::cout
+        << "  unused=99 is dead (never read)\n";
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -246,30 +371,39 @@ ModernPDE::Lexer lexer;
 
 if(argc > 1)
 {
-    if(lexer.tokenizeFile(argv[1]))
+    if(!lexer.tokenizeFile(argv[1]))
     {
-        std::cout
-        << "====================================\n";
-
-        std::cout
-        << "LEXER\n";
-
-        std::cout
-        << "====================================\n";
-
-        std::cout
-        << "Lexer OK\n";
-
-        std::cout
-        << "Token Count : "
-        << lexer.tokens().size()
-        << "\n\n";
+        std::cerr
+        << "Lexer failed: "
+        << lexer.lastError()
+        << std::endl;
+        return 1;
     }
-    else
+
+    if(lexer.hasError())
     {
-        std::cout
-        << "Lexer Failed\n";
+        std::cerr
+        << "Lexer warning: "
+        << lexer.lastError()
+        << std::endl;
     }
+
+    std::cout
+    << "====================================\n";
+
+    std::cout
+    << "LEXER\n";
+
+    std::cout
+    << "====================================\n";
+
+    std::cout
+    << "Lexer OK\n";
+
+    std::cout
+    << "Token Count : "
+    << lexer.tokens().size()
+    << "\n\n";
 }
 /////////////////////////////////////////////////////
 // PARSER
@@ -278,6 +412,14 @@ if(argc > 1)
 Parser parser(lexer.tokens());
 
 parser.parse();
+
+if(parser.hasError())
+{
+    std::cerr
+    << "Parser warning: "
+    << parser.lastError()
+    << std::endl;
+}
 
 std::cout
 << "====================================\n";
@@ -1023,6 +1165,8 @@ if(argc == 1)
 {
     runFieldSensitiveDemo();
 }
+
+runSccpDemo();
 
 std::cout << "\nEND OF PROGRAM\n";
 return 0;

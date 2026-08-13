@@ -49,6 +49,10 @@ public:
 
     const std::vector<Token>& tokens() const;
 
+    bool hasError() const;
+
+    const std::string& lastError() const;
+
 private:
 
     std::string source_;
@@ -104,6 +108,8 @@ private:
 private:
 
     std::unordered_set<std::string> keywords_;
+
+    std::string lastError_;
 };
 
 }

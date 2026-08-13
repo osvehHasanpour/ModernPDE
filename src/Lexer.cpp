@@ -1,8 +1,9 @@
 #include "Lexer.h"
 
+#include <cctype>
 #include <fstream>
 #include <sstream>
-#include <cctype>
+#include <string>
 
 namespace ModernPDE
 {
@@ -91,20 +92,47 @@ void Lexer::clear()
     line_ = 1;
 
     column_ = 1;
+
+    lastError_.clear();
+}
+
+bool Lexer::hasError() const
+{
+    return !lastError_.empty();
+}
+
+const std::string& Lexer::lastError() const
+{
+    return lastError_;
 }
 
 bool Lexer::tokenizeFile(const std::string& filename)
 {
     clear();
 
+    if(filename.empty())
+    {
+        lastError_ = "No input file specified";
+        return false;
+    }
+
     std::ifstream file(filename);
 
     if(!file)
+    {
+        lastError_ = "Cannot open file: " + filename;
         return false;
+    }
 
     std::stringstream buffer;
 
     buffer << file.rdbuf();
+
+    if(file.bad())
+    {
+        lastError_ = "Failed to read file: " + filename;
+        return false;
+    }
 
     return tokenize(buffer.str());
 }
@@ -339,6 +367,8 @@ void Lexer::scanString()
 
     text += advance();
 
+    bool terminated = false;
+
     while(!eof())
     {
         char c = advance();
@@ -354,7 +384,17 @@ void Lexer::scanString()
         }
 
         if(c == '"')
+        {
+            terminated = true;
             break;
+        }
+    }
+
+    if(!terminated && lastError_.empty())
+    {
+        lastError_ =
+            "Unterminated string literal at line " +
+            std::to_string(startLine);
     }
 
     addToken(
@@ -373,6 +413,8 @@ void Lexer::scanCharacter()
 
     text += advance();
 
+    bool terminated = false;
+
     while(!eof())
     {
         char c = advance();
@@ -388,7 +430,17 @@ void Lexer::scanCharacter()
         }
 
         if(c == '\'')
+        {
+            terminated = true;
             break;
+        }
+    }
+
+    if(!terminated && lastError_.empty())
+    {
+        lastError_ =
+            "Unterminated character literal at line " +
+            std::to_string(startLine);
     }
 
     addToken(
@@ -431,6 +483,8 @@ void Lexer::scanComment()
         text += advance();
         text += advance();
 
+        bool terminated = false;
+
         while(!eof())
         {
             char c = advance();
@@ -440,8 +494,16 @@ void Lexer::scanComment()
             if(c == '*' && current() == '/')
             {
                 text += advance();
+                terminated = true;
                 break;
             }
+        }
+
+        if(!terminated && lastError_.empty())
+        {
+            lastError_ =
+                "Unterminated block comment at line " +
+                std::to_string(startLine);
         }
 
         addToken(

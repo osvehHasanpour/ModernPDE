@@ -16,17 +16,17 @@ public:
 
     std::vector<std::string>
     getMethods(
-        const std::string& className);
+        const std::string& className) const;
 
     bool hasMethod(
         const std::string& className,
-        const std::string& methodName);
+        const std::string& methodName) const;
 
     std::vector<std::string>
     resolveVirtualCall(
         const std::string& baseClass,
         const std::string& methodName,
-        ClassHierarchy& CHA);
+        const ClassHierarchy& CHA) const;
 
 private:
 

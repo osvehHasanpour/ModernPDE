@@ -57,8 +57,10 @@ CFGBuilder::functions() const
 
 void CFGBuilder::buildTranslationUnit(ASTNode* root)
 {
-    for(ASTNode* child : root->children)
+    for(const auto& owned : root->children)
     {
+        ASTNode* child = owned.get();
+
         if(child == nullptr)
         {
             continue;
@@ -135,9 +137,12 @@ void CFGBuilder::buildFunction(ASTNode* function)
 
     int currentBlock = currentFunctionEntry_;
 
-    for(ASTNode* child : function->children)
+    for(const auto& owned : function->children)
     {
-        if(child->type == ASTNodeType::CompoundStatement)
+        ASTNode* child = owned.get();
+
+        if(child != nullptr &&
+           child->type == ASTNodeType::CompoundStatement)
         {
             currentBlock =
                 buildCompound(
@@ -167,11 +172,11 @@ int CFGBuilder::buildCompound(
         return -1;
     }
 
-    for(ASTNode* child : compound->children)
+    for(const auto& owned : compound->children)
     {
         currentBlock =
             buildStatement(
-                child,
+                owned.get(),
                 currentBlock);
     }
 
@@ -277,11 +282,11 @@ int CFGBuilder::buildIf(
     ASTNode* node,
     int currentBlock)
 {
-    if(!node->children.empty())
+    if(node->child(0) != nullptr)
     {
         appendNode(
             currentBlock,
-            node->children[0]);
+            node->child(0));
     }
 
     int thenBlock = createBlock();
@@ -291,11 +296,11 @@ int CFGBuilder::buildIf(
 
     int thenEnd = currentBlock;
 
-    if(node->children.size() >= 2)
+    if(node->childCount() >= 2)
     {
         thenEnd =
             buildCompoundOrStmt(
-                node->children[1],
+                node->child(1),
                 thenBlock);
     }
 
@@ -304,14 +309,14 @@ int CFGBuilder::buildIf(
         connect(thenEnd, mergeBlock);
     }
 
-    if(node->children.size() >= 3)
+    if(node->childCount() >= 3)
     {
         int elseBlock = createBlock();
         connect(currentBlock, elseBlock);
 
         int elseEnd =
             buildCompoundOrStmt(
-                node->children[2],
+                node->child(2),
                 elseBlock);
 
         if(elseEnd >= 0)
@@ -334,11 +339,11 @@ int CFGBuilder::buildWhile(
     int headerBlock = createBlock();
     connect(currentBlock, headerBlock);
 
-    if(!node->children.empty())
+    if(node->child(0) != nullptr)
     {
         appendNode(
             headerBlock,
-            node->children[0]);
+            node->child(0));
     }
 
     int bodyBlock = createBlock();
@@ -351,11 +356,11 @@ int CFGBuilder::buildWhile(
 
     int bodyEnd = headerBlock;
 
-    if(node->children.size() >= 2)
+    if(node->childCount() >= 2)
     {
         bodyEnd =
             buildCompoundOrStmt(
-                node->children[1],
+                node->child(1),
                 bodyBlock);
     }
 
@@ -383,11 +388,11 @@ int CFGBuilder::buildDoWhile(
 
     int bodyEnd = bodyBlock;
 
-    if(!node->children.empty())
+    if(node->child(0) != nullptr)
     {
         bodyEnd =
             buildCompoundOrStmt(
-                node->children[0],
+                node->child(0),
                 bodyBlock);
     }
 
@@ -402,11 +407,11 @@ int CFGBuilder::buildDoWhile(
         connect(bodyBlock, headerBlock);
     }
 
-    if(node->children.size() >= 2)
+    if(node->childCount() >= 2)
     {
         appendNode(
             headerBlock,
-            node->children[1]);
+            node->child(1));
     }
 
     connect(headerBlock, bodyBlock);
@@ -419,11 +424,11 @@ int CFGBuilder::buildFor(
     ASTNode* node,
     int currentBlock)
 {
-    if(!node->children.empty())
+    if(node->child(0) != nullptr)
     {
         appendNode(
             currentBlock,
-            node->children[0]);
+            node->child(0));
     }
 
     int condBlock = createBlock();
@@ -440,11 +445,11 @@ int CFGBuilder::buildFor(
 
     int bodyEnd = condBlock;
 
-    if(node->children.size() >= 2)
+    if(node->childCount() >= 2)
     {
         bodyEnd =
             buildCompoundOrStmt(
-                node->children[1],
+                node->child(1),
                 bodyBlock);
     }
 
@@ -468,11 +473,11 @@ int CFGBuilder::buildSwitch(
     ASTNode* node,
     int currentBlock)
 {
-    if(!node->children.empty())
+    if(node->child(0) != nullptr)
     {
         appendNode(
             currentBlock,
-            node->children[0]);
+            node->child(0));
     }
 
     int bodyBlock = createBlock();
@@ -484,11 +489,11 @@ int CFGBuilder::buildSwitch(
 
     int bodyEnd = bodyBlock;
 
-    if(node->children.size() >= 2)
+    if(node->childCount() >= 2)
     {
         bodyEnd =
             buildCompound(
-                node->children[1],
+                node->child(1),
                 bodyBlock);
     }
 

@@ -41,4 +41,10 @@ public:
     std::string name;
 
     std::vector<Instruction> instructions;
+
+    void print() const;
+
+    Instruction* findById(int id);
+
+    const Instruction* findById(int id) const;
 };

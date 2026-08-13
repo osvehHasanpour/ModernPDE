@@ -1,0 +1,34 @@
+# CMake generated Testfile for 
+# Source directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests
+# Build directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests
+# 
+# This file includes the relevant testing commands required for 
+# testing this directory and lists subdirectories to be tested as well.
+add_test(phase8_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/phase8_test")
+set_tests_properties(phase8_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;50;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(field_sensitive_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/field_sensitive_test")
+set_tests_properties(field_sensitive_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;61;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(lexer_parser_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/lexer_parser_test")
+set_tests_properties(lexer_parser_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;71;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(callgraph_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/callgraph_test")
+set_tests_properties(callgraph_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;78;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(cha_virtual_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/cha_virtual_test")
+set_tests_properties(cha_virtual_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;86;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(cfg_path_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/cfg_path_test")
+set_tests_properties(cfg_path_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;95;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(cfg_phase5_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/cfg_phase5_test")
+set_tests_properties(cfg_phase5_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;111;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(challenge_500 "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/challenge_500")
+set_tests_properties(challenge_500 PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;123;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(challenge_5000 "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/challenge_5000")
+set_tests_properties(challenge_5000 PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;131;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(challenge_50000 "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/challenge_50000")
+set_tests_properties(challenge_50000 PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;139;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(master_challenge "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/master_challenge")
+set_tests_properties(master_challenge PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;146;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(full_master_challenge "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/full_master_challenge")
+set_tests_properties(full_master_challenge PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;156;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(cjson_pde_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/cjson_pde_test")
+set_tests_properties(cjson_pde_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;189;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")
+add_test(tinyexpr_pde_test "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-baseline/tests/tinyexpr_pde_test")
+set_tests_properties(tinyexpr_pde_test PROPERTIES  WORKING_DIRECTORY "/mnt/c/Users/osveh/Music/Modernp/ModernPDE" _BACKTRACE_TRIPLES "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;22;add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;218;modernpde_add_test;/mnt/c/Users/osveh/Music/Modernp/ModernPDE/tests/CMakeLists.txt;0;")

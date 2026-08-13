@@ -1,0 +1,2031 @@
+Start testing: Aug 13 14:15 +0330
+----------------------------------------------------------
+1/14 Testing: phase8_test
+1/14 Test: phase8_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/phase8_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"phase8_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+
+######################################################################
+#                                                                    #
+#               PHASE 8 OPTIMIZATION TEST SUITE                      #
+#                                                                    #
+######################################################################
+
+
+============================================================
+TEST: CFG CACHE
+============================================================
+Reachable from block 0: 2 3 1 0 
+Cache stats: 1 hits, 1 misses
+Block 3 reachable from block 0: YES
+Block 0 reachable from block 3: NO
+✓ CFG Cache tests PASSED
+
+============================================================
+TEST: DOMINATOR ANALYSIS
+============================================================
+Dominator relationships verified
+✓ Dominator Analysis tests PASSED
+
+============================================================
+TEST: LAZY PATH ENUMERATION
+============================================================
+Path 1: 0 1 3 
+Path 2: 0 2 3 
+Total paths: 2
+✓ Lazy Path Enumeration tests PASSED
+
+============================================================
+TEST: MEMORY TRACKING
+============================================================
+Before: 0 bytes
+After allocation: 1024 bytes
+Peak memory: 1024 bytes
+✓ Memory Tracking tests PASSED
+
+============================================================
+TEST: BENCHMARK METRICS
+============================================================
+Runtime: 0 ms
+CFG Traversals: 1
+DU Chains: 8
+Cache Hit Rate: 66.6667%
+✓ Benchmark Metrics tests PASSED
+
+============================================================
+TEST: PDE CLASSIFICATION (Correctness Check)
+============================================================
+deadVar classification: DEAD
+mostlyDeadVar classification: MOSTLY DEAD
+partiallyDeadVar classification: PARTIALLY DEAD
+liveVar classification: LIVE
+✓ PDE Classification tests PASSED
+
+######################################################################
+#                                                                    #
+#                    ALL TESTS PASSED ✓                              #
+#                                                                    #
+######################################################################
+
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"phase8_test" end time: Aug 13 14:15 +0330
+"phase8_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/14 Testing: field_sensitive_test
+2/14 Test: field_sensitive_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/field_sensitive_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"field_sensitive_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  Field-Sensitive Analysis Test
+================================================
+[FieldRead] insn 5 : load x from o2 -> {Point#1}
+[FieldRead] insn 9 : load y from p -> {Point#0}
+
+Instruction Flags:
+  insn 0 Alloc dead=0 partialDead=0
+  insn 1 Alloc dead=0 partialDead=0
+  insn 2 Copy dead=0 partialDead=0
+  insn 3 FieldStore dead=0 partialDead=1
+  insn 4 FieldStore dead=0 partialDead=0
+  insn 5 FieldLoad dead=0 partialDead=0
+  insn 6 FieldStore dead=1 partialDead=0
+  insn 8 FieldStore dead=0 partialDead=1
+  insn 9 FieldLoad dead=0 partialDead=0
+
+====================================
+FIELD-SENSITIVE ANALYSIS RESULTS
+====================================
+
+Abstract Objects:
+  id=0 site=@summary escape=Escaped
+  id=1 site=Point#0 escape=Escaped
+  id=2 site=Point#1 escape=Local
+
+Points-To Sets:
+  p -> {Point#0}
+  o2 -> {Point#1}
+  o1 -> {Point#0}
+
+Field States:
+  (Point#0, w) = Top
+  (Point#0, x) = Top
+  (Point#0, y) = Top
+  (Point#1, x) = Read
+  (Point#1, z) = Written
+
+Field Read Log:
+  insn 5 base=o2 field=x objects={Point#1}
+  insn 9 base=p field=y objects={Point#0}
+
+================================================
+  Total : 10  Pass  : 10  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"field_sensitive_test" end time: Aug 13 14:15 +0330
+"field_sensitive_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/14 Testing: lexer_parser_test
+3/14 Test: lexer_parser_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/lexer_parser_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"lexer_parser_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  Lexer / Parser / CFG Test
+================================================
+
+[ tests/dead.cpp ]
+
+[ tests/cfg.cpp ]
+
+[ tests/oop.cpp ]
+
+[ tests/partial.cpp ]
+
+[ tests/recursion.cpp ]
+
+[ tests/template.cpp ]
+
+[ tests/mutual_recursive.cpp ]
+
+================================================
+  Total : 21  Pass  : 21  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"lexer_parser_test" end time: Aug 13 14:15 +0330
+"lexer_parser_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/14 Testing: callgraph_test
+4/14 Test: callgraph_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/callgraph_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"callgraph_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  CallGraph Test
+================================================
+
+================================================
+  Total : 7  Pass  : 7  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"callgraph_test" end time: Aug 13 14:15 +0330
+"callgraph_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/14 Testing: cha_virtual_test
+5/14 Test: cha_virtual_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cha_virtual_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"cha_virtual_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  CHA + Virtual Call Test
+================================================
+
+================================================
+  Total : 7  Pass  : 7  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cha_virtual_test" end time: Aug 13 14:15 +0330
+"cha_virtual_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/14 Testing: cfg_path_test
+6/14 Test: cfg_path_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cfg_path_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"cfg_path_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  CFG Path + DU Chain Test
+================================================
+
+================================================
+  Total : 3  Pass  : 3  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cfg_path_test" end time: Aug 13 14:15 +0330
+"cfg_path_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/14 Testing: cfg_phase5_test
+7/14 Test: cfg_phase5_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cfg_phase5_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"cfg_phase5_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  Phase 5 CFG Pipeline Test
+================================================
+
+[ tests/cfg.cpp ]
+
+[ tests/cfg_while.cpp ]
+
+[ tests/cfg_for.cpp ]
+
+[ tests/cfg_nested_if.cpp ]
+
+[ tests/cfg_do_while.cpp ]
+
+[ tests/cfg_break_continue.cpp ]
+
+[ tests/cfg_switch.cpp ]
+
+[ tests/cfg_multi_return.cpp ]
+
+[ tests/recursion.cpp ]
+
+[ tests/mutual_recursive.cpp ]
+
+[ tests/oop.cpp ]
+
+================================================
+  Total : 129  Pass  : 129  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"cfg_phase5_test" end time: Aug 13 14:15 +0330
+"cfg_phase5_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/14 Testing: challenge_500
+8/14 Test: challenge_500
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_500"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"challenge_500" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+   MODERNPDE CHALLENGE TEST  —  500 Variables
+================================================
+
+Per-Category Results:
+Category          Expected          Count Ratio   Status
+------------------------------------------------------------
+dead              DEAD              100   0.00    PASS
+mostlydead        MOSTLY DEAD       100   0.10    PASS
+partial           PARTIALLY DEAD    100   0.40    PASS
+mostlylive        MOSTLY LIVE       100   0.90    PASS
+live              LIVE              100   1.00    PASS
+
+------------------------------------------------
+Computed Metrics (500 variables):
+
+  Correct    : 500 / 500
+  TP / FP / FN : 200 / 0 / 0
+
+  Accuracy   : 1.0000
+  Precision  : 1.0000
+  Recall     : 1.0000
+  F1 Score   : 1.0000
+
+================================================
+RESULT : PASS
+ModernPDE classified all 500 variables correctly.
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"challenge_500" end time: Aug 13 14:15 +0330
+"challenge_500" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/14 Testing: challenge_5000
+9/14 Test: challenge_5000
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_5000"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"challenge_5000" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  MODERNPDE CHALLENGE TEST  —  5000 Variables
+================================================
+
+Populating 5000 variables (200,000 total execution paths)...
+
+Per-Category Results:
+Category          Expected          Count   Ratio   Status
+--------------------------------------------------------------
+dead              DEAD              1000    0.00    PASS
+mostlydead        MOSTLY DEAD       1000    0.10    PASS
+partial           PARTIALLY DEAD    1000    0.40    PASS
+mostlylive        MOSTLY LIVE       1000    0.90    PASS
+live              LIVE              1000    1.00    PASS
+
+------------------------------------------------
+Computed Metrics (5000 variables):
+
+  Correct      : 5000 / 5000
+  TP / FP / FN : 2000 / 0 / 0
+
+  Accuracy     : 1.0000
+  Precision    : 1.0000
+  Recall       : 1.0000
+  F1 Score     : 1.0000
+
+================================================
+RESULT : PASS
+ModernPDE classified all 5000 variables correctly.
+================================================
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"challenge_5000" end time: Aug 13 14:15 +0330
+"challenge_5000" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/14 Testing: challenge_50000
+10/14 Test: challenge_50000
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_50000"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"challenge_50000" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+ MODERNPDE CHALLENGE TEST  —  50,000 Variables
+================================================
+
+Scale:
+  Variables        : 50,000
+  Paths / variable : 50
+  Total paths      : 2,500,000
+
+Build time : 242.0 ms
+
+Classify time : 26.9 ms
+Total time    : 268.9 ms
+
+Per-Category Results:
+Category          Expected          Count   Ratio   Status
+--------------------------------------------------------------
+dead              DEAD              10000   0.00    PASS
+mostlydead        MOSTLY DEAD       10000   0.10    PASS
+partial           PARTIALLY DEAD    10000   0.40    PASS
+mostlylive        MOSTLY LIVE       10000   0.90    PASS
+live              LIVE              10000   1.00    PASS
+
+------------------------------------------------
+Computed Metrics (50,000 variables):
+
+  Correct      : 50000 / 50000
+  TP / FP / FN : 20000 / 0 / 0
+
+  Accuracy     : 1.0000
+  Precision    : 1.0000
+  Recall       : 1.0000
+  F1 Score     : 1.0000
+
+  Throughput   : 185921 variables/sec
+
+================================================
+RESULT : PASS
+ModernPDE classified all 50,000 variables correctly.
+================================================
+<end of output>
+Test time =   0.28 sec
+----------------------------------------------------------
+Test Passed.
+"challenge_50000" end time: Aug 13 14:15 +0330
+"challenge_50000" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/14 Testing: master_challenge
+11/14 Test: master_challenge
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/master_challenge"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"master_challenge" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+     MODERNPDE MASTER CHALLENGE TEST
+================================================
+
+
+====================================
+PATH-AWARE PDE RESULTS
+====================================
+
+Variable : live_19
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_18
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_15
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_14
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_13
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_11
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_8
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_7
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_6
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_1
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_18
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_15
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_14
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_13
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : live_10
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_2
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_12
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_10
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : live_4
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_9
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_6
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_17
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_5
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_4
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_2
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_11
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_1
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : live_16
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : partial_20
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_7
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlylive_7
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_4
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : dead_19
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_19
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_2
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : dead_11
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_20
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : partial_3
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_1
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : dead_5
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_2
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_8
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlydead_19
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : dead_20
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_6
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_12
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_7
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_13
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlydead_17
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : dead_3
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_16
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlylive_3
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_9
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_3
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_15
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_6
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : live_5
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_16
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_17
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_16
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : dead_6
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : live_17
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_4
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_1
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_15
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_9
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_12
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_8
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_12
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : dead_10
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_19
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_18
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_1
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_3
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlydead_8
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_10
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_15
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_11
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_11
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_12
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_14
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_4
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_16
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_20
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_2
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_9
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_8
+Definitions : 1
+Uses : 18
+Paths : 20
+Usage Ratio : 0.90
+Classification : MOSTLY LIVE
+
+Variable : partial_5
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_7
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_5
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_13
+Definitions : 1
+Uses : 2
+Paths : 20
+Usage Ratio : 0.10
+Classification : MOSTLY DEAD
+
+Variable : partial_9
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_10
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_13
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_20
+Definitions : 1
+Uses : 20
+Paths : 20
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_18
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_14
+Definitions : 1
+Uses : 0
+Paths : 20
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_14
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_17
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_18
+Definitions : 1
+Uses : 8
+Paths : 20
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+================================================
+MASTER CHALLENGE FINISHED SUCCESSFULLY!
+Total Variables Tested: 100
+Project PDE component is working well.
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"master_challenge" end time: Aug 13 14:15 +0330
+"master_challenge" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/14 Testing: full_master_challenge
+12/14 Test: full_master_challenge
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/full_master_challenge"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"full_master_challenge" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+     MODERNPDE FULL MASTER CHALLENGE
+     Testing All Core Components
+================================================
+
+[1] CLASS HIERARCHY ANALYSIS
+   → Character has 6 descendants
+
+[2] VIRTUAL CALL ANALYSIS
+   → Player::attack resolved to 3 targets
+
+[3] CONTEXT-SENSITIVE CALL GRAPH
+   → Recursion detected : YES
+
+[4] PDE PATH-AWARE CHALLENGE (100 Variables)
+
+====================================
+PATH-AWARE PDE RESULTS
+====================================
+
+Variable : live_19
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_18
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_15
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_14
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_13
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_11
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_8
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_7
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_6
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_1
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_18
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_15
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_14
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_13
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : live_10
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : live_2
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_12
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_10
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : live_4
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_9
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_6
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_17
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_5
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_4
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_2
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_11
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlylive_1
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : live_16
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : partial_20
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_7
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlylive_7
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_4
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : dead_19
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_19
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_2
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : dead_11
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_20
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : partial_3
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_1
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : dead_5
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_2
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_8
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlydead_19
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : dead_20
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_6
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_12
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_7
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_13
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlydead_17
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : dead_3
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_16
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlylive_3
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_9
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_3
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_15
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_6
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : live_5
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_16
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_17
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_16
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : dead_6
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : live_17
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_4
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_1
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_15
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_9
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_12
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_8
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_12
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : dead_10
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : mostlylive_19
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : mostlydead_18
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_1
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_3
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlydead_8
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_10
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_15
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_11
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_11
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_12
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_14
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_4
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_16
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_20
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_2
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_9
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : mostlylive_8
+Definitions : 1
+Uses : 22
+Paths : 25
+Usage Ratio : 0.88
+Classification : MOSTLY LIVE
+
+Variable : partial_5
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_7
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : mostlydead_5
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : mostlydead_13
+Definitions : 1
+Uses : 3
+Paths : 25
+Usage Ratio : 0.12
+Classification : MOSTLY DEAD
+
+Variable : partial_9
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_10
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_13
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : live_20
+Definitions : 1
+Uses : 25
+Paths : 25
+Usage Ratio : 1.00
+Classification : LIVE
+
+Variable : dead_18
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : dead_14
+Definitions : 1
+Uses : 0
+Paths : 25
+Usage Ratio : 0.00
+Classification : DEAD
+
+Variable : partial_14
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_17
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+Variable : partial_18
+Definitions : 1
+Uses : 10
+Paths : 25
+Usage Ratio : 0.40
+Classification : PARTIALLY DEAD
+
+================================================
+          FULL MASTER CHALLENGE PASSED
+================================================
+All major components (CHA + Virtual + CallGraph + PDE) validated!
+ModernPDE is in excellent condition.
+
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"full_master_challenge" end time: Aug 13 14:15 +0330
+"full_master_challenge" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/14 Testing: cjson_pde_test
+13/14 Test: cjson_pde_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cjson_pde_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"cjson_pde_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  ModernPDE x cJSON Integration Test
+  Loading: tests/pde_cases.json
+================================================
+
+Suite   : ModernPDE cJSON Integration
+Version : 1.0
+Cases   : 16
+
+Name              Paths  Uses   Ratio  Expected          Got               Result
+------------------------------------------------------------------------------
+x_dead            20     0      0.00   DEAD              DEAD              PASS
+x_mostlydead      20     2      0.10   MOSTLY DEAD       MOSTLY DEAD       PASS
+x_partial         20     8      0.40   PARTIALLY DEAD    PARTIALLY DEAD    PASS
+x_mostlylive      20     18     0.90   MOSTLY LIVE       MOSTLY LIVE       PASS
+x_live            20     20     1.00   LIVE              LIVE              PASS
+a_boundary_lo     4      1      0.25   PARTIALLY DEAD    PARTIALLY DEAD    PASS
+a_boundary_hi     4      3      0.75   MOSTLY LIVE       MOSTLY LIVE       PASS
+b_dead            50     0      0.00   DEAD              DEAD              PASS
+b_mostlydead      50     5      0.10   MOSTLY DEAD       MOSTLY DEAD       PASS
+b_partial         50     20     0.40   PARTIALLY DEAD    PARTIALLY DEAD    PASS
+b_mostlylive      50     45     0.90   MOSTLY LIVE       MOSTLY LIVE       PASS
+b_live            50     50     1.00   LIVE              LIVE              PASS
+c_solo_path       1      0      0.00   DEAD              DEAD              PASS
+c_solo_used       1      1      1.00   LIVE              LIVE              PASS
+d_large_dead      100    0      0.00   DEAD              DEAD              PASS
+d_large_live      100    100    1.00   LIVE              LIVE              PASS
+
+------------------------------------------------------------------------------
+Computed Metrics (16 variables):
+
+  Correct      : 16 / 16
+  TP / FP / FN : 7 / 0 / 0
+
+  Accuracy     : 1.0000
+  Precision    : 1.0000
+  Recall       : 1.0000
+  F1 Score     : 1.0000
+
+================================================
+  Total : 16  Pass  : 16  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"cjson_pde_test" end time: Aug 13 14:15 +0330
+"cjson_pde_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/14 Testing: tinyexpr_pde_test
+14/14 Test: tinyexpr_pde_test
+Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/tinyexpr_pde_test"
+Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
+"tinyexpr_pde_test" start time: Aug 13 14:15 +0330
+Output:
+----------------------------------------------------------
+================================================
+  ModernPDE x TinyExpr Integration Test
+================================================
+
+[ Test 1 ] Ratio expressions -> PDE classification
+  PASS  0                      ratio=0.00  -> DEAD
+  PASS  1/20                   ratio=0.05  -> MOSTLY DEAD
+  PASS  2/20                   ratio=0.10  -> MOSTLY DEAD
+  PASS  4/20                   ratio=0.20  -> MOSTLY DEAD
+  PASS  5/20                   ratio=0.25  -> PARTIALLY DEAD
+  PASS  8/20                   ratio=0.40  -> PARTIALLY DEAD
+  PASS  14/20                  ratio=0.70  -> PARTIALLY DEAD
+  PASS  15/20                  ratio=0.75  -> MOSTLY LIVE
+  PASS  18/20                  ratio=0.90  -> MOSTLY LIVE
+  PASS  19/20                  ratio=0.95  -> MOSTLY LIVE
+  PASS  20/20                  ratio=1.00  -> LIVE
+  PASS  100/100                ratio=1.00  -> LIVE
+  PASS  sqrt(4)/20             ratio=0.10  -> MOSTLY DEAD
+  PASS  pow(2,3)/40            ratio=0.20  -> MOSTLY DEAD
+  PASS  floor(5.9)/20          ratio=0.25  -> PARTIALLY DEAD
+  PASS  ceil(7.1)/20           ratio=0.40  -> PARTIALLY DEAD
+  PASS  floor(14.6+0.5)/20     ratio=0.75  -> MOSTLY LIVE
+  PASS  abs(-18)/20            ratio=0.90  -> MOSTLY LIVE
+  PASS  20/20                  ratio=1.00  -> LIVE
+
+[ Test 2 ] Boundary expressions (tinyexpr computes thresholds)
+  1/4                ratio=0.2500  got=PARTIALLY DEAD
+  floor(1.9)/4       ratio=0.2500  got=PARTIALLY DEAD
+  3/4                ratio=0.7500  got=MOSTLY LIVE
+  ceil(2.1)/4        ratio=0.7500  got=MOSTLY LIVE
+  pow(2,2)/pow(2,4)  ratio=0.2500  got=PARTIALLY DEAD
+  12/pow(2,4)        ratio=0.7500  got=MOSTLY LIVE
+
+[ Test 3 ] Real Metrics::* computed from tinyexpr-driven data
+  Correct      : 40/40
+  TP/FP/FN     : 16/0/0
+  Accuracy     : 1.0000
+  Precision    : 1.0000
+  Recall       : 1.0000
+  F1 Score     : 1.0000
+
+[ Test 4 ] tinyexpr error handling (bad ratio expressions)
+  BAD expr '' -> err=1  (NaN)
+  BAD expr 'uses/' -> err=4  (NaN)
+  BAD expr '1**2' -> err=3  (NaN)
+  BAD expr 'abc' -> err=3  (NaN)
+  BAD expr '(1+2' -> err=4  (NaN)
+
+================================================
+  Total : 60  Pass  : 60  Fail  : 0
+  RESULT : ALL TESTS PASSED
+================================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"tinyexpr_pde_test" end time: Aug 13 14:15 +0330
+"tinyexpr_pde_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 13 14:15 +0330
