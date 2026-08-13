@@ -26,18 +26,18 @@ public:
         const std::string& name);
 
     bool isDead(
-        const std::string& name);
+        const std::string& name) const;
 
     bool isPartiallyDead(
-        const std::string& name);
+        const std::string& name) const;
 
     double getUsageRatio(
-        const std::string& name);
+        const std::string& name) const;
 
     std::string classify(
-        const std::string& name);
+        const std::string& name) const;
 
-    void printResults();
+    void printResults() const;
 
 private:
 

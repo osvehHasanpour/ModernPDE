@@ -15,27 +15,27 @@ public:
 
     std::vector<std::string>
     getChildren(
-        const std::string& cls);
+        const std::string& cls) const;
 
     std::vector<std::string>
     getAllDescendants(
-        const std::string& cls);
+        const std::string& cls) const;
 
     std::string getParent(
-        const std::string& cls);
+        const std::string& cls) const;
 
     bool hasClass(
-        const std::string& cls);
+        const std::string& cls) const;
 
     std::vector<std::string>
-    getLeafClasses();
+    getLeafClasses() const;
 
 private:
 
     void dfs(
         const std::string& cls,
         std::unordered_set<std::string>& visited,
-        std::vector<std::string>& result);
+        std::vector<std::string>& result) const;
 
 private:
 

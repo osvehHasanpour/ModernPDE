@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IR.h"
-#include <set>
 #include <string>
 #include <unordered_map>
 

@@ -68,9 +68,9 @@ public:
         const std::string& context = "") const;
 
     std::string buildCallString(
-        const std::vector<std::string>& calls);
+        const std::vector<std::string>& calls) const;
 
-    void print();
+    void print() const;
 
 private:
 

@@ -1,6 +1,5 @@
 #include "Parser.h"
 
-#include <iostream>
 #include <unordered_set>
 
 namespace ModernPDE
@@ -31,20 +30,32 @@ bool isTypeKeyword(
     return types.count(word) != 0;
 }
 
+std::unique_ptr<ASTNode> makeNode(
+    ASTNodeType type,
+    const std::string& name,
+    int line)
+{
+    auto node = std::make_unique<ASTNode>(type, name);
+    node->line = line;
+    return node;
 }
 
-ASTNode::~ASTNode()
+const Token& eofToken()
 {
-    for(ASTNode* child : children)
-    {
-        delete child;
-    }
+    static const Token token{
+        TokenType::EndOfFile,
+        "",
+        0,
+        0};
+
+    return token;
+}
+
 }
 
 Parser::Parser(const std::vector<Token>& tokens)
     : tokenList_(tokens),
-      index_(0),
-      rootNode_(nullptr)
+      index_(0)
 {
 }
 
@@ -52,15 +63,11 @@ void Parser::parse()
 {
     functionList_.clear();
     globalVariableList_.clear();
+    lastError_.clear();
+    index_ = 0;
 
-    if(rootNode_)
-    {
-        delete rootNode_;
-    }
-
-    rootNode_ = nullptr;
     rootNode_ =
-        new ASTNode(
+        std::make_unique<ASTNode>(
             ASTNodeType::TranslationUnit,
             "TranslationUnit");
 
@@ -69,7 +76,7 @@ void Parser::parse()
 
 ASTNode* Parser::getRoot() const
 {
-    return rootNode_;
+    return rootNode_.get();
 }
 
 size_t Parser::functionCount() const
@@ -82,6 +89,16 @@ size_t Parser::globalVariableCount() const
     return globalVariableList_.size();
 }
 
+bool Parser::hasError() const
+{
+    return !lastError_.empty();
+}
+
+const std::string& Parser::lastError() const
+{
+    return lastError_;
+}
+
 bool Parser::eof() const
 {
     return index_ >= tokenList_.size();
@@ -89,12 +106,36 @@ bool Parser::eof() const
 
 const Token& Parser::current() const
 {
+    if(eof())
+    {
+        return eofToken();
+    }
+
     return tokenList_[index_];
 }
 
 const Token& Parser::peek(int offset) const
 {
-    std::size_t pos = index_ + offset;
+    if(tokenList_.empty())
+    {
+        return eofToken();
+    }
+
+    if(offset < 0)
+    {
+        const std::size_t back =
+            static_cast<std::size_t>(-offset);
+
+        if(back > index_)
+        {
+            return eofToken();
+        }
+
+        return tokenList_[index_ - back];
+    }
+
+    const std::size_t pos =
+        index_ + static_cast<std::size_t>(offset);
 
     if(pos >= tokenList_.size())
     {
@@ -132,6 +173,14 @@ void Parser::advance()
     }
 }
 
+void Parser::setError(const std::string& message)
+{
+    if(lastError_.empty())
+    {
+        lastError_ = message;
+    }
+}
+
 void Parser::parseTranslationUnit()
 {
     while(!eof())
@@ -154,7 +203,6 @@ void Parser::parseDeclaration()
         return;
     }
 
-    std::string typeName = current().text;
     advance();
 
     if(!match(TokenType::Identifier))
@@ -179,6 +227,7 @@ void Parser::parseFunction(const std::string& name)
     int line = current().line;
 
     int depth = 0;
+    bool closed = false;
 
     while(!eof())
     {
@@ -193,11 +242,21 @@ void Parser::parseFunction(const std::string& name)
             if(depth == 0)
             {
                 advance();
+                closed = true;
                 break;
             }
         }
 
         advance();
+    }
+
+    if(!closed)
+    {
+        setError(
+            "Unterminated parameter list for function '" +
+            name +
+            "'");
+        return;
     }
 
     if(match(";"))
@@ -206,38 +265,40 @@ void Parser::parseFunction(const std::string& name)
         return;
     }
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::Function,
-            name);
+            name,
+            line);
 
-    node->line = line;
-    functionList_.push_back(node);
-    rootNode_->children.push_back(node);
+    ASTNode* raw = node.get();
+    functionList_.push_back(raw);
 
     if(match("{"))
     {
-        ASTNode* body =
-            new ASTNode(
+        auto body =
+            makeNode(
                 ASTNodeType::CompoundStatement,
-                "");
+                "",
+                current().line);
 
-        body->line = current().line;
-        parseCompound(body);
-        node->children.push_back(body);
+        parseCompound(body.get());
+        node->addChild(std::move(body));
     }
+
+    rootNode_->addChild(std::move(node));
 }
 
 void Parser::parseVariable(const std::string& name)
 {
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::Variable,
-            name);
+            name,
+            current().line);
 
-    node->line = current().line;
-    globalVariableList_.push_back(node);
-    rootNode_->children.push_back(node);
+    globalVariableList_.push_back(node.get());
+    rootNode_->addChild(std::move(node));
 
     while(!eof())
     {
@@ -253,6 +314,11 @@ void Parser::parseVariable(const std::string& name)
 
 void Parser::parseCompound(ASTNode* compound)
 {
+    if(compound == nullptr)
+    {
+        return;
+    }
+
     if(match("{"))
     {
         advance();
@@ -266,11 +332,11 @@ void Parser::parseCompound(ASTNode* compound)
             continue;
         }
 
-        ASTNode* stmt = parseStatement();
+        std::unique_ptr<ASTNode> stmt = parseStatement();
 
-        if(stmt != nullptr)
+        if(stmt)
         {
-            compound->children.push_back(stmt);
+            compound->addChild(std::move(stmt));
         }
     }
 
@@ -278,9 +344,13 @@ void Parser::parseCompound(ASTNode* compound)
     {
         advance();
     }
+    else
+    {
+        setError("Unterminated compound statement");
+    }
 }
 
-ASTNode* Parser::parseStatement()
+std::unique_ptr<ASTNode> Parser::parseStatement()
 {
     if(eof())
     {
@@ -347,7 +417,7 @@ ASTNode* Parser::parseStatement()
     return nullptr;
 }
 
-ASTNode* Parser::parseIfStatement()
+std::unique_ptr<ASTNode> Parser::parseIfStatement()
 {
     int line = current().line;
     advance();
@@ -359,44 +429,41 @@ ASTNode* Parser::parseIfStatement()
         cond = collectBalanced('(', ')');
     }
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::IfStatement,
-            cond);
+            cond,
+            line);
 
-    node->line = line;
-
-    ASTNode* condNode =
-        new ASTNode(
+    node->addChild(
+        makeNode(
             ASTNodeType::Expression,
-            cond);
+            cond,
+            line));
 
-    condNode->line = line;
-    node->children.push_back(condNode);
+    auto thenBranch = parseStatement();
 
-    ASTNode* thenBranch = parseStatement();
-
-    if(thenBranch != nullptr)
+    if(thenBranch)
     {
-        node->children.push_back(thenBranch);
+        node->addChild(std::move(thenBranch));
     }
 
     if(match("else"))
     {
         advance();
 
-        ASTNode* elseBranch = parseStatement();
+        auto elseBranch = parseStatement();
 
-        if(elseBranch != nullptr)
+        if(elseBranch)
         {
-            node->children.push_back(elseBranch);
+            node->addChild(std::move(elseBranch));
         }
     }
 
     return node;
 }
 
-ASTNode* Parser::parseWhileStatement()
+std::unique_ptr<ASTNode> Parser::parseWhileStatement()
 {
     int line = current().line;
     advance();
@@ -408,32 +475,29 @@ ASTNode* Parser::parseWhileStatement()
         cond = collectBalanced('(', ')');
     }
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::WhileStatement,
-            cond);
+            cond,
+            line);
 
-    node->line = line;
-
-    ASTNode* condNode =
-        new ASTNode(
+    node->addChild(
+        makeNode(
             ASTNodeType::Expression,
-            cond);
+            cond,
+            line));
 
-    condNode->line = line;
-    node->children.push_back(condNode);
+    auto body = parseStatement();
 
-    ASTNode* body = parseStatement();
-
-    if(body != nullptr)
+    if(body)
     {
-        node->children.push_back(body);
+        node->addChild(std::move(body));
     }
 
     return node;
 }
 
-ASTNode* Parser::parseForStatement()
+std::unique_ptr<ASTNode> Parser::parseForStatement()
 {
     int line = current().line;
     advance();
@@ -445,48 +509,44 @@ ASTNode* Parser::parseForStatement()
         header = collectBalanced('(', ')');
     }
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::ForStatement,
-            header);
+            header,
+            line);
 
-    node->line = line;
-
-    ASTNode* headerNode =
-        new ASTNode(
+    node->addChild(
+        makeNode(
             ASTNodeType::Expression,
-            header);
+            header,
+            line));
 
-    headerNode->line = line;
-    node->children.push_back(headerNode);
+    auto body = parseStatement();
 
-    ASTNode* body = parseStatement();
-
-    if(body != nullptr)
+    if(body)
     {
-        node->children.push_back(body);
+        node->addChild(std::move(body));
     }
 
     return node;
 }
 
-ASTNode* Parser::parseDoWhileStatement()
+std::unique_ptr<ASTNode> Parser::parseDoWhileStatement()
 {
     int line = current().line;
     advance();
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::DoWhileStatement,
-            "");
+            "",
+            line);
 
-    node->line = line;
+    auto body = parseStatement();
 
-    ASTNode* body = parseStatement();
-
-    if(body != nullptr)
+    if(body)
     {
-        node->children.push_back(body);
+        node->addChild(std::move(body));
     }
 
     if(match("while"))
@@ -500,13 +560,11 @@ ASTNode* Parser::parseDoWhileStatement()
             cond = collectBalanced('(', ')');
         }
 
-        ASTNode* condNode =
-            new ASTNode(
+        node->addChild(
+            makeNode(
                 ASTNodeType::Expression,
-                cond);
-
-        condNode->line = current().line;
-        node->children.push_back(condNode);
+                cond,
+                current().line));
     }
 
     if(match(";"))
@@ -517,7 +575,7 @@ ASTNode* Parser::parseDoWhileStatement()
     return node;
 }
 
-ASTNode* Parser::parseSwitchStatement()
+std::unique_ptr<ASTNode> Parser::parseSwitchStatement()
 {
     int line = current().line;
     advance();
@@ -529,32 +587,29 @@ ASTNode* Parser::parseSwitchStatement()
         cond = collectBalanced('(', ')');
     }
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::SwitchStatement,
-            cond);
+            cond,
+            line);
 
-    node->line = line;
-
-    ASTNode* condNode =
-        new ASTNode(
+    node->addChild(
+        makeNode(
             ASTNodeType::Expression,
-            cond);
+            cond,
+            line));
 
-    condNode->line = line;
-    node->children.push_back(condNode);
+    auto body = parseCompoundStatement();
 
-    ASTNode* body = parseCompoundStatement();
-
-    if(body != nullptr)
+    if(body)
     {
-        node->children.push_back(body);
+        node->addChild(std::move(body));
     }
 
     return node;
 }
 
-ASTNode* Parser::parseBreakStatement()
+std::unique_ptr<ASTNode> Parser::parseBreakStatement()
 {
     int line = current().line;
     advance();
@@ -564,16 +619,13 @@ ASTNode* Parser::parseBreakStatement()
         advance();
     }
 
-    ASTNode* node =
-        new ASTNode(
-            ASTNodeType::BreakStatement,
-            "break");
-
-    node->line = line;
-    return node;
+    return makeNode(
+        ASTNodeType::BreakStatement,
+        "break",
+        line);
 }
 
-ASTNode* Parser::parseContinueStatement()
+std::unique_ptr<ASTNode> Parser::parseContinueStatement()
 {
     int line = current().line;
     advance();
@@ -583,16 +635,13 @@ ASTNode* Parser::parseContinueStatement()
         advance();
     }
 
-    ASTNode* node =
-        new ASTNode(
-            ASTNodeType::ContinueStatement,
-            "continue");
-
-    node->line = line;
-    return node;
+    return makeNode(
+        ASTNodeType::ContinueStatement,
+        "continue",
+        line);
 }
 
-ASTNode* Parser::parseReturnStatement()
+std::unique_ptr<ASTNode> Parser::parseReturnStatement()
 {
     int line = current().line;
     advance();
@@ -605,28 +654,25 @@ ASTNode* Parser::parseReturnStatement()
         advance();
     }
 
-    ASTNode* node =
-        new ASTNode(
-            ASTNodeType::ReturnStatement,
-            expr);
-
-    node->line = line;
-    return node;
+    return makeNode(
+        ASTNodeType::ReturnStatement,
+        expr,
+        line);
 }
 
-ASTNode* Parser::parseCompoundStatement()
+std::unique_ptr<ASTNode> Parser::parseCompoundStatement()
 {
-    ASTNode* compound =
-        new ASTNode(
+    auto compound =
+        makeNode(
             ASTNodeType::CompoundStatement,
-            "");
+            "",
+            current().line);
 
-    compound->line = current().line;
-    parseCompound(compound);
+    parseCompound(compound.get());
     return compound;
 }
 
-ASTNode* Parser::parseLocalDeclaration()
+std::unique_ptr<ASTNode> Parser::parseLocalDeclaration()
 {
     int line = current().line;
     advance();
@@ -640,12 +686,11 @@ ASTNode* Parser::parseLocalDeclaration()
     std::string name = current().text;
     advance();
 
-    ASTNode* node =
-        new ASTNode(
+    auto node =
+        makeNode(
             ASTNodeType::Variable,
-            name);
-
-    node->line = line;
+            name,
+            line);
 
     if(match("="))
     {
@@ -654,13 +699,11 @@ ASTNode* Parser::parseLocalDeclaration()
         std::string init =
             collectUntilSemicolon();
 
-        ASTNode* initExpr =
-            new ASTNode(
+        node->addChild(
+            makeNode(
                 ASTNodeType::Expression,
-                init);
-
-        initExpr->line = line;
-        node->children.push_back(initExpr);
+                init,
+                line));
     }
 
     if(match(";"))
@@ -671,7 +714,7 @@ ASTNode* Parser::parseLocalDeclaration()
     return node;
 }
 
-ASTNode* Parser::parseExpressionStatement()
+std::unique_ptr<ASTNode> Parser::parseExpressionStatement()
 {
     int line = current().line;
 
@@ -683,13 +726,10 @@ ASTNode* Parser::parseExpressionStatement()
         advance();
     }
 
-    ASTNode* node =
-        new ASTNode(
-            ASTNodeType::Expression,
-            text);
-
-    node->line = line;
-    return node;
+    return makeNode(
+        ASTNodeType::Expression,
+        text,
+        line);
 }
 
 std::string Parser::collectBalanced(
@@ -704,6 +744,7 @@ std::string Parser::collectBalanced(
     }
 
     int depth = 0;
+    bool closed = false;
 
     while(!eof())
     {
@@ -722,12 +763,22 @@ std::string Parser::collectBalanced(
             {
                 result += text;
                 advance();
+                closed = true;
                 break;
             }
         }
 
         result += text;
         advance();
+    }
+
+    if(!closed)
+    {
+        setError(
+            std::string("Unmatched '") +
+            open +
+            "' starting at line " +
+            std::to_string(current().line));
     }
 
     return result;

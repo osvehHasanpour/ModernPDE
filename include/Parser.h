@@ -1,10 +1,11 @@
-#ifndef MODERNPDE_PARSER_H
-#define MODERNPDE_PARSER_H
+#pragma once
 
 #include "Lexer.h"
 
-#include <vector>
+#include <cstddef>
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace ModernPDE
 {
@@ -41,7 +42,7 @@ struct ASTNode
 
     int line = 0;
 
-    std::vector<ASTNode*> children;
+    std::vector<std::unique_ptr<ASTNode>> children;
 
     ASTNode(
         ASTNodeType t = ASTNodeType::Unknown,
@@ -52,7 +53,28 @@ struct ASTNode
     {
     }
 
-    ~ASTNode();
+    ASTNode* child(std::size_t index) const
+    {
+        if(index >= children.size())
+        {
+            return nullptr;
+        }
+
+        return children[index].get();
+    }
+
+    std::size_t childCount() const
+    {
+        return children.size();
+    }
+
+    void addChild(std::unique_ptr<ASTNode> node)
+    {
+        if(node)
+        {
+            children.push_back(std::move(node));
+        }
+    }
 };
 
 class Parser
@@ -64,11 +86,16 @@ public:
 
     void parse();
 
+    // Non-owning view; the Parser retains ownership of the AST.
     ASTNode* getRoot() const;
 
     size_t functionCount() const;
 
     size_t globalVariableCount() const;
+
+    bool hasError() const;
+
+    const std::string& lastError() const;
 
 private:
 
@@ -84,6 +111,8 @@ private:
 
     void advance();
 
+    void setError(const std::string& message);
+
     void parseTranslationUnit();
 
     void parseDeclaration();
@@ -97,29 +126,29 @@ private:
     void parseCompound(
         ASTNode* compound);
 
-    ASTNode* parseStatement();
+    std::unique_ptr<ASTNode> parseStatement();
 
-    ASTNode* parseIfStatement();
+    std::unique_ptr<ASTNode> parseIfStatement();
 
-    ASTNode* parseWhileStatement();
+    std::unique_ptr<ASTNode> parseWhileStatement();
 
-    ASTNode* parseDoWhileStatement();
+    std::unique_ptr<ASTNode> parseDoWhileStatement();
 
-    ASTNode* parseForStatement();
+    std::unique_ptr<ASTNode> parseForStatement();
 
-    ASTNode* parseSwitchStatement();
+    std::unique_ptr<ASTNode> parseSwitchStatement();
 
-    ASTNode* parseBreakStatement();
+    std::unique_ptr<ASTNode> parseBreakStatement();
 
-    ASTNode* parseContinueStatement();
+    std::unique_ptr<ASTNode> parseContinueStatement();
 
-    ASTNode* parseReturnStatement();
+    std::unique_ptr<ASTNode> parseReturnStatement();
 
-    ASTNode* parseCompoundStatement();
+    std::unique_ptr<ASTNode> parseCompoundStatement();
 
-    ASTNode* parseLocalDeclaration();
+    std::unique_ptr<ASTNode> parseLocalDeclaration();
 
-    ASTNode* parseExpressionStatement();
+    std::unique_ptr<ASTNode> parseExpressionStatement();
 
     std::string collectBalanced(
         char open,
@@ -137,13 +166,13 @@ private:
 
     size_t index_ = 0;
 
-    ASTNode* rootNode_ = nullptr;
+    std::unique_ptr<ASTNode> rootNode_;
 
     std::vector<ASTNode*> functionList_;
 
     std::vector<ASTNode*> globalVariableList_;
+
+    std::string lastError_;
 };
 
 }
-
-#endif

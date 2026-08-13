@@ -24,47 +24,58 @@ void PDE::addExecutionPath(
 }
 
 bool PDE::isDead(
-    const std::string& name)
+    const std::string& name) const
 {
-    return
-        variables[name].definitions > 0 &&
-        variables[name].uses == 0;
-}
+    const auto found = variables.find(name);
 
-bool PDE::isPartiallyDead(
-    const std::string& name)
-{
-    if(
-        variables[name].paths == 0)
+    if(found == variables.end())
     {
         return false;
     }
 
     return
-        variables[name].uses > 0 &&
-        variables[name].uses <
-        variables[name].paths;
+        found->second.definitions > 0 &&
+        found->second.uses == 0;
+}
+
+bool PDE::isPartiallyDead(
+    const std::string& name) const
+{
+    const auto found = variables.find(name);
+
+    if(found == variables.end() ||
+       found->second.paths == 0)
+    {
+        return false;
+    }
+
+    return
+        found->second.uses > 0 &&
+        found->second.uses <
+        found->second.paths;
 }
 
 double PDE::getUsageRatio(
-    const std::string& name)
+    const std::string& name) const
 {
-    if(
-        variables[name].paths == 0)
+    const auto found = variables.find(name);
+
+    if(found == variables.end() ||
+       found->second.paths == 0)
     {
         return 0.0;
     }
 
     return
         static_cast<double>(
-            variables[name].uses)
+            found->second.uses)
         /
         static_cast<double>(
-            variables[name].paths);
+            found->second.paths);
 }
 
 std::string PDE::classify(
-    const std::string& name)
+    const std::string& name) const
 {
     if(isDead(name))
     {
@@ -92,7 +103,7 @@ std::string PDE::classify(
     return "LIVE";
 }
 
-void PDE::printResults()
+void PDE::printResults() const
 {
     std::cout
     << "\n====================================\n";
@@ -103,9 +114,9 @@ void PDE::printResults()
     std::cout
     << "====================================\n";
 
-    for(auto& pair : variables)
+    for(const auto& pair : variables)
     {
-        auto& var =
+        const auto& var =
             pair.second;
 
         std::cout

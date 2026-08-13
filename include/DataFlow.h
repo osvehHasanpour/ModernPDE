@@ -9,3 +9,11 @@ struct DataFlowSet
 
     std::set<std::string> out;
 };
+
+DataFlowSet unionSets(
+    const DataFlowSet& left,
+    const DataFlowSet& right);
+
+bool equalSets(
+    const DataFlowSet& left,
+    const DataFlowSet& right);

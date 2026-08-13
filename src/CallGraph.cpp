@@ -202,7 +202,7 @@ bool CallGraph::isReachable(
 }
 
 std::string CallGraph::buildCallString(
-    const std::vector<std::string>& calls)
+    const std::vector<std::string>& calls) const
 {
     std::string result;
 
@@ -219,7 +219,7 @@ std::string CallGraph::buildCallString(
     return result;
 }
 
-void CallGraph::print()
+void CallGraph::print() const
 {
     std::cout
         << "\nContext Sensitive Call Graph:\n";

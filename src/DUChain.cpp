@@ -94,11 +94,11 @@ void collectDefsAndUses(
         def.defId    = nextDefId++;
         defs.push_back(def);
 
-        if(!node->children.empty())
+        if(node->child(0) != nullptr)
         {
             std::vector<std::string> ids;
             extractIdentifiers(
-                node->children[0]->name,
+                node->child(0)->name,
                 ids);
 
             for(const auto& id : ids)

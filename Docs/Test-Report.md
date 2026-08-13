@@ -32,7 +32,7 @@ ModernPDE is a modular C++17 static-analysis framework covering class hierarchy 
 | Lexer / parser / CFG builder | `Lexer.cpp`, `Parser.cpp`, `CFGBuilder.cpp` | Working smoke tests |
 | Field-sensitive analysis | `FieldSensitiveAnalysis.cpp` | New; demo via `--field-sensitive` |
 | Main pipeline | `main.cpp` | Runs all phases; file mode for samples |
-| Stubs / empty | `IR.cpp`, `ModernPDE.cpp`, `SCCP.H` | Not tested / not implemented |
+| Stubs / empty | `IR.cpp`, `ModernPDE.cpp`, `SCCP.h` | Not tested / not implemented |
 
 ---
 
