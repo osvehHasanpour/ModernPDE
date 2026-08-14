@@ -1,10 +1,10 @@
-Start testing: Aug 14 21:08 +0330
+Start testing: Aug 14 21:21 +0330
 ----------------------------------------------------------
 1/14 Testing: phase8_test
 1/14 Test: phase8_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/phase8_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"phase8_test" start time: Aug 14 21:08 +0330
+"phase8_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 
@@ -71,10 +71,10 @@ liveVar classification: LIVE
 ######################################################################
 
 <end of output>
-Test time =   0.01 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"phase8_test" end time: Aug 14 21:08 +0330
+"phase8_test" end time: Aug 14 21:21 +0330
 "phase8_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -82,7 +82,7 @@ Test Passed.
 2/14 Test: field_sensitive_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/field_sensitive_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"field_sensitive_test" start time: Aug 14 21:08 +0330
+"field_sensitive_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -135,7 +135,7 @@ Field Read Log:
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"field_sensitive_test" end time: Aug 14 21:08 +0330
+"field_sensitive_test" end time: Aug 14 21:21 +0330
 "field_sensitive_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -143,7 +143,7 @@ Test Passed.
 3/14 Test: lexer_parser_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/lexer_parser_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"lexer_parser_test" start time: Aug 14 21:08 +0330
+"lexer_parser_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -169,10 +169,10 @@ Output:
   RESULT : ALL TESTS PASSED
 ================================================
 <end of output>
-Test time =   0.04 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"lexer_parser_test" end time: Aug 14 21:08 +0330
+"lexer_parser_test" end time: Aug 14 21:21 +0330
 "lexer_parser_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -180,7 +180,7 @@ Test Passed.
 4/14 Test: callgraph_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/callgraph_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"callgraph_test" start time: Aug 14 21:08 +0330
+"callgraph_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -195,7 +195,7 @@ Output:
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"callgraph_test" end time: Aug 14 21:08 +0330
+"callgraph_test" end time: Aug 14 21:21 +0330
 "callgraph_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -203,7 +203,7 @@ Test Passed.
 5/14 Test: cha_virtual_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cha_virtual_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"cha_virtual_test" start time: Aug 14 21:08 +0330
+"cha_virtual_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -218,7 +218,7 @@ Output:
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"cha_virtual_test" end time: Aug 14 21:08 +0330
+"cha_virtual_test" end time: Aug 14 21:21 +0330
 "cha_virtual_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -226,7 +226,7 @@ Test Passed.
 6/14 Test: cfg_path_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cfg_path_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"cfg_path_test" start time: Aug 14 21:08 +0330
+"cfg_path_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -241,7 +241,7 @@ Output:
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"cfg_path_test" end time: Aug 14 21:08 +0330
+"cfg_path_test" end time: Aug 14 21:21 +0330
 "cfg_path_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -249,7 +249,7 @@ Test Passed.
 7/14 Test: cfg_phase5_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cfg_phase5_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"cfg_phase5_test" start time: Aug 14 21:08 +0330
+"cfg_phase5_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -283,10 +283,10 @@ Output:
   RESULT : ALL TESTS PASSED
 ================================================
 <end of output>
-Test time =   0.06 sec
+Test time =   0.03 sec
 ----------------------------------------------------------
 Test Passed.
-"cfg_phase5_test" end time: Aug 14 21:08 +0330
+"cfg_phase5_test" end time: Aug 14 21:21 +0330
 "cfg_phase5_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -294,7 +294,7 @@ Test Passed.
 8/14 Test: challenge_500
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_500"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"challenge_500" start time: Aug 14 21:08 +0330
+"challenge_500" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -329,7 +329,7 @@ ModernPDE classified all 500 variables correctly.
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"challenge_500" end time: Aug 14 21:08 +0330
+"challenge_500" end time: Aug 14 21:21 +0330
 "challenge_500" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -337,7 +337,7 @@ Test Passed.
 9/14 Test: challenge_5000
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_5000"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"challenge_5000" start time: Aug 14 21:08 +0330
+"challenge_5000" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -371,10 +371,10 @@ RESULT : PASS
 ModernPDE classified all 5000 variables correctly.
 ================================================
 <end of output>
-Test time =   0.04 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"challenge_5000" end time: Aug 14 21:08 +0330
+"challenge_5000" end time: Aug 14 21:21 +0330
 "challenge_5000" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -382,7 +382,7 @@ Test Passed.
 10/14 Test: challenge_50000
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/challenge_50000"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"challenge_50000" start time: Aug 14 21:08 +0330
+"challenge_50000" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -394,10 +394,10 @@ Scale:
   Paths / variable : 50
   Total paths      : 2,500,000
 
-Build time : 310.8 ms
+Build time : 201.0 ms
 
-Classify time : 31.0 ms
-Total time    : 341.8 ms
+Classify time : 25.6 ms
+Total time    : 226.6 ms
 
 Per-Category Results:
 Category          Expected          Count   Ratio   Status
@@ -419,17 +419,17 @@ Computed Metrics (50,000 variables):
   Recall       : 1.0000
   F1 Score     : 1.0000
 
-  Throughput   : 146266 variables/sec
+  Throughput   : 220625 variables/sec
 
 ================================================
 RESULT : PASS
 ModernPDE classified all 50,000 variables correctly.
 ================================================
 <end of output>
-Test time =   0.35 sec
+Test time =   0.24 sec
 ----------------------------------------------------------
 Test Passed.
-"challenge_50000" end time: Aug 14 21:08 +0330
+"challenge_50000" end time: Aug 14 21:21 +0330
 "challenge_50000" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -437,7 +437,7 @@ Test Passed.
 11/14 Test: master_challenge
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/master_challenge"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"master_challenge" start time: Aug 14 21:08 +0330
+"master_challenge" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -1155,10 +1155,10 @@ Total Variables Tested: 100
 Project PDE component is working well.
 ================================================
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"master_challenge" end time: Aug 14 21:08 +0330
+"master_challenge" end time: Aug 14 21:21 +0330
 "master_challenge" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1166,7 +1166,7 @@ Test Passed.
 12/14 Test: full_master_challenge
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/full_master_challenge"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"full_master_challenge" start time: Aug 14 21:08 +0330
+"full_master_challenge" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -1896,10 +1896,10 @@ All major components (CHA + Virtual + CallGraph + PDE) validated!
 ModernPDE is in excellent condition.
 
 <end of output>
-Test time =   0.01 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"full_master_challenge" end time: Aug 14 21:08 +0330
+"full_master_challenge" end time: Aug 14 21:21 +0330
 "full_master_challenge" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1907,7 +1907,7 @@ Test Passed.
 13/14 Test: cjson_pde_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/cjson_pde_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"cjson_pde_test" start time: Aug 14 21:08 +0330
+"cjson_pde_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -1957,7 +1957,7 @@ Computed Metrics (16 variables):
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"cjson_pde_test" end time: Aug 14 21:08 +0330
+"cjson_pde_test" end time: Aug 14 21:21 +0330
 "cjson_pde_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -1965,7 +1965,7 @@ Test Passed.
 14/14 Test: tinyexpr_pde_test
 Command: "/mnt/c/Users/osveh/Music/Modernp/ModernPDE/build-verify/tests/tinyexpr_pde_test"
 Directory: /mnt/c/Users/osveh/Music/Modernp/ModernPDE
-"tinyexpr_pde_test" start time: Aug 14 21:08 +0330
+"tinyexpr_pde_test" start time: Aug 14 21:21 +0330
 Output:
 ----------------------------------------------------------
 ================================================
@@ -2021,11 +2021,11 @@ Output:
   RESULT : ALL TESTS PASSED
 ================================================
 <end of output>
-Test time =   0.01 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"tinyexpr_pde_test" end time: Aug 14 21:08 +0330
+"tinyexpr_pde_test" end time: Aug 14 21:21 +0330
 "tinyexpr_pde_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Aug 14 21:08 +0330
+End testing: Aug 14 21:21 +0330
