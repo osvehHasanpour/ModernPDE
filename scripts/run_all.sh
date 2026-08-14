@@ -5,8 +5,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 RUN_ID=$(date +%Y-%m-%d_%H-%M-%S)
-OUT="results/runs/${RUN_ID}"
-mkdir -p "$OUT" results/benchmarks results/reports results/archive
+OUT="output/runs/${RUN_ID}"
+mkdir -p "$OUT" output/benchmarks output/reports output/archive
 
 echo "=============================================="
 echo " ModernPDE Run: ${RUN_ID}"
@@ -73,13 +73,13 @@ meta = {
 print("Wrote run_meta.json")
 PY
 
-rm -rf results/latest
-ln -sfn "runs/${RUN_ID}" results/latest
-cp -f "$OUT/metrics.json" results/reports/latest_metrics.json
-cp -f "$OUT/pde_summary.json" results/reports/latest_pde_summary.json
+rm -rf output/latest
+ln -sfn "runs/${RUN_ID}" output/latest
+cp -f "$OUT/metrics.json" output/reports/latest_metrics.json
+cp -f "$OUT/pde_summary.json" output/reports/latest_pde_summary.json
 
 echo ""
 echo "Results saved to: $OUT"
 echo "  - metrics.json / pde_summary.json / run_meta.json"
-echo "Latest: results/latest -> runs/${RUN_ID}"
+echo "Latest: output/latest -> runs/${RUN_ID}"
 echo "=============================================="

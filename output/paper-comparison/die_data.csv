@@ -1,0 +1,6 @@
+source,metric_name,value,unit,notes,extraction
+die.pdf,pages,4,,IMPACT 2025 workshop,manual+text
+die.pdf,benchmark_tables,0,,no numeric evaluation table,manual+text
+die.pdf,llama_prompt_time_reduction_pct,3,,LLaMa 3.1 8B last decoder / logits row,manual+text
+die.pdf,algorithm_steps,6,,"raise, DDG, invert, analyze, restrict, codegen",manual+text
+die.pdf,word_count_approx,781,words,whitespace tokens,pdfplumber

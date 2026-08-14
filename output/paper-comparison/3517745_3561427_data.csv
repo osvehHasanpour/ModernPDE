@@ -1,0 +1,41 @@
+source,metric_name,value,unit,notes,extraction
+3517745.3561427.pdf,pages,14,,ACM IMC '22,manual+text
+3517745.3561427.pdf,corpus_web_pages,15000,,Alexa top list landing pages,manual+text
+3517745.3561427.pdf,corpus_js_files,300000,,JS files in those pages,manual+text
+3517745.3561427.pdf,unused_functions_median_pct,70,%,% unused functions on median page,manual+text
+3517745.3561427.pdf,unused_filesize_median_pct,55,%,% of JS file size unused,manual+text
+3517745.3561427.pdf,eliminated_functions_per_file_median,67,,functions / JS file,manual+text
+3517745.3561427.pdf,eliminated_bytes_per_file_median_kb,10,KB,KB / JS file,manual+text
+3517745.3561427.pdf,eliminated_functions_per_page_mean,2000,,functions / page,manual+text
+3517745.3561427.pdf,eliminated_bytes_per_page_mean_kb,700,KB,KB / page,manual+text
+3517745.3561427.pdf,page_size_reduction_median_kb,400,KB,Chrome/Firefox/Edge median bandwidth save,manual+text
+3517745.3561427.pdf,pages_under_5min_pct,85,%,% of pages Muzeel finishes in <5 min (6 cores),manual+text
+3517745.3561427.pdf,median_runtime_64core_s,30,s,"seconds, all 64 cores",manual+text
+3517745.3561427.pdf,js_unchanged_over_week_pct,99,%,Muzeel-ed JS stability,manual+text
+3517745.3561427.pdf,perf_eval_pages,200,,phones/browsers/networks subset,manual+text
+3517745.3561427.pdf,loads_per_page,5,,median of 5 loads reported,manual+text
+3517745.3561427.pdf,structural_similarity_p90_pct,90,%,90% of 200 pages score >90%,manual+text
+3517745.3561427.pdf,lacuna_structural_p90_pct,60,%,same 200-page set,manual+text
+3517745.3561427.pdf,plt_speedup_pct,27.5,%,abstract range 25-30%; midpoint for plotting,manual+text
+3517745.3561427.pdf,plt_speedup_pct_low,25,,abstract lower bound,manual+text
+3517745.3561427.pdf,plt_speedup_pct_high,30,,abstract upper bound,manual+text
+3517745.3561427.pdf,max_3g_speedup_s,9,s,"seconds faster on 3G, low- and high-end",manual+text
+3517745.3561427.pdf,user_no_func_impact_pct,80,,user study: none or no-impact missing functions,manual+text
+3517745.3561427.pdf,user_no_struct_impact_pct,90,,user study: none or no-impact missing structure,manual+text
+3517745.3561427.pdf,testbed_phones,3,,"Redmi Go, J3, S10 — Table 1",manual+text
+3517745.3561427.pdf,testbed_browsers,4,,"Chrome, Firefox, Edge, Brave",manual+text
+3517745.3561427.pdf,extracted_table_1,3 rows,,pdfplumber table; first row=gnissecorperP,pdfplumber
+3517745.3561427.pdf,extracted_table_2,2 rows,,pdfplumber table; first row=Retrieve JS |  |  |  | Update JS,pdfplumber
+3517745.3561427.pdf,extracted_table_3,10 rows,,pdfplumber table; first row=<html>,pdfplumber
+3517745.3561427.pdf,extracted_table_4,4 rows,,pdfplumber table; first row=1.0 12000 FDC 0.5 10000 ycneuqerF 0.0 8000 101 103 Eliminated 6000 functions 4000 2000 0 100 101 102 103 104 105 106 Number of eliminated functions | 1.0 8000 FDC 0.5 6000 ycneuqerF 0.0 10−1 102 Eliminated size 4000 (KBytes) 2000 0 100 101 102 103 104 105 Eliminated size (KBytes) | 700 1.0 600 FDC 0.5 500 ycneuqerF 0.0 400 101 103 Eliminated functions 300 200 100 0 100 101 102 103 104 Number of eliminated functions |  | 1.0 | ,pdfplumber
+3517745.3561427.pdf,extracted_table_5,4 rows,,pdfplumber table; first row= | 1.0 | ,pdfplumber
+3517745.3561427.pdf,extracted_table_6,3 rows,,pdfplumber table; first row=1.0 |  | ,pdfplumber
+3517745.3561427.pdf,extracted_table_7,4 rows,,pdfplumber table; first row=1.0 700 FDC 600 0.5 ycneuqerF 500 0.0 101 104 400 Size (KBytes) 300 200 100 0 10−1 100 101 102 103 104 Eliminated size (KBytes) | 1.0 |  |  | 2000 1.0 1750 0.8 1500 0.6 FDC ycneuqerF 0.4 1250 0.2 1000 0.0 750 0 20 40 60 500 Time (m) 250 0 0 5 10 15 20 25 30 Time (m) | 1.0 Structural Muzeel Structural Lacuna 0.8 Functional Muzeel Functional Lacuna 0.6 FDC 0.4 0.2 0.0 0 20 40 60 80 10 Similarity Score (%),pdfplumber
+3517745.3561427.pdf,extracted_table_8,1 rows,,pdfplumber table; first row=0 20 Time | 40 (m) |  | 6,pdfplumber
+3517745.3561427.pdf,extracted_table_9,6 rows,,pdfplumber table; first row=1.0 0.8 0.6 FDC lowEnd (3G) 0.4 highEnd (3G) lowEnd (LTE) 0.2 highEnd (LTE) lowEnd (LTE+) 0.0 highEnd (LTE+) -1 0 1 10 100 Delta first contenful paint (s) | 1.0 0.8 0.6 FDC lowEnd (3G) 0.4 highEnd (3G) lowEnd (LTE) 0.2 highEnd (LTE) lowEnd (LTE+) 0.0 highEnd (LTE+) -10 -1 0 1 10 100 Delta speed index (s) |  |  |  | ,pdfplumber
+3517745.3561427.pdf,extracted_table_10,3 rows,,pdfplumber table; first row= |  |  | lowEn | d (3G),pdfplumber
+3517745.3561427.pdf,extracted_table_11,2 rows,,pdfplumber table; first row= | 1 (Ma 2 | ny missing | elements | ),pdfplumber
+3517745.3561427.pdf,extracted_table_12,2 rows,,pdfplumber table; first row=Ex Hi | treme impa gh impact | ct | Slight i No impa | mpact ct,pdfplumber
+3517745.3561427.pdf,extracted_table_13,12 rows,,pdfplumber table; first row=1.0 0.8 0.6 FDC 0.4 Etisalat 4G (UAE) Etisalat 3G (UAE) Vodafone 4G (Ireland) 0.2 Vodafone 3G (Ireland) Mint 4G (US) 0.0 Mint 3G (US) 0 1 10 Delta page size (MB) | 1.0 0.8 0.6 FDC 0.4 Etisalat 4G (UAE) Etisalat 3G (UAE) Vodafone 4G (Ireland) 0.2 Vodafone 3G (Ireland) Mint 4G (US) 0.0 Mint 3G (US) -1 0 1 10 Delta Speed Index (s) |  |  |  | ,pdfplumber
+3517745.3561427.pdf,extracted_table_14,6 rows,,pdfplumber table; first row= |  | Etisalat 4G (UAE),pdfplumber
+3517745.3561427.pdf,word_count_approx,2388,words,whitespace tokens,pdfplumber

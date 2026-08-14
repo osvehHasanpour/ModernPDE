@@ -767,7 +767,7 @@ Benchmark Results:
   Redundant Traversals Avoided: 1
   Early Terminations: 0
 
-Saving benchmark report to: results/phase8_benchmark.txt
+Saving benchmark report to: output/phase8_benchmark.txt
 ✓ Report saved successfully
 
 ================================================================================
@@ -775,7 +775,7 @@ PHASE 8 PIPELINE COMPLETE
 ================================================================================
 ```
 
-### Saved Report (results/phase8_benchmark.txt)
+### Saved Report (output/phase8_benchmark.txt)
 
 ```
 PHASE 8 OPTIMIZATION BENCHMARK REPORT
@@ -944,7 +944,7 @@ diff /tmp/phase7.txt /tmp/phase8.txt
 ### Test 4: Benchmark Comparison
 ```bash
 # Phase 8 generates automatic benchmark report
-cat results/phase8_benchmark.txt
+cat output/phase8_benchmark.txt
 
 # Shows speedup metrics
 ```

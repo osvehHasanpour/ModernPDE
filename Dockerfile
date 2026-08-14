@@ -16,7 +16,7 @@ COPY include/ include/
 COPY src/ src/
 COPY tests/ tests/
 
-RUN mkdir -p build results \
+RUN mkdir -p build output \
  && cd build \
  && cmake .. -DCMAKE_BUILD_TYPE=Release \
  && cmake --build . -j$(nproc)
@@ -40,10 +40,10 @@ COPY --from=builder /app/build/tests/phase8_test /app/bin/phase8_test
 COPY tests/ /app/tests/
 COPY scripts/ /app/scripts/
 
-RUN mkdir -p /app/results \
+RUN mkdir -p /app/output \
  && chmod +x /app/bin/ModernPDE /app/bin/ModernPDE_Phase8 /app/bin/phase8_test \
  && chmod +x /app/scripts/*.sh 2>/dev/null || true
 
 ENV PATH="/app/bin:${PATH}"
 
-CMD ["ModernPDE_Phase8", "/app/results/phase8_benchmark.txt"]
+CMD ["ModernPDE_Phase8", "/app/output/phase8_benchmark.txt"]

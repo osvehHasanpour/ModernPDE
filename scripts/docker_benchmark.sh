@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RESULTS="${RESULTS_DIR:-/app/results}"
+RESULTS="${RESULTS_DIR:-/app/output}"
 mkdir -p "$RESULTS"
 
 CSV="$RESULTS/docker_benchmark.csv"
@@ -28,13 +28,13 @@ run_one() {
 
 echo "=== ModernPDE baseline samples ==="
 for f in \
-  /app/tests/cfg.cpp \
-  /app/tests/dead.cpp \
-  /app/tests/oop.cpp \
-  /app/tests/partial.cpp \
-  /app/tests/recursion.cpp \
-  /app/tests/cfg_while.cpp \
-  /app/tests/cfg_for.cpp
+  /app/tests/samples/cfg.cpp \
+  /app/tests/samples/dead.cpp \
+  /app/tests/samples/oop.cpp \
+  /app/tests/samples/partial.cpp \
+  /app/tests/samples/recursion.cpp \
+  /app/tests/samples/cfg_while.cpp \
+  /app/tests/samples/cfg_for.cpp
 do
   if [[ -f "$f" ]]; then
     run_one ModernPDE "$f"

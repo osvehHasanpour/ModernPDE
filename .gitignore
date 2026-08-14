@@ -1,79 +1,46 @@
-# Build
+# Build trees
 build/
+build-baseline/
+build-benchmark/
+build-verify/
 CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
 *.o
 ModernPDE
-
-# Results
-results/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Results (keep structure, ignore generated data)
-results/latest/
-results/runs/
-results/benchmarks/*.csv
-results/archive/
-!results/README.md
-!results/reports/
-.venv/
-venv/
-.venv/
-venv/
-build/
-*.o
-ModernPDE
-ModernPDE_Phase8
-phase8_test
-project.zip
-*.pdf
-results/runs/
-results/latest/
-results/archive/
-.venv/
-venv/
-build/
-*.o
-ModernPDE
 ModernPDE_Phase8
 phase8_test
 *_test
-project.zip
-project/
-*.pdf
-results/runs/
-results/latest/
-results/archive/
+
+# Python
 .venv/
 venv/
-build/
-*.o
-ModernPDE
-ModernPDE_Phase8
-phase8_test
-*_test
-project.zip
-project/
-*.pdf
-results/runs/
-results/latest/
-results/archive/
-
-# Benchmark build artifacts
-build-benchmark/
-
-# Python generated files
 __pycache__/
 *.py[cod]
 
-# Benchmark generated results
+# Generated analyzer output
+results/
+output/runs/
+output/latest
+output/archive/
+output/benchmarks/*.csv
+output/reports/
+!output/README.md
+
+# Benchmark runner output
 benchmarks/results/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archives
+project.zip
+project/
+
+# PDFs except committed papers
+*.pdf
+!docs/papers/*.pdf

@@ -1,0 +1,28 @@
+source,metric_name,value,unit,notes,extraction
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,pages,12,,ASE '16,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,projects,5,,"Math, Vectorz, Lang, JSyn, Img2",manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,total_loops_abstract,6028,,abstract / RQ1 prose,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,total_loops_table2,6082,,Table 2 total column; disagrees with abstract,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,payloads_generated,4705,,Table 2,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,payloads_generated_pct,77,%,Table 2 of 6082,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,payloads_initialized,3485,,Table 2,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,microbenchmarks_generated,3462,,Table 2,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,rejected,1377,,precondition failures,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,rejected_pct,23,%,,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,unsupported_variables,1027,,,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,unsupported_invocations,350,,,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,regression_failures,23,,0.4%,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,expert_match_autojmh,23,,of 23; CI overlap α=0.05,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,expert_match_dce_off,0,,sink maximization off,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,expert_match_cfcp_inverted,11,,declaration rules inverted,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,expert_match_bad_init,3,,random/wrong inputs,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,sort_linkedlist_sorted_ns,203,ns,Table 1,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,sort_linkedlist_unsorted_ns,453,ns,Table 1,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,sort_vector_sorted_ns,1639,ns,Table 1,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,sort_vector_unsorted_ns,645,ns,Table 1,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,rq3_engineers,6,,"professional Java, little microbenchmark experience",manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,rq3_suas,5,,all handwritten payloads distorted,manual+text
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,word_count_approx,7683,words,whitespace tokens,pdfplumber
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,extracted_table_1,1 rows,,pdfplumber table; first row=0. | check snippet,pdfplumber
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,extracted_table_2,1 rows,,pdfplumber table; first row=6. g initia va | enerate lization lues,pdfplumber
+Generation to Prevent DeadCode Elimination and Constant Folding (1).pdf,extracted_table_3,3 rows,,pdfplumber table; first row=2851 | 1498 | 501 | 306 | 926 | 6082,pdfplumber

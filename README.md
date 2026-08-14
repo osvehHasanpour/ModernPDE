@@ -199,24 +199,17 @@ Variables: 50,000   Time: X ms
 ## Project Structure
 
 ```
-Modernp/
-├── src/
-│   ├── main.cpp                  # Entry point — runs all phases in sequence
-│   ├── ClassHierarchy.cpp        # Phase 1  · inheritance tree
-│   ├── VirtualCallAnalysis.cpp   # Phase 2  · vtable-style dispatch resolution
-│   ├── CallGraph.cpp             # Phase 3  · context-sensitive call graph + DFS
-│   ├── PDE.cpp                   # Phase 4  · partial dead code classification
-│   ├── CFG.cpp                   # Phase 5  · basic block CFG
-│   ├── DUChain.cpp               # Phase 5  · definition-use chains
-│   ├── PathEnumeration.cpp       # Phase 5  · CFG path enumeration
-│   ├── CFGPDE.cpp                # Phase 5.4 · path-precise dead code
-│   ├── Metrics.cpp               # Phase 5.6 · accuracy / precision / recall / F1
-│   └── Benchmark.cpp             # Phase 5.7 · scalability timing
-├── include/                      # Headers for all modules
-├── results/                      # Auto-generated output files
-├── build/                        # CMake build artifacts
-└── scripts/
-    └── run_all.sh                # One-shot: build, run, save all results
+ModernPDE/
+├── src/                          # Analyzer implementation
+├── include/                      # Headers
+├── tests/                        # CTest sources + tests/samples/ inputs
+├── scripts/                      # Build, run, plot, and paper-extract helpers
+├── docs/                         # Guides and reports
+│   └── papers/                   # Reference PDFs (muzeel, die, autojmh)
+├── benchmarks/                   # Benchmark runners only
+├── output/                       # Generated runs, plots, paper extracts
+├── Dockerfile
+└── .github/workflows/ci.yml
 ```
 
 ---
@@ -243,7 +236,7 @@ cd scripts
 ./run_all.sh
 ```
 
-Output files saved to `results/`:
+Output files saved to `output/runs/<timestamp>/`:
 
 | File                     | Contents                           |
 |--------------------------|------------------------------------|

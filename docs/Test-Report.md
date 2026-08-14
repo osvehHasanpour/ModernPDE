@@ -15,7 +15,7 @@ ModernPDE is a modular C++17 static-analysis framework covering class hierarchy 
 | Category | Passed | Failed | Skipped / N/A |
 |----------|--------|--------|----------------|
 | CTest automated targets | 12 | 0 | 0 |
-| Incomplete / non-tests | — | — | 1 (`tests/Benchmark.cpp` fragment) |
+| Incomplete / non-tests | — | — | 0 (`tests/Benchmark.cpp` removed) |
 | **Total (ctest)** | **12** | **0** | — |
 
 ---
@@ -68,17 +68,17 @@ ModernPDE is a modular C++17 static-analysis framework covering class hierarchy 
 
 ### Lexer / parser sample inputs (smoke — no assertions)
 
-Run: `./build/ModernPDE tests/<file>.cpp` from project root.
+Run: `./build/ModernPDE tests/samples/<file>.cpp` from project root.
 
 | File | Scenario | Result |
 |------|----------|--------|
-| `tests/dead.cpp` | Unused locals | Lexer OK, 1 function |
-| `tests/cfg.cpp` | If/else branch | Lexer OK, 1 function |
-| `tests/oop.cpp` | `new` + virtual `attack()` | Lexer OK, 1 function |
-| `tests/partial.cpp` | Conditional `std::cout` use | Lexer OK, 1 function |
-| `tests/recursion.cpp` | `factorial` recursion | Lexer OK, 1 function |
-| `tests/template.cpp` | Function template `add` | Lexer OK, 1 function |
-| `tests/mutual_recursive.cpp` | `even` / `odd` mutual recursion | Lexer OK, 3 functions |
+| `tests/samples/dead.cpp` | Unused locals | Lexer OK, 1 function |
+| `tests/samples/cfg.cpp` | If/else branch | Lexer OK, 1 function |
+| `tests/samples/oop.cpp` | `new` + virtual `attack()` | Lexer OK, 1 function |
+| `tests/samples/partial.cpp` | Conditional `std::cout` use | Lexer OK, 1 function |
+| `tests/samples/recursion.cpp` | `factorial` recursion | Lexer OK, 1 function |
+| `tests/samples/template.cpp` | Function template `add` | Lexer OK, 1 function |
+| `tests/samples/mutual_recursive.cpp` | `even` / `odd` mutual recursion | Lexer OK, 3 functions |
 
 ### Main binary integration
 
@@ -86,13 +86,12 @@ Run: `./build/ModernPDE tests/<file>.cpp` from project root.
 |---------|-------------------|--------|
 | `./build/ModernPDE` | Full demo pipeline (phases 1–6 including field-sensitive) | **PASS** (exit 0) |
 | `./build/ModernPDE --field-sensitive` | Field-sensitive heap demo only | **PASS** (exit 0) |
-| `./build/ModernPDE tests/<sample>.cpp` | Lexer → parser → CFG on sample file | **PASS** (all 7 samples) |
+| `./build/ModernPDE tests/samples/<sample>.cpp` | Lexer → parser → CFG on sample file | **PASS** (all 7 samples) |
 
 ### Not runnable / incomplete
 
 | File | Notes |
 |------|-------|
-| `tests/Benchmark.cpp` | Fragment only (`for` loops, no `main`); not a test |
 | `scripts/run_all.sh` | Runs main binary and greps output; not an assertion suite |
 
 ---
@@ -152,7 +151,7 @@ Compiling `tinyexpr.c` directly with `g++` fails due to C++/C `const`/`void*` st
 | Issue observed | Classification | Action taken |
 |----------------|----------------|--------------|
 | `tinyexpr.c` fails when compiled as C++ | Build / toolchain | Documented two-step gcc+g++ build above |
-| `tests/Benchmark.cpp` not a complete program | Incomplete artifact | Left unchanged; excluded from pass/fail count |
+| `tests/Benchmark.cpp` not a complete program | Incomplete artifact | Removed |
 | `ModernPDE.cpp` unused-parameter warnings | Pre-existing stubs | Not blocking; not modified |
 
 ---
@@ -181,7 +180,7 @@ Supporting API additions for testability: `DUChainAnalysis::chainCount()`, `Path
 2. **Extend field-sensitive tests** — branchy CFG, more alias patterns.
 3. **Parser assertions** — expected token counts per sample file.
 4. **Optional: implement `IR.cpp` helpers** — only if you explicitly approve filling the empty file.
-5. **Complete or remove `tests/Benchmark.cpp`** — fragment remains incomplete.
+5. ~~Complete or remove `tests/Benchmark.cpp`~~ — removed.
 
 ---
 

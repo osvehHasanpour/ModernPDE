@@ -183,17 +183,17 @@ int main()
 
     const Phase5Case cases[] =
     {
-        { "tests/cfg.cpp",              5, 1, true,  true  },
-        { "tests/cfg_while.cpp",        5, 1, true,  true  },
-        { "tests/cfg_for.cpp",          6, 1, true,  true  },
-        { "tests/cfg_nested_if.cpp",    8, 1, true,  true  },
-        { "tests/cfg_do_while.cpp",     5, 1, true,  true  },
-        { "tests/cfg_break_continue.cpp", 6, 1, true, true },
-        { "tests/cfg_switch.cpp",       5, 1, true,  true  },
-        { "tests/cfg_multi_return.cpp", 5, 1, true,  false },
-        { "tests/recursion.cpp",        5, 1, true,  false },
-        { "tests/mutual_recursive.cpp", 5, 1, true,  false },
-        { "tests/oop.cpp",              3, 1, true,  false },
+        { "tests/samples/cfg.cpp",              5, 1, true,  true  },
+        { "tests/samples/cfg_while.cpp",        5, 1, true,  true  },
+        { "tests/samples/cfg_for.cpp",          6, 1, true,  true  },
+        { "tests/samples/cfg_nested_if.cpp",    8, 1, true,  true  },
+        { "tests/samples/cfg_do_while.cpp",     5, 1, true,  true  },
+        { "tests/samples/cfg_break_continue.cpp", 6, 1, true, true },
+        { "tests/samples/cfg_switch.cpp",       5, 1, true,  true  },
+        { "tests/samples/cfg_multi_return.cpp", 5, 1, true,  false },
+        { "tests/samples/recursion.cpp",        5, 1, true,  false },
+        { "tests/samples/mutual_recursive.cpp", 5, 1, true,  false },
+        { "tests/samples/oop.cpp",              3, 1, true,  false },
     };
 
     for(const auto& testCase : cases)

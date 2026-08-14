@@ -5,8 +5,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 RUN_ID=$(date +%Y-%m-%d_%H-%M-%S)
-OUT="results/runs/${RUN_ID}_phase8"
-mkdir -p "$OUT" results/benchmarks results/reports
+OUT="output/runs/${RUN_ID}_phase8"
+mkdir -p "$OUT" output/benchmarks output/reports
 
 echo "=============================================="
 echo " ModernPDE Phase8 Run: ${RUN_ID}"
@@ -71,9 +71,9 @@ data = {
 print("Wrote phase8_summary.json")
 PY
 
-rm -rf results/latest
-ln -sfn "runs/${RUN_ID}_phase8" results/latest
-cp -f "$OUT/phase8_summary.json" results/reports/latest_phase8_summary.json
+rm -rf output/latest
+ln -sfn "runs/${RUN_ID}_phase8" output/latest
+cp -f "$OUT/phase8_summary.json" output/reports/latest_phase8_summary.json
 
 echo ""
 echo "Phase8 results saved to: $OUT"
