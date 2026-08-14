@@ -40,8 +40,8 @@ echo "------"
 echo ""
 echo "Running Phase 8 Full Pipeline..."
 echo "------"
-mkdir -p ../results
-./ModernPDE_Phase8 ../results/phase8_benchmark.txt
+mkdir -p ../output
+./ModernPDE_Phase8 ../output/phase8_benchmark.txt
 
 echo ""
 echo "==============================================================================="
@@ -51,5 +51,5 @@ echo ""
 echo "Generated artifacts:"
 echo "  - Binary: ./ModernPDE_Phase8"
 echo "  - Tests:  ./tests/phase8_test"
-echo "  - Report: ../results/phase8_benchmark.txt"
+echo "  - Report: ../output/phase8_benchmark.txt"
 echo ""

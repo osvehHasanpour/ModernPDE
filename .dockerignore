@@ -1,6 +1,8 @@
 build/
 .venv/
 results/
+output/runs/
+output/archive/
 .git/
 .vscode/
 .idea/
@@ -9,7 +11,7 @@ ModernPDE
 ModernPDE_Phase8
 **/__pycache__/
 *.pyc
-Docs/*.pdf
+docs/papers/
 phase8_test
 **/.DS_Store
 Thumbs.db

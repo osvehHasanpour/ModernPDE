@@ -213,7 +213,7 @@ Benchmark Results:
   Redundant Traversals Avoided: 1
   Early Terminations: 0
 
-Saving benchmark report to: results/phase8_benchmark.txt
+Saving benchmark report to: output/phase8_benchmark.txt
 ✓ Report saved successfully
 
 ============================================================================
@@ -238,7 +238,7 @@ All existing Phase 1-7 tests pass without modification.
 
 ## Benchmark Report Format
 
-Generated at `results/phase8_benchmark.txt`:
+Generated at `output/phase8_benchmark.txt`:
 
 ```
 PHASE 8 OPTIMIZATION BENCHMARK REPORT

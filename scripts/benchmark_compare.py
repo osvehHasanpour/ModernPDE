@@ -5,18 +5,14 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build"
-TEST_DIR = ROOT / "tests"
-RESULTS_DIR = ROOT / "results"
-RESULTS_DIR.mkdir(exist_ok=True)
+TEST_DIR = ROOT / "tests" / "samples"
+RESULTS_DIR = ROOT / "output" / "benchmarks"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 MODERNPDE = BUILD / "ModernPDE"
 PHASE8 = BUILD / "ModernPDE_Phase8"
 
-SKIP = {"Benchmark.cpp", "phase8_test.cpp"}
-INPUTS = sorted(
-    p for p in TEST_DIR.glob("*.cpp")
-    if not p.name.endswith("_test.cpp") and p.name not in SKIP
-)
+INPUTS = sorted(TEST_DIR.glob("*.cpp"))
 
 def find(out, pattern):
     m = re.search(pattern, out)

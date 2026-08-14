@@ -83,13 +83,13 @@ int main()
         << "================================================\n";
 
     const SampleExpectation samples[] = {
-        { "tests/dead.cpp",              1 },
-        { "tests/cfg.cpp",               1 },
-        { "tests/oop.cpp",               1 },
-        { "tests/partial.cpp",           1 },
-        { "tests/recursion.cpp",         2 },
-        { "tests/template.cpp",          1 },
-        { "tests/mutual_recursive.cpp",  3 },
+        { "tests/samples/dead.cpp",              1 },
+        { "tests/samples/cfg.cpp",               1 },
+        { "tests/samples/oop.cpp",               1 },
+        { "tests/samples/partial.cpp",           1 },
+        { "tests/samples/recursion.cpp",         2 },
+        { "tests/samples/template.cpp",          1 },
+        { "tests/samples/mutual_recursive.cpp",  3 },
     };
 
     for(const auto& sample : samples)

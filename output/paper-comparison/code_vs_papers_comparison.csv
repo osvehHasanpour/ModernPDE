@@ -1,0 +1,28 @@
+metric_name,my_code_value,paper_source,paper_value,notes
+language,C++17,Muzeel,JavaScript (web),different host languages
+language,C++17,DIE,C / polyhedral / ML ops,compiler IR vs tensor ops
+language,C++17,AutoJMH,Java / JMH,analyzer vs benchmark generator
+dead_code_granularity,variable paths + IR instructions,Muzeel,JS functions after interaction crawl,conceptual overlap only
+dead_code_granularity,variable paths + IR instructions,DIE,loop iterations (polyhedral),DIE is finer than statement DCE; ModernPDE is path-ratio PDE
+constant_folding,SCCP lattice on FunctionIR,AutoJMH,prevent JIT CF/CP in payloads,same compiler idea; opposite goal (analyze vs keep live)
+loc_code,13440,all papers,N/A,tool size not reported
+cpp_translation_units,61,all papers,N/A,code-only
+header_files,30,all papers,N/A,code-only
+include_directives,346,all papers,N/A,dependency proxy
+mean_file_cyclomatic_proxy,16.1,all papers,N/A,1 + decision keywords per .cpp/.c file
+ctest_targets,14,all papers,N/A,local CMake suite
+pde_accuracy,1.0000,Muzeel,90% pages >90% visual/functional similarity,"same word, different definition"
+pde_f1,1.0000,Muzeel,N/A,ModernPDE F1 is dead/partial vs live on synthetic labels
+pde_precision,1.0000,AutoJMH,23/23 expert-time match,not the same statistic
+scale_items_analyzed,500 / 5000 / 50000 synthetic variables,Muzeel,"15000 pages, 300000 JS files",incomparable corpora
+scale_items_analyzed,500 / 5000 / 50000 synthetic variables,AutoJMH,6082 loops (Table 2),incomparable corpora
+runtime_50k_classify_ms,28.7,Muzeel,median 30 s / page on 64 cores,PDE classify vs web crawl DCE
+speedup_pct,Phase 8 cache vs Phase 7 (internal),Muzeel,25-30% faster page load,do not overlay on one axis
+speedup_pct,N/A as end-to-end app time,DIE,3% LLaMa 3.1 8B prompt,paper-only numeric result
+size_reduction_pct,N/A (no shipped JS/binary shrink reported),Muzeel,55% of JS file size unused,paper-only unless dead-insn fraction used as proxy
+page_bytes_saved_kb,N/A,Muzeel,400,median bandwidth save
+microbenchmarks_generated,N/A,AutoJMH,3462,paper-only
+expert_benchmark_agreement,N/A,AutoJMH,23/23,paper-only
+cfg_cyclomatic_of_subject,CFGStatistics on samples,all papers,N/A,code-only analysis metric
+web_fcp_si_plt,N/A,Muzeel,reported as CDF deltas,paper-only UX metrics
+sort_vector_sorted_ns,N/A,AutoJMH,1639,"Table 1 pitfall example, not a DCE result"

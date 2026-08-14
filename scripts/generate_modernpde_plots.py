@@ -23,7 +23,7 @@ speedup ranges):
 No external data files are required -- everything is self
 contained. Run:
 
-    python3 generate_modernpde_plots.py [output_dir]
+    python3 scripts/generate_modernpde_plots.py [output_dir]
 
 Requires: matplotlib, numpy
 ============================================================
@@ -31,6 +31,7 @@ Requires: matplotlib, numpy
 
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,7 +41,8 @@ from matplotlib.patches import FancyArrowPatch
 # ------------------------------------------------------------------
 # Output location
 # ------------------------------------------------------------------
-OUTDIR = sys.argv[1] if len(sys.argv) > 1 else "."
+_ROOT = Path(__file__).resolve().parents[1]
+OUTDIR = sys.argv[1] if len(sys.argv) > 1 else str(_ROOT / "output" / "plots")
 os.makedirs(OUTDIR, exist_ok=True)
 
 

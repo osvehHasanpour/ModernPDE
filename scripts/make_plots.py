@@ -1,20 +1,26 @@
 """
 Generate publication-quality plots from ModernPDE benchmark/results data.
 
-Inputs (expected in the same directory):
-    - benchmark.csv            (results/benchmarks/benchmark.csv)
-    - latest_pde_summary.json  (results/reports/latest_pde_summary.json)
+Inputs:
+    - output/benchmarks/benchmark.csv
+    - output/reports/latest_pde_summary.json
 
-Outputs:
+Outputs (written to output/plots/):
     - runtime_per_testcase.png / .pdf
     - pde_classification.png  / .pdf
 """
 
+from pathlib import Path
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# ---- journal-friendly style ----
+ROOT = Path(__file__).resolve().parents[1]
+BENCH_CSV = ROOT / "output" / "benchmarks" / "benchmark.csv"
+PDE_JSON = ROOT / "output" / "reports" / "latest_pde_summary.json"
+OUTDIR = ROOT / "output" / "plots"
+OUTDIR.mkdir(parents=True, exist_ok=True)
+
 plt.rcParams.update({
     "font.family": "serif",
     "font.size": 11,
@@ -26,12 +32,7 @@ plt.rcParams.update({
     "figure.dpi": 300,
 })
 
-# =========================================================
-# Plot 1: Runtime per test case (bar chart)
-# =========================================================
-df = pd.read_csv("benchmark.csv")
-
-# drop the synthetic Phase8 cache-demo row; keep the real CFG test files
+df = pd.read_csv(BENCH_CSV)
 df = df[df["binary"] == "ModernPDE"].copy()
 df = df.sort_values("runtime_ms", ascending=True)
 
@@ -47,15 +48,11 @@ for bar, val in zip(bars, df["runtime_ms"]):
             va="center", fontsize=8)
 
 fig.tight_layout()
-fig.savefig("runtime_per_testcase.png", bbox_inches="tight")
-fig.savefig("runtime_per_testcase.pdf", bbox_inches="tight")
+fig.savefig(OUTDIR / "runtime_per_testcase.png", bbox_inches="tight")
+fig.savefig(OUTDIR / "runtime_per_testcase.pdf", bbox_inches="tight")
 plt.close(fig)
 
-# =========================================================
-# Plot 2: Partial Dead-code Elimination (PDE) classification
-#          distribution (stacked/bar chart)
-# =========================================================
-with open("latest_pde_summary.json") as f:
+with open(PDE_JSON) as f:
     pde = json.load(f)
 
 labels = ["DEAD", "MOSTLY DEAD", "PARTIALLY DEAD", "MOSTLY LIVE", "LIVE"]
@@ -79,8 +76,9 @@ for bar, c, p in zip(bars, counts, pct):
             f"{c}\n({p:.1f}%)", ha="center", va="bottom", fontsize=8)
 
 fig.tight_layout()
-fig.savefig("pde_classification.png", bbox_inches="tight")
-fig.savefig("pde_classification.pdf", bbox_inches="tight")
+fig.savefig(OUTDIR / "pde_classification.png", bbox_inches="tight")
+fig.savefig(OUTDIR / "pde_classification.pdf", bbox_inches="tight")
 plt.close(fig)
 
-print("Saved: runtime_per_testcase.{png,pdf}, pde_classification.{png,pdf}")
+print(f"Saved: {OUTDIR / 'runtime_per_testcase.png'}")
+print(f"Saved: {OUTDIR / 'pde_classification.png'}")

@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
     std::cout << "  Early Terminations: " << metrics.earlyTerminations << "\n\n";
 
     // Save report
-    std::string reportPath = argc > 1 ? argv[1] : "results/phase8_benchmark.txt";
+    std::string reportPath = argc > 1 ? argv[1] : "output/phase8_benchmark.txt";
     std::cout << "Saving benchmark report to: " << reportPath << "\n";
 
     std::ofstream reportFile(reportPath);

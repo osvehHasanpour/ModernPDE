@@ -1,0 +1,29 @@
+metric_name,value,notes
+loc_code,13440,physical non-comment non-blank
+loc_comment,394,
+loc_blank,3280,
+cpp_files,61,.cpp/.c
+header_files,30,
+python_files,6,
+include_directives,346,dependency proxy
+mean_file_cyclomatic_proxy,16.10,
+max_file_cyclomatic_proxy,109,src/FieldSensitiveAnalysis.cpp
+ctest_targets,14,tests/CMakeLists.txt
+challenge_500_accuracy,1.0000,from executed binary
+challenge_500_precision,1.0000,from executed binary
+challenge_500_recall,1.0000,from executed binary
+challenge_500_f1,1.0000,from executed binary
+challenge_500_correct,500,from executed binary
+challenge_5000_accuracy,1.0000,from executed binary
+challenge_5000_precision,1.0000,from executed binary
+challenge_5000_recall,1.0000,from executed binary
+challenge_5000_f1,1.0000,from executed binary
+challenge_5000_correct,5000,from executed binary
+challenge_50000_accuracy,1.0000,from executed binary
+challenge_50000_precision,1.0000,from executed binary
+challenge_50000_recall,1.0000,from executed binary
+challenge_50000_f1,1.0000,from executed binary
+challenge_50000_build_ms,302.1,from executed binary
+challenge_50000_classify_ms,28.7,from executed binary
+challenge_50000_total_ms,330.8,from executed binary
+challenge_50000_correct,50000,from executed binary
