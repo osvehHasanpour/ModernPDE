@@ -1,0 +1,33 @@
+paper,metric_name,value,unit,cite,origin
+B1_muzeel,title,Muzeel: Assessing the Impact of JavaScript Dead Code Elimination on Mobile Web Performance,,p.1,paper-derived
+B1_muzeel,authors,Kupoluyi; Chaqfeh; Varvello; Coke; Hashmi; Subramanian; Zaki,,p.1,paper-derived
+B1_muzeel,year_venue,2022 / ACM IMC'22,,p.1 DOI 10.1145/3517745.3561427,paper-derived
+B1_muzeel,pages,14,,pdfplumber,paper-derived
+B1_muzeel,domain,JavaScript dead functions on mobile web pages,,abstract,paper-derived
+B1_muzeel,method,Black-box dynamic analysis + post-load user-event emulation; eliminate unused JS functions,,§4,paper-derived
+B1_muzeel,baseline,Lacuna (stops at onLoad); Lighthouse guidance,,§2,paper-derived
+B1_muzeel,corpus_pages,15000,pages,Alexa landing pages; §6.1.1,paper-derived
+B1_muzeel,corpus_js_files,300000,files,§6 / abstract,paper-derived
+B1_muzeel,crawl_hw,"64 cores, 1 TB RAM",,§6.1.1,paper-derived
+B1_muzeel,client_phones,Redmi Go; Samsung J3; Samsung S10,,Table 1 p.7,paper-derived
+B1_muzeel,client_ram_gb,1; 2; 8,GB,Table 1 p.7,paper-derived
+B1_muzeel,browsers,Chrome; Firefox; Edge; Brave,,§6.1.2,paper-derived
+B1_muzeel,networks,100 Mbps; 3G; LTE; LTE+,,§6.1.2,paper-derived
+B1_muzeel,runs_per_metric,5,loads,median of 5; §6.3,paper-derived
+B1_muzeel,unused_functions_median_pct,70,%,abstract / contrib,paper-derived
+B1_muzeel,unused_filesize_median_pct,55,%,abstract,paper-derived
+B1_muzeel,elim_funcs_per_file_median,67,functions,§6.2.1,paper-derived
+B1_muzeel,elim_bytes_per_file_median_kb,10,KB,§6.2.1,paper-derived
+B1_muzeel,elim_funcs_per_page_mean,2000,functions,§6.2.1,paper-derived
+B1_muzeel,muzeel_under_5min_pct,85,%,≤6 cores; §6.2,paper-derived
+B1_muzeel,median_runtime_64core_s,30,s,§6.2,paper-derived
+B1_muzeel,plt_speedup_pct_low,25,%,abstract,paper-derived
+B1_muzeel,plt_speedup_pct_high,30,%,abstract,paper-derived
+B1_muzeel,max_3g_speedup_s,9,s,intro,paper-derived
+B1_muzeel,median_size_reduction_kb,400,KB,intro,paper-derived
+B1_muzeel,similarity_ge90_pct_of_pages,90,%,§6.2.2 structural/functional,paper-derived
+B1_muzeel,lacuna_structural_ge90_pct,60,%,§6.2.2 same 200-page set,paper-derived
+B1_muzeel,perf_eval_pages,200,pages,§6.1.1,paper-derived
+B1_muzeel,compiler_flags,N/A,,browser/JS; not a C++ compile study,paper-derived
+B1_muzeel,opt_level,N/A,,N/A,paper-derived
+B1_muzeel,statistical_method,median of 5 loads; CDFs/figures,,§6,paper-derived

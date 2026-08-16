@@ -1,0 +1,13 @@
+metric,paper_value,paper_unit,paper_cite,artifact_a_value,artifact_a_unit,artifact_a_origin,classification,rationale
+dead_code_granularity,"unused JS functions (dynamic, post-interaction)",N/A,§4,variables by path usage ratio (static PDE),N/A,code,Partially comparable,"Both identify unused computation, but JS functions≠C++ variables; dynamic browser≠static analyzer."
+unused_functions_median_pct,70,%,abstract,N/A,N/A,N/A,Paper-only,A does not measure % unused JS functions on web corpora.
+plt_speedup_pct,25–30,%,abstract,N/A,N/A,N/A,Paper-only,"Page-load time on Android/browsers; A reports analyzer wall time, not PLT."
+median_size_reduction_kb,400,KB,intro,N/A,N/A,N/A,Paper-only,Transferred JS bytes; A has no page-size metric.
+structural_similarity_ge90,90% of 200 pages,N/A,§6.2.2,N/A,N/A,N/A,Paper-only,Visual/functional page similarity vs Lacuna; not classifier accuracy.
+accuracy_named_metric,page similarity / Lacuna comparison,N/A,§6.2.2,PDE Accuracy/Precision/Recall/F1 on synthetic labels (when main/challenges run),N/A,code+tests,Not directly comparable,"Same English word 'accuracy' but different definitions, units, and inputs."
+runtime_of_tool,median ~30 s/page on 64 cores; 85% <5 min on ≤6 cores,s,§6.2,53.920739,ms,prior-measured-csv,Not directly comparable,Muzeel: crawl+emulate web pages on 64c server. A: synthetic PDE challenge wall ms on different HW (host N/A in CSV).
+corpus_scale,15000 pages / 300000 JS files,N/A,§6.1,14 samples; challenges 500/5000/50000 vars,N/A,code,Not directly comparable,Web corpus ≠ synthetic variable counts.
+hardware_match,64c/1TB server + Android phones Table 1,N/A,§6.1 / Table 1,N/A (not recorded for prior CSV; WSL g++ available locally),N/A,N/A,Not directly comparable,No shared HW profile → no direct speedup comparison.
+loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,Paper does not publish Muzeel LOC in the inspected PDF.
+ctest_targets,N/A,N/A,N/A,14,targets,code-derived,Code-only,A regression suite; paper evaluates mobile web metrics.
+sccp_constant_propagation,N/A (JS browser DCE),N/A,N/A,SCCP implemented (Unknown/Constant/Overdefined),N/A,code,Code-only,B1 does not study sparse conditional constant propagation.

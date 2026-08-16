@@ -1,275 +1,195 @@
 <div align="center">
 
-# ⚙️ ModernPDE
+# ModernPDE
 
-### A full-pipeline C++ static analysis engine — from class hierarchies to dead code, all in one run.
+### Artifact A — A self-contained C++17 static-analysis pipeline
 
-![C++17](https://img.shields.io/badge/C%2B%2B-17-blue?style=flat-square&logo=c%2B%2B)
-![CMake](https://img.shields.io/badge/Build-CMake-red?style=flat-square)
-![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-brightgreen?style=flat-square)
+[![C++17](https://img.shields.io/badge/standard-C%2B%2B17-0B6E4F?style=for-the-badge)](./CMakeLists.txt)
+[![CMake](https://img.shields.io/badge/build-CMake%203.16%2B-1B4965?style=for-the-badge)](./CMakeLists.txt)
+[![Deps](https://img.shields.io/badge/core%20deps-none-C9A227?style=for-the-badge)](./CMakeLists.txt)
+[![CI](https://img.shields.io/badge/CI-CTest-5C4B51?style=for-the-badge)](./.github/workflows/ci.yml)
 
 </div>
 
----
-
-ModernPDE is a modular, zero-dependency C++ framework that implements **seven distinct static analysis techniques** in a single pipeline. It models a game engine's class hierarchy as its subject program, then tears it apart phase by phase — resolving virtual calls, building call graphs, classifying dead code, tracing control flow, and benchmarking the whole thing at 50,000+ variables.
-
-No LLVM. No libclang. Just clean, modern C++17 from scratch.
+<p align="center">
+  <em>Class hierarchy → virtual calls → call graph → path-aware PDE → CFG / DU / paths → SCCP &amp; faint analysis → Phase&nbsp;8 caches</em>
+</p>
 
 ---
 
-## The Pipeline
+## Artifact overview
 
-ModernPDE runs in sequential phases. Each one feeds context into the next.
+**ModernPDE** is a zero-dependency static-analysis engine written in modern C++. It is intended as a readable research / teaching artifact: every major pass is implemented in-tree, without LLVM or libclang.
 
-```
-[Source Program]
-      │
-      ▼
-┌─────────────────────────────┐
-│  Phase 1 · Class Hierarchy  │  Who inherits from whom?
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 2 · Virtual Calls    │  Which subclass handles Player::attack()?
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 3 · Call Graph       │  Context-sensitive. Detects recursion.
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 4 · PDE              │  Dead / Partially Dead / Live — per path.
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 5 · CFG + DU + Paths │  Basic blocks, def-use chains, path enum.
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 5.4 · CFG × PDE      │  Path-precise dead code.
-└──────────────┬──────────────┘
-               ▼
-┌─────────────────────────────┐
-│  Phase 5.5–5.7 · Eval       │  Accuracy, F1, benchmarks up to 50k vars.
-└─────────────────────────────┘
-```
+| Item | Detail |
+|------|--------|
+| **Artifact ID** | Artifact A — ModernPDE |
+| **Language** | C++17 |
+| **Build** | CMake ≥ 3.16 |
+| **Core libraries** | None (optional sibling cJSON / tinyexpr for extra tests only) |
+| **Primary binaries** | `ModernPDE`, `ModernPDE_Phase8` |
+| **Validation** | CMake/CTest (regression, CFG, challenges, Phase 8) |
+
+> **Scope note.** Synthetic challenge suites can report perfect Accuracy / F1 because labels are constructed to match the classifier. Those scores are **not** claims of equivalence to industrial DCE (Muzeel, LLVM, JMH, etc.). See `output/comparison-report.md` for a paper-by-paper comparison.
 
 ---
 
-## Phases in Detail
+## What this artifact does
 
-### 🧬 Phase 1 — Class Hierarchy Analysis
+The default binary runs a staged pipeline on a built-in subject program (and can also analyze sample sources under `tests/samples/`):
 
-Builds a full inheritance tree from a game engine domain model and answers structural queries:
+| Stage | Module | Role |
+|------:|--------|------|
+| 1 | Class Hierarchy (CHA) | Inheritance queries |
+| 2 | Virtual Call Analysis | Resolve dispatch targets via CHA |
+| 3 | Call Graph | Context-sensitive reachability & recursion |
+| 4 | PDE | Path-ratio dead / partial / live labels |
+| 5 | CFG · DU · Paths | Blocks, def–use chains, path enumeration |
+| 5.4 | CFG × PDE | Path-precise deadness |
+| 5.5–5.7 | Metrics & scale | Labeled check, Acc/P/R/F1, timing |
+| 6–7 | Field-sensitive · SCCP · Faint | Heap fields, constants, faint vars |
+| 8 | Phase 8 | CFG/DU caches, lazy paths, report |
 
-```
-Entity
-├── Character
-│   ├── Player
-│   │   ├── Warrior
-│   │   ├── Mage
-│   │   └── Archer
-│   └── NPC
-│       ├── Merchant
-│       └── QuestGiver
-├── Weapon
-│   ├── Sword
-│   └── Bow
-└── Potion
-    ├── HealthPotion
-    └── ManaPotion
-```
+**PDE label bands**
 
-Queries supported: `getParent`, `getAllDescendants`, `getLeafClasses`.
-
----
-
-### 📞 Phase 2 — Virtual Call Analysis
-
-Resolves virtual dispatch targets using the class hierarchy. Ask `Player::attack()` and it returns every concrete subclass that actually implements it — exactly what a vtable would resolve at runtime.
-
-```
-Player::attack  →  Warrior, Mage, Archer
-NPC::talk       →  Merchant, QuestGiver
-Entity::use     →  Sword, Bow, HealthPotion, ManaPotion
-```
+| Label | Usage ratio | Meaning |
+|-------|-------------|---------|
+| DEAD | 0% | Defined, never used |
+| MOSTLY DEAD | &lt; 25% | Rarely used |
+| PARTIALLY DEAD | 25–74% | Used on some paths only |
+| MOSTLY LIVE | 75–99% | Used on most paths |
+| LIVE | 100% | Used on every path |
 
 ---
 
-### 🕸️ Phase 3 — Context-Sensitive Call Graph
-
-Builds a call graph that distinguishes **who called whom and from what context**. Two calls to the same function from different contexts are tracked separately — a core precision upgrade over context-insensitive analysis.
-
-Detects:
-- **Reachability** — does `main` reach `uploadGPU` via `CTX_GAME`?
-- **Direct recursion** — `factorial` calls itself
-- **Mutual recursion** — `even ↔ odd`
-- **DFS traversal** from any entry point in any context
-
-Contexts modeled: `CTX_GAME`, `CTX_LEVEL`, `CTX_REC`, `CTX_MR`.
-
----
-
-### 💀 Phase 4 — Partial Dead Code Elimination (PDE)
-
-The heart of the project. Variables aren't just dead or alive — they exist on a spectrum based on how many execution paths actually use them.
-
-| Classification    | Usage Ratio      | Meaning                              |
-|-------------------|------------------|--------------------------------------|
-| **DEAD**          | 0%               | Defined, never used anywhere         |
-| **MOSTLY DEAD**   | < 25%            | Used on almost no paths              |
-| **PARTIALLY DEAD**| 25% – 74%        | Used sometimes, skipped often        |
-| **MOSTLY LIVE**   | 75% – 99%        | Used on most paths                   |
-| **LIVE**          | 100%             | Used on every execution path         |
-
-This is more nuanced than a typical liveness pass — a variable alive on one branch but dead on nine others is **not** the same as a variable that's fully live.
-
----
-
-### 🗺️ Phase 5 — CFG · DU Chains · Path Enumeration
-
-Three sub-analyses built on a shared Control Flow Graph:
-
-**Control Flow Graph** — Basic blocks with explicit predecessor/successor edges. Models if/then/else/merge branching.
-
-**DU Chains** — Tracks every Definition → Use relationship across line numbers. Finds the latest reaching definition for each use.
-
-```
-Def(x, line 1) -> Use(line 2)
-Def(x, line 3) -> Use(line 4)
-Def(y, line 5) -> Use(line 6)
-Def(z, line 7) -> Use(line 10)
-```
-
-**Path Enumeration** — Enumerates all possible paths through the CFG from a given entry block. Used to feed precise path counts into the PDE engine.
-
----
-
-### 🔗 Phase 5.4 — CFG × PDE Integration
-
-Combines the CFG's path structure with the PDE classifier. Instead of counting uses globally, it asks: *on how many of the CFG's actual paths is this variable used?* This is path-precise dead code detection, not just use/def counting.
-
-```
-playerHealth  →  2 paths / 2 used  →  LIVE
-bonusDamage   →  2 paths / 1 used  →  PARTIALLY DEAD
-unusedTemp    →  2 paths / 0 used  →  DEAD
-questReward   →  10 paths / 7 used →  MOSTLY LIVE
-```
-
----
-
-### 📊 Phase 5.5 — Accuracy Dataset
-
-Runs the PDE classifier on a ground-truth dataset of **70 labeled variables** across all categories and compares against expected output.
-
-```
-Expected:   DEAD: 20  |  MOSTLY DEAD: 20  |  PARTIALLY DEAD: 15  |  LIVE: 15
-```
-
----
-
-### 📈 Phase 5.6 — Evaluation Metrics
-
-Standard classifier metrics computed from the accuracy run:
-
-```
-Accuracy  : 1.00
-Precision : 1.00
-Recall    : 1.00
-F1 Score  : 1.00
-```
-
----
-
-### ⚡ Phase 5.7 — Benchmark
-
-Stress-tests the PDE engine from 100 to 50,000 variables using `std::chrono` high-resolution timing:
-
-```
-Variables: 100      Time: X ms
-Variables: 1,000    Time: X ms
-Variables: 5,000    Time: X ms
-Variables: 10,000   Time: X ms
-Variables: 50,000   Time: X ms
-```
-
----
-
-## Project Structure
+## Repository layout
 
 ```
 ModernPDE/
-├── src/                          # Analyzer implementation
-├── include/                      # Headers
-├── tests/                        # CTest sources + tests/samples/ inputs
-├── scripts/                      # Build, run, plot, and paper-extract helpers
-├── docs/                         # Guides and reports
-│   └── papers/                   # Reference PDFs (muzeel, die, autojmh)
-├── benchmarks/                   # Benchmark runners only
-├── output/                       # Generated runs, plots, paper extracts
-├── Dockerfile
-└── .github/workflows/ci.yml
+├── include/                 Public headers
+├── src/                     Analyzer + mains
+├── tests/                   CTest sources
+│   └── samples/             Input programs for lexer/CFG demos
+├── scripts/                 Build, run, plot, paper comparison
+├── benchmarks/              Scalability / cJSON runners
+├── docs/                    Guides & reports
+│   └── papers/              Reference PDFs (Muzeel, DIE, AutoJMH)
+├── output/                  Generated runs, plots, comparison CSVs
+├── Dockerfile               Ubuntu 24.04 Release image
+└── .github/workflows/ci.yml Configure → build → ctest
 ```
 
 ---
 
-## Build & Run
+## Requirements
 
-**Requirements:** CMake 3.10+, any C++17 compiler (GCC, Clang, MSVC).
+- CMake **3.16+**
+- A C++17 compiler (GCC, Clang, or MSVC)
+- Optional: Docker; Python 3 + venv for paper-comparison plots
+
+Verified on WSL (Ubuntu) with g++ 13 and CMake 3.28.
+
+---
+
+## Build
 
 ```bash
-# Clone and build
-git clone https://github.com/your-username/ModernPDE.git
-cd ModernPDE/build
-cmake ..
-make
+git clone https://github.com/osvehHasanpour/ModernPDE.git
+cd ModernPDE
 
-# Run the full pipeline
-./ModernPDE
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
 ```
 
-**Or use the script** to run everything and automatically save per-phase results:
+Binaries land in `build/` (`ModernPDE`, `ModernPDE_Phase8`) and under `build/tests/` for CTest targets.
+
+---
+
+## Run
+
+**Full demo pipeline**
 
 ```bash
-cd scripts
-./run_all.sh
+./build/ModernPDE
 ```
 
-Output files saved to `output/runs/<timestamp>/`:
+**Analyze a sample**
 
-| File                     | Contents                           |
-|--------------------------|------------------------------------|
-| `full_output.txt`        | Complete pipeline output           |
-| `pde_result.txt`         | All variable classifications       |
-| `cfg_result.txt`         | CFG block structure                |
-| `duchain_result.txt`     | DU chain definitions               |
-| `path_result.txt`        | Enumerated CFG paths               |
-| `metrics.txt`            | Accuracy, Precision, Recall, F1    |
-| `benchmark.txt`          | Timing results by variable count   |
+```bash
+./build/ModernPDE tests/samples/cfg.cpp
+```
+
+**Phase 8 report** (default path `output/phase8_benchmark.txt`)
+
+```bash
+mkdir -p output
+./build/ModernPDE_Phase8
+```
+
+**Test suite**
+
+```bash
+cd build && ctest --output-on-failure
+# or from repo root:
+./scripts/run_tests.sh
+```
+
+**Logged full run** (writes under `output/runs/<timestamp>/`)
+
+```bash
+./scripts/run_all.sh   # expects ./build/ModernPDE
+```
+
+**Docker**
+
+```bash
+docker compose run --rm analyze
+docker compose run --rm test
+```
 
 ---
 
-## Concepts Covered
+## Evaluation & reproducibility
 
-This project is a practical implementation of techniques taught in compiler design and program analysis courses:
+| Claim type | How to check | Notes |
+|------------|--------------|-------|
+| Build & unit/regression | `ctest` in CI and locally | Always-on targets + optional cJSON/tinyexpr |
+| Sample front-end / CFG | `ModernPDE tests/samples/*.cpp` | 14 sample inputs |
+| Synthetic PDE scale | `challenge_500` / `_5000` / `_50000` | Labels are synthetic |
+| Phase 8 caches | `ModernPDE_Phase8`, `phase8_test` | Text report under `output/` |
+| Paper comparison (optional) | `scripts/compare_artifact_vs_papers.py` | Independent B1/B2/B3 extracts; see `output/comparison-report.md` |
 
-- Class Hierarchy Analysis (CHA)
-- Virtual method resolution & vtable simulation
-- Context-sensitive call graph construction
-- Worklist-based reachability (DFS)
-- Partial Dead Code Elimination (PDE) with path-ratio classification
-- Control Flow Graph (CFG) construction
-- Definition-Use (DU) chain analysis
-- Control-flow path enumeration
-- CFG-precise dead code classification
-- ML-style classifier evaluation (Accuracy, Precision, Recall, F1)
+Reference papers (read-only inputs) live in `docs/papers/`:
+
+- **B1** Muzeel (IMC ’22) — JS dead-function elimination on mobile web  
+- **B2** Dead Iteration Elimination (IMPACT 2025) — polyhedral dead iterations  
+- **B3** AutoJMH (ASE ’16) — microbenchmarks that *prevent* DCE / constant folding  
+
+Numeric head-to-heads with those papers are **not** claimed; methodology and units differ. The comparison script records that explicitly.
 
 ---
 
-## Why ModernPDE?
+## Design principles
 
-Most static analysis frameworks are massive — LLVM, Soot, CodeQL. ModernPDE is the opposite: a **single self-contained binary**, no dependencies, no configuration files, no IR format to learn. Every algorithm is written from scratch so you can actually read it.
+1. **Readable passes** — each analysis is a normal C++ module, not a compiler-plugin opaque blob.  
+2. **No core deps** — the main library links only the standard library.  
+3. **Testable** — CTest targets share the same sources as the product binaries.  
+4. **Honest metrics** — perfect F1 on synthetic challenges is expected; real-world DCE claims require different corpora and protocols.
 
-If you're learning program analysis, this is a working reference. If you're building something bigger, these modules are clean enough to lift directly.
+---
 
+## Documentation map
+
+| Path | Contents |
+|------|----------|
+| `docs/PHASE8_GUIDE.md` | Phase 8 usage |
+| `docs/PHASE8_REPORT.md` | Phase 8 write-up |
+| `docs/Test-Report.md` | Test inventory |
+| `output/comparison-report.md` | Artifact A vs B1/B2/B3 |
+| `output/README.md` | Output directory layout |
+
+---
+
+## License / citation
+
+Use this repository as **Artifact A (ModernPDE)** in reports and comparisons. Prefer citing the GitHub revision you evaluated and, when discussing papers, the DOIs / venues listed under `docs/papers/`.

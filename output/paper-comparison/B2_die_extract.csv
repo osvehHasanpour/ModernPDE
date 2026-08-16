@@ -1,0 +1,17 @@
+paper,metric_name,value,unit,cite,origin
+B2_die,title,Dead Iteration Elimination,,p.1 / HAL title,paper-derived
+B2_die,authors,Bastoul; Schmitt; Meister; Reddy,,p.2,paper-derived
+B2_die,year_venue,2025 / IMPACT 2025 Barcelona,,HAL header,paper-derived
+B2_die,pages,4,,pdfplumber,paper-derived
+B2_die,domain,Polyhedral removal of dead loop iterations (AI/DL fused ops),,abstract,paper-derived
+B2_die,method,6-step polyhedral DIE: raise→DDG→invert→dead-space analysis→restrict→codegen,,§2 Fig.3,paper-derived
+B2_die,algorithm_steps,6,,§2,paper-derived
+B2_die,baseline,SSA DCE; partial DCE (Knoop); Polly/PPCG/AlphaZ (qualitative),,§3,paper-derived
+B2_die,benchmark_tables,0,,no numeric eval table in PDF,paper-derived
+B2_die,llama_prompt_time_reduction_pct,3,%,LLaMa 3.1 8B last-decoder/logits; §2/conclusion,paper-derived
+B2_die,hardware,N/A,,not reported,paper-derived
+B2_die,os,N/A,,not reported,paper-derived
+B2_die,compiler_flags,N/A,,not reported,paper-derived
+B2_die,opt_level,N/A,,not reported,paper-derived
+B2_die,run_count,N/A,,not reported,paper-derived
+B2_die,statistical_method,N/A,,anecdotal application note only,paper-derived

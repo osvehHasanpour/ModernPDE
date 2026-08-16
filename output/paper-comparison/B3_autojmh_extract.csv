@@ -1,0 +1,35 @@
+paper,metric_name,value,unit,cite,origin
+B3_autojmh,title,Automatic Microbenchmark Generation to Prevent Dead Code Elimination and Constant Folding,,p.1,paper-derived
+B3_autojmh,authors,Rodriguez-Cancio; Combemale; Baudry,,p.1,paper-derived
+B3_autojmh,year_venue,2016 / ASE'16 Singapore,,footer ASE'16,paper-derived
+B3_autojmh,pages,12,,pdfplumber,paper-derived
+B3_autojmh,domain,Java JMH payload generation preventing DCE and constant folding,,abstract,paper-derived
+B3_autojmh,method,Static slice + sink maximization + anti-CF field rules + test-derived init + regression tests,,§2–3,paper-derived
+B3_autojmh,projects,5,,Math; Vectorz; Lang; JSyn; Img2,paper-derived
+B3_autojmh,total_loops_abstract,6028,loops,abstract / RQ1 prose,paper-derived
+B3_autojmh,total_loops_table2,6082,loops,Table 2 total; disagrees with abstract,paper-derived
+B3_autojmh,payloads_generated,4705,,Table 2,paper-derived
+B3_autojmh,payloads_generated_pct,77,%,Table 2 of 6082,paper-derived
+B3_autojmh,payloads_initialized,3485,,Table 2,paper-derived
+B3_autojmh,microbenchmarks_generated,3462,,Table 2,paper-derived
+B3_autojmh,rejected,1377,,Table 2 preconditions,paper-derived
+B3_autojmh,rejected_pct,23,%,Table 2,paper-derived
+B3_autojmh,unsupported_variables,1027,,Table 2,paper-derived
+B3_autojmh,unsupported_invocations,350,,Table 2,paper-derived
+B3_autojmh,regression_failures,23,,Table 2; 0.4%,paper-derived
+B3_autojmh,expert_match_autojmh,23/23,,Table 3; CI overlap α=0.05,paper-derived
+B3_autojmh,expert_match_dce_off,0/23,,Table 3 sink maximization off,paper-derived
+B3_autojmh,expert_match_cfcp_inverted,11/23,,Table 3,paper-derived
+B3_autojmh,expert_match_bad_init,3/23,,Table 3,paper-derived
+B3_autojmh,sort_linkedlist_sorted_ns,203,ns,Table 1,paper-derived
+B3_autojmh,sort_linkedlist_unsorted_ns,453,ns,Table 1,paper-derived
+B3_autojmh,sort_vector_sorted_ns,1639,ns,Table 1,paper-derived
+B3_autojmh,sort_vector_unsorted_ns,645,ns,Table 1,paper-derived
+B3_autojmh,jmh_invocations,30,VM invocations,§4.2.2 Georges methodology,paper-derived
+B3_autojmh,jmh_warmup_measure,10 warmup + 10 measure (stated),,§4.2.2,paper-derived
+B3_autojmh,confidence_level,0.05,,§4.2.2,paper-derived
+B3_autojmh,rq3_engineers,6,,§4.3,paper-derived
+B3_autojmh,rq3_suas,5,,§4.3,paper-derived
+B3_autojmh,hardware,N/A,,not fully specified in PDF extract,paper-derived
+B3_autojmh,compiler_flags,N/A,,HotSpot/JMH; flags not tabulated,paper-derived
+B3_autojmh,opt_level,N/A,,JIT; not a fixed -O level study,paper-derived

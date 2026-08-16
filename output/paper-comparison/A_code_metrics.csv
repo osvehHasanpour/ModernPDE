@@ -1,0 +1,24 @@
+metric_name,value,unit,origin,notes
+loc_code,16466,,code-derived,
+loc_comment,417,,code-derived,
+loc_blank,3877,,code-derived,
+cpp_files,60,,code-derived,
+headers,30,,code-derived,
+python_files,7,,code-derived,
+test_cpp_files,14,,code-derived,
+sample_cpp_files,14,,code-derived,
+include_directives,346,,code-derived,
+class_struct_approx,81,,code-derived,
+template_approx,2,,code-derived,
+ctest_always_on,14,,code-derived,
+ctest_optional_hooks,2,,code-derived,
+coverage_tooling,none,,code-derived,
+cmake_cxx_standard,17,,code-derived,
+core_dependencies,none (optional cJSON/tinyexpr for tests),,code-derived,
+algorithms,"CHA, VCA, CallGraph, PDE, CFG, DU, PathEnum, CFGPDE, SCCP, Faint, FieldSensitive, Phase8 caches",,code-derived,
+top_cc_proxy,/mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/FieldSensitiveAnalysis.cpp=109; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/Parser.cpp=98; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/Lexer.cpp=70; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/SCCP.cpp=61; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/main.cpp=47; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/CFGBuilder.cpp=46; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/DUChain.cpp=41; /mnt/c/Users/osveh/Music/Modernp/ModernPDE/src/CFGStatistics.cpp=31,,code-derived,
+challenge_500_median_wall_ms,4.250545499999999,,prior-measured-csv,host/compiler for prior CSV not recorded in file
+challenge_5000_median_wall_ms,7.843781,,prior-measured-csv,host/compiler for prior CSV not recorded in file
+challenge_50000_median_wall_ms,53.920739,,prior-measured-csv,host/compiler for prior CSV not recorded in file
+scalability_runs,20,,prior-measured-csv,host/compiler for prior CSV not recorded in file
+scalability_source,benchmarks/results/scalability_summary.csv,,prior-measured-csv,host/compiler for prior CSV not recorded in file

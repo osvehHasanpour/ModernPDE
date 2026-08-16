@@ -1,0 +1,13 @@
+metric,paper_value,paper_unit,paper_cite,artifact_a_value,artifact_a_unit,artifact_a_origin,classification,rationale
+relationship_to_dce,PREVENT DCE so timed code actually executes,N/A,§2.1 / abstract,"DETECT/classify dead or faint computation (PDE, faint, SCCP dead)",N/A,code,Partially comparable,Opposite goals around DCE: B3 keeps code alive for measurement; A finds deadness.
+relationship_to_constant_folding,PREVENT CF/CP via field declaration / non-literal init rules,N/A,§2 / Table 3 CF/CP row,PERFORM SCCP constant propagation on IR,N/A,code,Partially comparable,"B3 defeats CF; A implements CF-like SCCP. Related topic, opposite intent."
+ensures_code_executed,sink maximization + regression tests + JMH harness,N/A,§3–4,N/A as microbenchmark generator,N/A,code,Paper-only,A is not a JMH payload generator; no sink-maximization harness.
+microbenchmarks_generated,3462 / 6082 loops (Table 2; abstract says 6028),N/A,Table 2 / abstract,N/A,N/A,N/A,Paper-only,A does not extract Java loops into JMH payloads.
+expert_time_similarity,23/23 AutoJMH; 0/23 if DCE not prevented,N/A,Table 3,N/A,N/A,N/A,Paper-only,Statistical overlap of JMH ns distributions — not A's PDE F1.
+execution_time_ns_sort,LinkedList 203–453 ns; Vector 645–1639 ns,ns,Table 1,53.920739,ms,prior-measured-csv,Not directly comparable,JMH steady-state ns for Collections.sort ≠ analyzer wall ms on synthetic PDE.
+input_generation,values observed from covering unit tests; anti-random for RQ2,N/A,§3 / §4.2,handwritten samples + synthetic challenge generators,N/A,code,Not directly comparable,Different languages and goals; both care about realistic inputs but not comparable protocols.
+statistical_methodology,Georges et al.; 30 VM inv; CI α=0.05,N/A,§4.2.2,scalability script: 3 warmups + 20 runs (median/mean/stddev) when used,N/A,code,Not directly comparable,"Both use repeated runs, but JMH/CI-overlap ≠ wall-ms summary on C++ challenges."
+sccp_vs_anti_cf,anti-CF rules required for valid micros (11/23 if inverted),N/A,Table 3,SCCP present,N/A,code,Partially comparable,Evidence that CF matters on both sides; still not a numeric head-to-head.
+java_ast_slicing,yes,N/A,§3,C-like lexer/parser/CFG builder (not Java AST slice),N/A,code,Not directly comparable,Front-ends differ.
+loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,AutoJMH LOC not in inspected PDF tables.
+pde_path_classification,N/A,N/A,N/A,DEAD/MOSTLY DEAD/PARTIALLY DEAD/MOSTLY LIVE/LIVE,N/A,code,Code-only,A advantage area; not AutoJMH's task.

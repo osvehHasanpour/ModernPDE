@@ -1,0 +1,11 @@
+metric,paper_value,paper_unit,paper_cite,artifact_a_value,artifact_a_unit,artifact_a_origin,classification,rationale
+dead_code_granularity,dead loop iterations (polyhedral iteration space),N/A,abstract / §2,variables by path usage ratio; statement-level IR faint/SCCP,N/A,code,Partially comparable,"Both refine classical DCE; B2 acts on iterations, A on variables/IR ops."
+technique_family,polyhedral image/preimage on DDG,N/A,Algorithm 1,CFG/DU/path enumeration + worklist dataflow,N/A,code,Partially comparable,Shared dataflow-over-dependence idea; different math and IR.
+partial_dead_code_literature,cites Knoop partial DCE; proposes iteration-level alternative,N/A,§3,PDE path-ratio classification (MOSTLY/PARTIALLY DEAD bands),N/A,code,Partially comparable,Conceptual kinship with partial deadness; algorithms and targets differ.
+llama_prompt_time_reduction_pct,3,%,§2 / conclusion,N/A,N/A,N/A,Paper-only,A has no LLaMa/transformer operator pipeline or DIE codegen.
+benchmark_suite,N/A (no numeric evaluation tables),N/A,PDF 4 pages,challenge_500/5000/50000; samples; optional cJSON,N/A,code,Not directly comparable,Paper is technique-focused; A has runnable synthetic benches — not matching inputs.
+polyhedral_codegen,yes (step f),N/A,§2,no,N/A,code,Paper-only,Missing capability in A.
+desired_output_specification,yes (specialization/sparsity/subsampling),N/A,§2,no,N/A,code,Paper-only,Missing capability in A.
+cha_vca_callgraph,N/A,N/A,N/A,implemented,N/A,code,Code-only,OO call-structure analyses not part of DIE paper.
+loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,Paper does not report implementation LOC.
+hardware_match,N/A,N/A,not reported,N/A,N/A,N/A,Not directly comparable,Cannot validate any runtime comparison.
