@@ -8,8 +8,8 @@ Missing data is **N/A** (never invented).
 
 | metric | value | origin |
 | --- | --- | --- |
-| LOC code / comment / blank | 16466 / 417 / 3877 | code-derived |
-| .cpp / headers / .py | 60 / 30 / 7 | code-derived |
+| LOC code / comment / blank | 17242 / 418 / 3980 | code-derived |
+| .cpp / headers / .py | 60 / 30 / 8 | code-derived |
 | CTest always-on targets | 14 | code-derived |
 | Samples | 14 | code-derived |
 | C++ standard | 17 | CMakeLists.txt |
@@ -43,7 +43,7 @@ PDF paths: `docs/papers/muzeel.pdf` (B1), `die.pdf` (B2), `autojmh.pdf` (B3).
 | runtime_of_tool | median ~30 s/page on 64 cores; 85% <5 min on ≤6 cores s | 53.920739 ms | Not directly comparable |
 | corpus_scale | 15000 pages / 300000 JS files | 14 samples; challenges 500/5000/50000 vars | Not directly comparable |
 | hardware_match | 64c/1TB server + Android phones Table 1 | N/A (not recorded for prior CSV; WSL g++ available locally) | Not directly comparable |
-| loc_code | N/A | 16466 lines | Code-only |
+| loc_code | N/A | 17242 lines | Code-only |
 | ctest_targets | N/A | 14 targets | Code-only |
 | sccp_constant_propagation | N/A (JS browser DCE) | SCCP implemented (Unknown/Constant/Overdefined) | Code-only |
 
@@ -92,7 +92,7 @@ Comparing "accuracy" or "speedup" by name alone is invalid. B1 accuracy is page 
 | polyhedral_codegen | yes (step f) | no | Paper-only |
 | desired_output_specification | yes (specialization/sparsity/subsampling) | no | Paper-only |
 | cha_vca_callgraph | N/A | implemented | Code-only |
-| loc_code | N/A | 16466 lines | Code-only |
+| loc_code | N/A | 17242 lines | Code-only |
 | hardware_match | N/A | N/A | Not directly comparable |
 
 ### Benchmark results
@@ -145,7 +145,7 @@ Paper reports essentially **one** numeric application claim (~**3%** LLaMa 3.1 8
 | statistical_methodology | Georges et al.; 30 VM inv; CI α=0.05 | scalability script: 3 warmups + 20 runs (median/mean/stddev) when used | Not directly comparable |
 | sccp_vs_anti_cf | anti-CF rules required for valid micros (11/23 if inverted) | SCCP present | Partially comparable |
 | java_ast_slicing | yes | C-like lexer/parser/CFG builder (not Java AST slice) | Not directly comparable |
-| loc_code | N/A | 16466 lines | Code-only |
+| loc_code | N/A | 17242 lines | Code-only |
 | pde_path_classification | N/A | DEAD/MOSTLY DEAD/PARTIALLY DEAD/MOSTLY LIVE/LIVE | Code-only |
 
 ### Benchmark results
@@ -182,8 +182,16 @@ Opposite optimization goals around DCE/CF make "who is better at DCE" a malforme
 | What to add next (suggestions only) | (1) Document HW/compiler/flags beside every CSV; (2) optional real C/C++ corpus timing beyond cJSON; (3) explicit SCCP vs anti-CF discussion in docs; (4) do **not** chase Muzeel PLT numbers inside A |
 
 ### Plots produced
-See `output/plots/`: `code_size.png`, `code_file_counts.png`, `a_scalability_wall_ms.png` (if prior CSV), `benchmark_comparison_3517745_paper_only.png`, `execution_time_vs_die_paper_only.png`, `autojmh_table2_reach.png`, `autojmh_table3_expert_match.png`, `summary.png`.
-Paper-only charts are labeled as such — no fake A-vs-paper time overlays.
+See `output/plots/` for PNG and PDF pairs. Titles use **article names** (Muzeel IMC'22, Dead Iteration Elimination IMPACT'25, AutoJMH ASE'16), not B1/B2/B3.
+
+Key comparison charts:
+- `compare_modernpde_vs_muzeel_comparability` / `compare_modernpde_vs_die_comparability` / `compare_modernpde_vs_autojmh_comparability`
+- `compare_muzeel_paper_metrics`, `compare_muzeel_corpus_scale`, `compare_muzeel_similarity_vs_lacuna`, `compare_muzeel_elimination_savings`
+- `compare_die_llama_time_reduction`
+- `compare_autojmh_extraction_reach`, `compare_autojmh_expert_similarity`, `compare_autojmh_collections_sort_table1`, `compare_autojmh_rejection_reasons`
+- `compare_conceptual_dce_roles`, `compare_overview_three_papers`, `compare_comparability_panels`, `summary`
+
+Paper-only metrics are labeled as such — no fake ModernPDE-vs-paper runtime overlays.
 
 ### CSV outputs
 - `output/paper-comparison/A_code_metrics.csv`

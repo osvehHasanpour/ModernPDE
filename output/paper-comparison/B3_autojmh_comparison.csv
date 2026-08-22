@@ -9,5 +9,5 @@ input_generation,values observed from covering unit tests; anti-random for RQ2,N
 statistical_methodology,Georges et al.; 30 VM inv; CI α=0.05,N/A,§4.2.2,scalability script: 3 warmups + 20 runs (median/mean/stddev) when used,N/A,code,Not directly comparable,"Both use repeated runs, but JMH/CI-overlap ≠ wall-ms summary on C++ challenges."
 sccp_vs_anti_cf,anti-CF rules required for valid micros (11/23 if inverted),N/A,Table 3,SCCP present,N/A,code,Partially comparable,Evidence that CF matters on both sides; still not a numeric head-to-head.
 java_ast_slicing,yes,N/A,§3,C-like lexer/parser/CFG builder (not Java AST slice),N/A,code,Not directly comparable,Front-ends differ.
-loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,AutoJMH LOC not in inspected PDF tables.
+loc_code,N/A,N/A,N/A,17242,lines,code-derived,Code-only,AutoJMH LOC not in inspected PDF tables.
 pde_path_classification,N/A,N/A,N/A,DEAD/MOSTLY DEAD/PARTIALLY DEAD/MOSTLY LIVE/LIVE,N/A,code,Code-only,A advantage area; not AutoJMH's task.

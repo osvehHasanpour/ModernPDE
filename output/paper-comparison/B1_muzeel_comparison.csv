@@ -8,6 +8,6 @@ accuracy_named_metric,page similarity / Lacuna comparison,N/A,§6.2.2,PDE Accura
 runtime_of_tool,median ~30 s/page on 64 cores; 85% <5 min on ≤6 cores,s,§6.2,53.920739,ms,prior-measured-csv,Not directly comparable,Muzeel: crawl+emulate web pages on 64c server. A: synthetic PDE challenge wall ms on different HW (host N/A in CSV).
 corpus_scale,15000 pages / 300000 JS files,N/A,§6.1,14 samples; challenges 500/5000/50000 vars,N/A,code,Not directly comparable,Web corpus ≠ synthetic variable counts.
 hardware_match,64c/1TB server + Android phones Table 1,N/A,§6.1 / Table 1,N/A (not recorded for prior CSV; WSL g++ available locally),N/A,N/A,Not directly comparable,No shared HW profile → no direct speedup comparison.
-loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,Paper does not publish Muzeel LOC in the inspected PDF.
+loc_code,N/A,N/A,N/A,17242,lines,code-derived,Code-only,Paper does not publish Muzeel LOC in the inspected PDF.
 ctest_targets,N/A,N/A,N/A,14,targets,code-derived,Code-only,A regression suite; paper evaluates mobile web metrics.
 sccp_constant_propagation,N/A (JS browser DCE),N/A,N/A,SCCP implemented (Unknown/Constant/Overdefined),N/A,code,Code-only,B1 does not study sparse conditional constant propagation.

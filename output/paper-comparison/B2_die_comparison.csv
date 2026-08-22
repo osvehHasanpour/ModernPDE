@@ -7,5 +7,5 @@ benchmark_suite,N/A (no numeric evaluation tables),N/A,PDF 4 pages,challenge_500
 polyhedral_codegen,yes (step f),N/A,§2,no,N/A,code,Paper-only,Missing capability in A.
 desired_output_specification,yes (specialization/sparsity/subsampling),N/A,§2,no,N/A,code,Paper-only,Missing capability in A.
 cha_vca_callgraph,N/A,N/A,N/A,implemented,N/A,code,Code-only,OO call-structure analyses not part of DIE paper.
-loc_code,N/A,N/A,N/A,16466,lines,code-derived,Code-only,Paper does not report implementation LOC.
+loc_code,N/A,N/A,N/A,17242,lines,code-derived,Code-only,Paper does not report implementation LOC.
 hardware_match,N/A,N/A,not reported,N/A,N/A,N/A,Not directly comparable,Cannot validate any runtime comparison.

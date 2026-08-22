@@ -80,6 +80,31 @@ NOT_DIRECT = "Not directly comparable"
 PAPER_ONLY = "Paper-only"
 CODE_ONLY = "Code-only"
 
+# Display names for plots (use article titles, not B1/B2/B3).
+ARTIFACT_A = "ModernPDE (Artifact A)"
+MUZEEL_TITLE = (
+    "Muzeel: JS Dead Code Elimination on Mobile Web (IMC 2022)"
+)
+DIE_TITLE = "Dead Iteration Elimination (IMPACT 2025)"
+AUTOJMH_TITLE = (
+    "AutoJMH: Prevent DCE & Constant Folding (ASE 2016)"
+)
+
+CLASS_COLORS = {
+    DIRECT: "#2d6a4f",
+    PARTIAL: "#40916c",
+    NOT_DIRECT: "#1b4965",
+    PAPER_ONLY: "#b23a48",
+    CODE_ONLY: "#bc6c25",
+}
+CLASS_LABELS = [
+    (DIRECT, "Direct"),
+    (PARTIAL, "Partial"),
+    (NOT_DIRECT, "Not direct"),
+    (PAPER_ONLY, "Paper-only"),
+    (CODE_ONLY, "Code-only"),
+]
+
 
 def log(msg: str) -> None:
     print(msg, flush=True)
@@ -898,18 +923,58 @@ def make_plots(a: dict) -> None:
         }
     )
 
+    b1_rows = comparison_b1(a)
+    b2_rows = comparison_b2(a)
+    b3_rows = comparison_b3(a)
+
+    def save(fig, stem: str) -> None:
+        fig.savefig(PLOTS / f"{stem}.png", bbox_inches="tight")
+        fig.savefig(PLOTS / f"{stem}.pdf", bbox_inches="tight")
+        plt.close(fig)
+        log(f"  plot {stem}.png + .pdf")
+
+    def comparability_counts(rows: list[dict]) -> Counter:
+        return Counter(r["classification"] for r in rows)
+
+    def plot_comparability_panel(
+        rows: list[dict],
+        paper_title: str,
+        stem: str,
+    ) -> None:
+        """Per-paper: how many metrics fall in each comparability class vs ModernPDE."""
+        counts = comparability_counts(rows)
+        labels = [short for _, short in CLASS_LABELS]
+        vals = [counts[full] for full, _ in CLASS_LABELS]
+        colors = [CLASS_COLORS[full] for full, _ in CLASS_LABELS]
+
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        y = np.arange(len(labels))
+        ax.barh(y, vals, color=colors, edgecolor="white", linewidth=0.5)
+        ax.set_yticks(y)
+        ax.set_yticklabels(labels)
+        ax.set_xlabel("Number of compared metrics")
+        ax.set_title(
+            f"ModernPDE vs {paper_title}\n"
+            "metric comparability (independent analysis)"
+        )
+        ax.invert_yaxis()
+        for i, v in enumerate(vals):
+            if v:
+                ax.text(v + 0.05, i, str(v), va="center", fontsize=9)
+        fig.tight_layout()
+        save(fig, stem)
+
+    # --- Artifact A only ---
     fig, ax = plt.subplots(figsize=(7, 4))
     labels = ["code", "comment", "blank"]
     vals = [a["loc_code"], a["loc_comment"], a["loc_blank"]]
     ax.bar(labels, vals, color="#3b6ea5")
     ax.set_ylabel("Lines")
-    ax.set_title("Artifact A — physical LOC breakdown")
+    ax.set_title(f"{ARTIFACT_A} — physical LOC breakdown")
     for i, v in enumerate(vals):
         ax.text(i, v, str(v), ha="center", va="bottom", fontsize=9)
     fig.tight_layout()
-    fig.savefig(PLOTS / "code_size.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot code_size.png")
+    save(fig, "code_size")
 
     fig, ax = plt.subplots(figsize=(7, 4))
     flabels = [".cpp", "headers", ".py", "tests", "samples"]
@@ -922,11 +987,9 @@ def make_plots(a: dict) -> None:
     ]
     ax.bar(flabels, fvals, color="#5a7d4f")
     ax.set_ylabel("Count")
-    ax.set_title("Artifact A — file counts")
+    ax.set_title(f"{ARTIFACT_A} — file counts")
     fig.tight_layout()
-    fig.savefig(PLOTS / "code_file_counts.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot code_file_counts.png")
+    save(fig, "code_file_counts")
 
     ms = [
         a.get("challenge_500_median_wall_ms"),
@@ -937,97 +1000,297 @@ def make_plots(a: dict) -> None:
         fig, ax = plt.subplots(figsize=(7, 4))
         xs = ["500", "5000", "50000"]
         ys = [float(x) for x in ms]
-        ax.plot(xs, ys, marker="o", color="#3b6ea5")
+        ax.plot(xs, ys, marker="o", color="#3b6ea5", linewidth=2)
         ax.set_xlabel("Synthetic variables (challenge suite)")
         ax.set_ylabel("Median wall time (ms)")
-        ax.set_title("Artifact A — prior scalability medians (host N/A in CSV)")
+        ax.set_title(
+            f"{ARTIFACT_A} — PDE challenge scalability\n"
+            "(prior run; host/compiler not recorded in CSV)"
+        )
         fig.tight_layout()
-        fig.savefig(PLOTS / "a_scalability_wall_ms.png", bbox_inches="tight")
-        plt.close(fig)
-        log("  plot a_scalability_wall_ms.png")
-    else:
-        log("  skip a_scalability_wall_ms.png (N/A)")
+        save(fig, "a_scalability_wall_ms")
 
+    # --- ModernPDE snapshot vs each paper (code-only side; not numeric contest) ---
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(
+        ["CTest targets", "Sample inputs", "LOC (code)"],
+        [a["ctest_always_on"], a["sample_cpp_files"], a["loc_code"] / 1000],
+        color="#3b6ea5",
+    )
+    ax.set_ylabel("Count (LOC in thousands)")
+    ax.set_title(f"{ARTIFACT_A} — evaluation footprint")
+    fig.tight_layout()
+    save(fig, "modernpde_evaluation_footprint")
+
+    # --- Muzeel (IMC 2022) paper metrics ---
     fig, ax = plt.subplots(figsize=(8, 4.5))
-    b1_labels = [
+    m_labels = [
         "unused fn\nmedian %",
         "unused size\nmedian %",
         "PLT speedup\nlow %",
         "PLT speedup\nhigh %",
-        "sim≥90%\npages %",
+        "pages sim≥90%",
     ]
-    b1_vals = [70, 55, 25, 30, 90]
-    ax.bar(b1_labels, b1_vals, color="#b23a48")
+    m_vals = [70, 55, 25, 30, 90]
+    ax.bar(m_labels, m_vals, color="#b23a48")
     ax.set_ylabel("Percent (paper-reported)")
-    ax.set_title("B1 Muzeel — selected paper % metrics (not comparable to A)")
-    fig.tight_layout()
-    fig.savefig(
-        PLOTS / "benchmark_comparison_3517745_paper_only.png", bbox_inches="tight"
+    ax.set_title(
+        f"{MUZEEL_TITLE}\n"
+        "selected evaluation metrics (paper-only; not vs ModernPDE times)"
     )
-    plt.close(fig)
-    log("  plot benchmark_comparison_3517745_paper_only.png")
-
-    fig, ax = plt.subplots(figsize=(5, 4))
-    ax.bar(["LLaMa prompt\ntime reduction"], [3], color="#d98c5f")
-    ax.set_ylabel("Percent (paper-reported)")
-    ax.set_title("B2 DIE — only numeric runtime claim in PDF")
-    ax.set_ylim(0, 10)
     fig.tight_layout()
-    fig.savefig(PLOTS / "execution_time_vs_die_paper_only.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot execution_time_vs_die_paper_only.png")
-
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    t2_labels = ["loops\n(table)", "payloads\ngen", "initialized", "microbenches", "rejected"]
-    t2_vals = [6082, 4705, 3485, 3462, 1377]
-    ax.bar(t2_labels, t2_vals, color="#6b5b95")
-    ax.set_ylabel("Count (Table 2)")
-    ax.set_title("B3 AutoJMH — Table 2 reach (paper-only; abstract loops=6028)")
-    fig.tight_layout()
-    fig.savefig(PLOTS / "autojmh_table2_reach.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot autojmh_table2_reach.png")
+    save(fig, "compare_muzeel_paper_metrics")
 
     fig, ax = plt.subplots(figsize=(7, 4))
     ax.bar(
-        ["AutoJMH", "DCE off", "CF/CP bad", "Bad init"],
-        [23, 0, 11, 3],
-        color="#3b6ea5",
+        ["Alexa pages", "JS files (÷1000)", "perf eval pages"],
+        [15000, 300, 200],
+        color="#b23a48",
     )
-    ax.set_ylabel("Successful similarity tests / 23")
-    ax.set_title("B3 AutoJMH — Table 3 vs handwritten experts")
+    ax.set_ylabel("Count (JS files shown in thousands)")
+    ax.set_title(f"{MUZEEL_TITLE}\n corpus scale")
+    fig.tight_layout()
+    save(fig, "compare_muzeel_corpus_scale")
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(
+        ["Muzeel-ed pages", "Lacuna (baseline)"],
+        [90, 60],
+        color=["#b23a48", "#888888"],
+    )
+    ax.set_ylabel("% of 200 pages with structural similarity ≥ 90%")
+    ax.set_title(
+        f"{MUZEEL_TITLE}\n"
+        "structural similarity vs Lacuna (paper-reported)"
+    )
+    ax.set_ylim(0, 100)
+    fig.tight_layout()
+    save(fig, "compare_muzeel_similarity_vs_lacuna")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(
+        ["Elim. funcs/file\n(median)", "Elim. KB/file\n(median)", "Page size\nreduction KB"],
+        [67, 10, 400],
+        color="#b23a48",
+    )
+    ax.set_ylabel("Paper-reported value")
+    ax.set_title(f"{MUZEEL_TITLE}\n dead-code elimination savings")
+    fig.tight_layout()
+    save(fig, "compare_muzeel_elimination_savings")
+
+    plot_comparability_panel(
+        b1_rows,
+        MUZEEL_TITLE,
+        "compare_modernpde_vs_muzeel_comparability",
+    )
+
+    # --- DIE (IMPACT 2025) ---
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.bar(["LLaMa 3.1 8B\nprompt processing"], [3], color="#d98c5f")
+    ax.set_ylabel("Time reduction (%)")
+    ax.set_title(
+        f"{DIE_TITLE}\n"
+        "application note: last-decoder iteration removal (paper-only)"
+    )
+    ax.set_ylim(0, 10)
+    fig.tight_layout()
+    save(fig, "compare_die_llama_time_reduction")
+
+    plot_comparability_panel(
+        b2_rows,
+        DIE_TITLE,
+        "compare_modernpde_vs_die_comparability",
+    )
+
+    # --- AutoJMH (ASE 2016) ---
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    t2_labels = ["loops\n(Table 2)", "payloads", "initialized", "microbenches", "rejected"]
+    t2_vals = [6082, 4705, 3485, 3462, 1377]
+    ax.bar(t2_labels, t2_vals, color="#6b5b95")
+    ax.set_ylabel("Count (Table 2)")
+    ax.set_title(
+        f"{AUTOJMH_TITLE}\n"
+        "automatic extraction reach (abstract: 6028 loops)"
+    )
+    fig.tight_layout()
+    save(fig, "compare_autojmh_extraction_reach")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(
+        ["Full AutoJMH", "DCE not prevented", "CF/CP rules inverted", "Bad initialization"],
+        [23, 0, 11, 3],
+        color="#6b5b95",
+    )
+    ax.set_ylabel("Expert-similar microbenchmarks / 23")
+    ax.set_title(
+        f"{AUTOJMH_TITLE}\n"
+        "Table 3 — similarity to handwritten JMH (paper-reported)"
+    )
     ax.set_ylim(0, 25)
     fig.tight_layout()
-    fig.savefig(PLOTS / "autojmh_table3_expert_match.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot autojmh_table3_expert_match.png")
+    save(fig, "compare_autojmh_expert_similarity")
 
-    def count_class(rows: list[dict]) -> Counter:
-        return Counter(r["classification"] for r in rows)
-
-    c1 = count_class(comparison_b1(a))
-    c2 = count_class(comparison_b2(a))
-    c3 = count_class(comparison_b3(a))
-    cats = [DIRECT, PARTIAL, NOT_DIRECT, PAPER_ONLY, CODE_ONLY]
-    x = np.arange(len(cats))
-    w = 0.25
-    fig, ax = plt.subplots(figsize=(10, 4.5))
-    ax.bar(x - w, [c1[c] for c in cats], w, label="A vs B1")
-    ax.bar(x, [c2[c] for c in cats], w, label="A vs B2")
-    ax.bar(x + w, [c3[c] for c in cats], w, label="A vs B3")
+    fig, ax = plt.subplots(figsize=(7, 4))
+    x = np.arange(2)
+    w = 0.35
+    ax.bar(x - w / 2, [203, 453], w, label="LinkedList", color="#6b5b95")
+    ax.bar(x + w / 2, [1639, 645], w, label="Vector", color="#9b8ec4")
     ax.set_xticks(x)
-    ax.set_xticklabels(
-        ["Direct", "Partial", "Not direct", "Paper-only", "Code-only"],
-        rotation=15,
-        ha="right",
+    ax.set_xticklabels(["Sorted input", "Unsorted input"])
+    ax.set_ylabel("Time (ns)")
+    ax.set_title(
+        f"{AUTOJMH_TITLE}\n"
+        "Table 1 — Collections.sort (paper-only; JMH ns)"
     )
-    ax.set_ylabel("# metrics in comparison tables")
-    ax.set_title("Summary — comparability classifications (independent A vs each paper)")
     ax.legend()
     fig.tight_layout()
-    fig.savefig(PLOTS / "summary.png", bbox_inches="tight")
-    plt.close(fig)
-    log("  plot summary.png")
+    save(fig, "compare_autojmh_collections_sort_table1")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(
+        ["Unsupported\nvariables", "Unsupported\ninvocations", "Regression\nfailures"],
+        [1027, 350, 23],
+        color="#6b5b95",
+    )
+    ax.set_ylabel("Loops rejected (Table 2)")
+    ax.set_title(f"{AUTOJMH_TITLE}\n rejection reasons (total corpus)")
+    fig.tight_layout()
+    save(fig, "compare_autojmh_rejection_reasons")
+
+    plot_comparability_panel(
+        b3_rows,
+        AUTOJMH_TITLE,
+        "compare_modernpde_vs_autojmh_comparability",
+    )
+
+    # --- Conceptual: each paper's role vs dead code (qualitative, not numeric) ---
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    roles = [
+        ("Muzeel\n(IMC'22)", "Eliminate unused\nJS functions", 3),
+        ("DIE\n(IMPACT'25)", "Remove dead\nloop iterations", 3),
+        ("AutoJMH\n(ASE'16)", "Prevent DCE/CF\nin microbenchmarks", 3),
+        (ARTIFACT_A.split()[0], "Classify dead/partial\nvariables + SCCP", 3),
+    ]
+    names = [r[0] for r in roles]
+    scores = [r[2] for r in roles]
+    ax.barh(names, scores, color=["#b23a48", "#d98c5f", "#6b5b95", "#3b6ea5"])
+    ax.set_xlabel("Primary focus (qualitative scale 1–3)")
+    ax.set_title(
+        "Conceptual comparison — role in dead-code / optimization space\n"
+        "(not a numeric benchmark score)"
+    )
+    for i, (_, desc, _) in enumerate(roles):
+        ax.text(3.05, i, desc, va="center", fontsize=8)
+    ax.set_xlim(0, 5.5)
+    fig.tight_layout()
+    save(fig, "compare_conceptual_dce_roles")
+
+    # --- Overview: three independent comparability profiles ---
+    c1 = comparability_counts(b1_rows)
+    c2 = comparability_counts(b2_rows)
+    c3 = comparability_counts(b3_rows)
+    cats = [full for full, _ in CLASS_LABELS]
+    short = [s for _, s in CLASS_LABELS]
+    x = np.arange(len(cats))
+    w = 0.25
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.bar(
+        x - w,
+        [c1[c] for c in cats],
+        w,
+        label="Muzeel (IMC'22)",
+        color="#b23a48",
+    )
+    ax.bar(
+        x,
+        [c2[c] for c in cats],
+        w,
+        label="Dead Iteration Elimination (IMPACT'25)",
+        color="#d98c5f",
+    )
+    ax.bar(
+        x + w,
+        [c3[c] for c in cats],
+        w,
+        label="AutoJMH (ASE'16)",
+        color="#6b5b95",
+    )
+    ax.set_xticks(x)
+    ax.set_xticklabels(short, rotation=15, ha="right")
+    ax.set_ylabel("# metrics in comparison tables")
+    ax.set_title(
+        f"ModernPDE vs three reference papers — comparability overview\n"
+        "(each paper analyzed independently)"
+    )
+    ax.legend(loc="upper right", fontsize=9)
+    fig.tight_layout()
+    save(fig, "compare_overview_three_papers")
+
+    # --- Three-panel comparability (one subplot per article) ---
+    fig, axes = plt.subplots(1, 3, figsize=(12, 4.5), sharey=True)
+    panels = [
+        (b1_rows, "Muzeel\n(IMC'22)", "#b23a48"),
+        (b2_rows, "Dead Iteration\nElimination", "#d98c5f"),
+        (b3_rows, "AutoJMH\n(ASE'16)", "#6b5b95"),
+    ]
+    for ax, (rows, subtitle, color) in zip(axes, panels):
+        counts = comparability_counts(rows)
+        vals = [counts[full] for full, _ in CLASS_LABELS]
+        ax.bar([s for _, s in CLASS_LABELS], vals, color=color, alpha=0.85)
+        ax.set_title(subtitle, fontsize=10)
+        ax.set_xlabel("Comparability class")
+        ax.tick_params(axis="x", rotation=35)
+    axes[0].set_ylabel("# metrics")
+    fig.suptitle(
+        f"{ARTIFACT_A} — per-article metric comparability",
+        fontsize=12,
+        fontweight="bold",
+    )
+    fig.tight_layout()
+    save(fig, "compare_comparability_panels")
+
+    # Legacy filenames (retitled) for backward compatibility
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.bar(m_labels, m_vals, color="#b23a48")
+    ax.set_ylabel("Percent (paper-reported)")
+    ax.set_title(f"{MUZEEL_TITLE}\nselected paper metrics")
+    fig.tight_layout()
+    save(fig, "benchmark_comparison_3517745_paper_only")
+
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.bar(["LLaMa prompt time"], [3], color="#d98c5f")
+    ax.set_ylabel("Percent (paper-reported)")
+    ax.set_title(f"{DIE_TITLE}\nnumeric claim in PDF")
+    ax.set_ylim(0, 10)
+    fig.tight_layout()
+    save(fig, "execution_time_vs_die_paper_only")
+
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    ax.bar(t2_labels, t2_vals, color="#6b5b95")
+    ax.set_ylabel("Count (Table 2)")
+    ax.set_title(f"{AUTOJMH_TITLE}\nTable 2 reach")
+    fig.tight_layout()
+    save(fig, "autojmh_table2_reach")
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(["Full AutoJMH", "DCE off", "CF/CP bad", "Bad init"], [23, 0, 11, 3], color="#6b5b95")
+    ax.set_ylabel("Successful tests / 23")
+    ax.set_title(f"{AUTOJMH_TITLE}\nTable 3 vs experts")
+    ax.set_ylim(0, 25)
+    fig.tight_layout()
+    save(fig, "autojmh_table3_expert_match")
+
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.bar(x - w, [c1[c] for c in cats], w, label="Muzeel (IMC'22)", color="#b23a48")
+    ax.bar(x, [c2[c] for c in cats], w, label="DIE (IMPACT'25)", color="#d98c5f")
+    ax.bar(x + w, [c3[c] for c in cats], w, label="AutoJMH (ASE'16)", color="#6b5b95")
+    ax.set_xticks(x)
+    ax.set_xticklabels(short, rotation=15, ha="right")
+    ax.set_ylabel("# metrics")
+    ax.set_title("ModernPDE vs reference papers — comparability summary")
+    ax.legend()
+    fig.tight_layout()
+    save(fig, "summary")
 
 
 def write_report(a: dict) -> None:
@@ -1199,8 +1462,16 @@ Opposite optimization goals around DCE/CF make "who is better at DCE" a malforme
 | What to add next (suggestions only) | (1) Document HW/compiler/flags beside every CSV; (2) optional real C/C++ corpus timing beyond cJSON; (3) explicit SCCP vs anti-CF discussion in docs; (4) do **not** chase Muzeel PLT numbers inside A |
 
 ### Plots produced
-See `output/plots/`: `code_size.png`, `code_file_counts.png`, `a_scalability_wall_ms.png` (if prior CSV), `benchmark_comparison_3517745_paper_only.png`, `execution_time_vs_die_paper_only.png`, `autojmh_table2_reach.png`, `autojmh_table3_expert_match.png`, `summary.png`.
-Paper-only charts are labeled as such — no fake A-vs-paper time overlays.
+See `output/plots/` for PNG and PDF pairs. Titles use **article names** (Muzeel IMC'22, Dead Iteration Elimination IMPACT'25, AutoJMH ASE'16), not B1/B2/B3.
+
+Key comparison charts:
+- `compare_modernpde_vs_muzeel_comparability` / `compare_modernpde_vs_die_comparability` / `compare_modernpde_vs_autojmh_comparability`
+- `compare_muzeel_paper_metrics`, `compare_muzeel_corpus_scale`, `compare_muzeel_similarity_vs_lacuna`, `compare_muzeel_elimination_savings`
+- `compare_die_llama_time_reduction`
+- `compare_autojmh_extraction_reach`, `compare_autojmh_expert_similarity`, `compare_autojmh_collections_sort_table1`, `compare_autojmh_rejection_reasons`
+- `compare_conceptual_dce_roles`, `compare_overview_three_papers`, `compare_comparability_panels`, `summary`
+
+Paper-only metrics are labeled as such — no fake ModernPDE-vs-paper runtime overlays.
 
 ### CSV outputs
 - `output/paper-comparison/A_code_metrics.csv`
