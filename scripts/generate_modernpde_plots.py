@@ -69,7 +69,7 @@ plt.rcParams.update({
     "axes.titleweight": "bold",
     "axes.labelsize": 11,
     "axes.labelweight": "normal",
-    "axes.edgecolor": "#333333",
+    "axes.edgecolor": "#1F4E79",
     "axes.linewidth": 0.8,
     "axes.spines.top": False,
     "axes.spines.right": False,
@@ -87,15 +87,15 @@ plt.rcParams.update({
 })
 
 # ModernPDE house palette
-C_DEAD          = "#b23a48"
-C_MOSTLY_DEAD   = "#d98c5f"
-C_PARTIAL_DEAD  = "#e8c46a"
-C_MOSTLY_LIVE   = "#8fb996"
-C_LIVE          = "#3b6ea5"
-C_PHASE7        = "#8a8d91"
-C_PHASE8        = "#3b6ea5"
-C_ACCENT        = "#b23a48"
-C_NEUTRAL_DARK  = "#2b2b2b"
+C_DEAD          = "#C0392B"
+C_MOSTLY_DEAD   = "#E67E22"
+C_PARTIAL_DEAD  = "#F1C40F"
+C_MOSTLY_LIVE   = "#27AE60"
+C_LIVE          = "#2980B9"
+C_PHASE7        = "#1F4E79"
+C_PHASE8        = "#2980B9"
+C_ACCENT        = "#C0392B"
+C_NEUTRAL_DARK  = "#1F4E79"
 
 CLASS_COLORS = [C_DEAD, C_MOSTLY_DEAD, C_PARTIAL_DEAD, C_MOSTLY_LIVE, C_LIVE]
 CLASS_LABELS = ["DEAD", "MOSTLY DEAD", "PARTIALLY DEAD", "MOSTLY LIVE", "LIVE"]
@@ -130,7 +130,7 @@ def fig1_pde_classification():
     ax.text(0.99, 0.97,
              "Source: tests/challenge_500.cpp\n(5 categories $\\times$ 100 variables)",
              transform=ax.transAxes, ha="right", va="top", fontsize=8,
-             style="italic", color="#555555")
+             style="italic", color="#1F4E79")
 
     fig.tight_layout()
     save(fig, "fig1_pde_classification")
@@ -250,7 +250,7 @@ def fig4_accuracy_metrics():
         "LIVE":            [1.000, 1.000, 1.000, 1.000],
     }
     metric_names = ["Accuracy", "Precision", "Recall", "F1-score"]
-    metric_colors = ["#3b6ea5", "#8fb996", "#d98c5f", "#b23a48"]
+    metric_colors = ["#2980B9", "#27AE60", "#F39C12", "#C0392B"]
 
     labels = list(metrics.keys())
     data = np.array([metrics[k] for k in labels])  # rows=class, cols=metric
@@ -269,11 +269,11 @@ def fig4_accuracy_metrics():
                      rotation=90)
 
     overall_f1 = data[:, 3].mean()
-    ax.axhline(overall_f1, color="#444444", linestyle="--", linewidth=1,
+    ax.axhline(overall_f1, color="#1F4E79", linestyle="--", linewidth=1,
                 zorder=2)
     ax.text(len(labels) - 0.55, overall_f1 + 0.015,
              f"macro-avg F1 = {overall_f1:.3f}", fontsize=8.5,
-             color="#444444", ha="right")
+             color="#1F4E79", ha="right")
 
     ax.set_ylim(0.9, 1.05)
     ax.set_xticks(x)
@@ -365,8 +365,8 @@ def fig6_pipeline_breakdown():
     # Percent of total pipeline wall-clock time on a representative
     # mid-sized program (~5,000 variables), Phase 7+8 combined pipeline.
     pct = [8.5, 6.0, 11.5, 14.0, 22.0, 29.0, 9.0]
-    colors = ["#6b7f9e", "#8a8d91", "#7ea6c4", "#8fb996",
-              "#e8c46a", "#b23a48", "#3b6ea5"]
+    colors = ["#1F4E79", "#1ABC9C", "#2980B9", "#27AE60",
+              "#F1C40F", "#C0392B", "#8E44AD"]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.8),
                                      gridspec_kw={"width_ratios": [1.1, 1]})

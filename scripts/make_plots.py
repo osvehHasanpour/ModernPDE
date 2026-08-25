@@ -37,7 +37,7 @@ df = df[df["binary"] == "ModernPDE"].copy()
 df = df.sort_values("runtime_ms", ascending=True)
 
 fig, ax = plt.subplots(figsize=(8, 6))
-bars = ax.barh(df["file"], df["runtime_ms"], color="#3b6ea5", edgecolor="black", linewidth=0.4)
+bars = ax.barh(df["file"], df["runtime_ms"], color="#2980B9", edgecolor="black", linewidth=0.4)
 
 ax.set_xlabel("Runtime (ms)")
 ax.set_ylabel("Test case")
@@ -60,7 +60,7 @@ counts = [pde["raw_counts"][k] for k in labels]
 total = pde["total"]
 pct = [100 * c / total for c in counts]
 
-colors = ["#b23a48", "#d98c5f", "#e8c46a", "#8fb996", "#3b6ea5"]
+colors = ["#C0392B", "#E67E22", "#F1C40F", "#27AE60", "#2980B9"]
 
 fig, ax = plt.subplots(figsize=(8, 5))
 bars = ax.bar(labels, counts, color=colors, edgecolor="black", linewidth=0.5)

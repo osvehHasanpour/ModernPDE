@@ -711,11 +711,11 @@ def setup_pyplot():
     return plt
 
 
-BLUE = "#2F5D8A"
-OCHRE = "#C4783A"
-GREEN = "#3D7A5A"
-SLATE = "#4A5560"
-RED = "#A33B3B"
+BLUE = "#2980B9"
+OCHRE = "#F39C12"
+GREEN = "#27AE60"
+SLATE = "#1F4E79"
+RED = "#C0392B"
 
 
 def save(fig, name: str) -> None:
