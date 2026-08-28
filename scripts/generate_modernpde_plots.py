@@ -38,23 +38,28 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.patches import FancyArrowPatch
 
+_ROOT = Path(__file__).resolve().parents[1]
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+from plot_style import FIG_SIZE, journal_save, layout_grid2x2, layout_tall_barh, new_figure, verify_png_sizes
+
 # ------------------------------------------------------------------
 # Output location
 # ------------------------------------------------------------------
-_ROOT = Path(__file__).resolve().parents[1]
+
 OUTDIR = sys.argv[1] if len(sys.argv) > 1 else str(_ROOT / "output" / "plots")
 os.makedirs(OUTDIR, exist_ok=True)
 
 
-def save(fig, name):
-    """Save a figure as both 300 dpi PNG and vector PDF."""
+def save(fig, name, *, layout="single"):
+    """Save a figure as both 300 dpi PNG and vector PDF (fixed journal size)."""
     png_path = os.path.join(OUTDIR, f"{name}.png")
-    pdf_path = os.path.join(OUTDIR, f"{name}.pdf")
-    fig.savefig(png_path, dpi=300, bbox_inches="tight")
-    fig.savefig(pdf_path, bbox_inches="tight")
+    journal_save(fig, png_path, layout=layout)
     plt.close(fig)
     print(f"  saved {png_path}")
-    print(f"  saved {pdf_path}")
+    print(f"  saved {png_path.replace('.png', '.pdf')}")
 
 
 # ------------------------------------------------------------------
@@ -112,7 +117,7 @@ def fig1_pde_classification():
     total = sum(counts)
     pct = [100.0 * c / total for c in counts]
 
-    fig, ax = plt.subplots(figsize=(8, 5.2))
+    fig, ax = new_figure()
     bars = ax.bar(CLASS_LABELS, counts, color=CLASS_COLORS,
                    edgecolor="black", linewidth=0.6, width=0.62, zorder=3)
 
@@ -132,7 +137,6 @@ def fig1_pde_classification():
              transform=ax.transAxes, ha="right", va="top", fontsize=8,
              style="italic", color="#1F4E79")
 
-    fig.tight_layout()
     save(fig, "fig1_pde_classification")
 
 
@@ -154,7 +158,7 @@ def fig2_scalability():
     phase8_ms = 0.0075 * n_vars + 2.0
     phase8_ms *= (1 + rng.normal(0, 0.015, size=n_vars.shape))
 
-    fig, ax = plt.subplots(figsize=(8, 5.6))
+    fig, ax = new_figure()
     ax.plot(n_vars, phase7_ms, marker="o", color=C_PHASE7, linewidth=2,
              markersize=6, label="Phase 7 (baseline fixed-point)", zorder=3)
     ax.plot(n_vars, phase8_ms, marker="s", color=C_PHASE8, linewidth=2,
@@ -177,7 +181,6 @@ def fig2_scalability():
         arrowprops=dict(arrowstyle="->", color=C_ACCENT, lw=1.2),
     )
 
-    fig.tight_layout()
     save(fig, "fig2_scalability")
 
 
@@ -194,7 +197,7 @@ def fig3_phase_comparison():
     x = np.arange(len(n_vars))
     width = 0.36
 
-    fig, ax1 = plt.subplots(figsize=(8.5, 5.6))
+    fig, ax1 = new_figure()
     b1 = ax1.bar(x - width / 2, phase7_ms, width, label="Phase 7",
                   color=C_PHASE7, edgecolor="black", linewidth=0.5, zorder=3)
     b2 = ax1.bar(x + width / 2, phase8_ms, width, label="Phase 8",
@@ -230,7 +233,6 @@ def fig3_phase_comparison():
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
 
-    fig.tight_layout()
     save(fig, "fig3_phase_comparison")
 
 
@@ -258,7 +260,7 @@ def fig4_accuracy_metrics():
     x = np.arange(len(labels))
     width = 0.19
 
-    fig, ax = plt.subplots(figsize=(9, 5.6))
+    fig, ax = new_figure()
     for i, (mname, mcolor) in enumerate(zip(metric_names, metric_colors)):
         offset = (i - 1.5) * width
         bars = ax.bar(x + offset, data[:, i], width, label=mname,
@@ -283,7 +285,6 @@ def fig4_accuracy_metrics():
                   "(n = 500 variables, tests/challenge_500.cpp)")
     ax.legend(loc="lower right", ncol=4, fontsize=8.5)
 
-    fig.tight_layout()
     save(fig, "fig4_accuracy_metrics")
 
 
@@ -330,7 +331,8 @@ def fig5_runtime_per_testcase():
     norm_vals = (norm_vals - norm_vals.min()) / np.ptp(norm_vals)
     bar_colors = plt.cm.Blues(0.35 + 0.55 * norm_vals)
 
-    fig, ax = plt.subplots(figsize=(8.5, 9.5))
+    fig, ax = new_figure()
+    ax.tick_params(axis="y", labelsize=6)
     bars = ax.barh(names, values, color=bar_colors, edgecolor="black",
                     linewidth=0.4, zorder=3)
     ax.set_xscale("log")
@@ -341,11 +343,10 @@ def fig5_runtime_per_testcase():
     for bar, v in zip(bars, values):
         label = f"{v:,.1f}" if v < 1000 else f"{v:,.0f}"
         ax.text(bar.get_width() * 1.06, bar.get_y() + bar.get_height() / 2,
-                 label, va="center", fontsize=7.6)
+                 label, va="center", fontsize=6)
 
     ax.set_xlim(1, values.max() * 3.5)
-    fig.tight_layout()
-    save(fig, "fig5_runtime_per_testcase")
+    save(fig, "fig5_runtime_per_testcase", layout="tall_barh")
 
 
 # ==================================================================
@@ -368,8 +369,10 @@ def fig6_pipeline_breakdown():
     colors = ["#1F4E79", "#1ABC9C", "#2980B9", "#27AE60",
               "#F1C40F", "#C0392B", "#8E44AD"]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.8),
-                                     gridspec_kw={"width_ratios": [1.1, 1]})
+    fig, (ax1, ax2) = new_figure(
+        ncols=2,
+        gridspec_kw={"width_ratios": [1.1, 1]},
+    )
 
     # --- left: horizontal stacked bar (single "pipeline" bar) ---
     left = 0
@@ -390,7 +393,7 @@ def fig6_pipeline_breakdown():
 
     handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in colors]
     ax1.legend(handles, phases, loc="upper center",
-               bbox_to_anchor=(0.5, -0.18), ncol=2, fontsize=8, frameon=False)
+               bbox_to_anchor=(0.5, -0.22), ncol=2, fontsize=7, frameon=False)
 
     # --- right: horizontal bar chart, one bar per phase ---
     order = np.argsort(pct)
@@ -407,8 +410,7 @@ def fig6_pipeline_breakdown():
                   va="center", fontsize=8.5)
     ax2.set_xlim(0, max(pct_sorted) * 1.25)
 
-    fig.tight_layout()
-    save(fig, "fig6_pipeline_breakdown")
+    save(fig, "fig6_pipeline_breakdown", layout="wide")
 
 
 # ==================================================================

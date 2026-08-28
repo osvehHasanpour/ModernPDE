@@ -1010,155 +1010,49 @@ Compiler writers should treat path awareness, context sensitivity and field sens
 ``Dead code'' is a crowded phrase. To avoid conflating incomparable metrics, we discuss three adjacent research lines and how \textsc{ModernPDE} relates to each \emph{conceptually}. Figures in this subsection reproduce paper-reported quantities from those lines; they are \textbf{not} head-to-head runtime contests against our challenge suite, because inputs, hardware, and measured quantities differ.
 
 \paragraph{Dynamic JavaScript DCE (Muzeel).}
-Muzeel~\cite{kupoluyi2022muzeel} eliminates unused JavaScript \emph{functions} on mobile web pages via post-load interaction emulation. \autoref{fig:muzeelmetrics}--\autoref{fig:muzeelsim} summarize its reported evaluation: large fractions of unused functions and bytes, multi-second page-load benefits under throttled networks, and higher structural similarity than Lacuna. \textsc{ModernPDE} shares the goal of removing unused computation but operates in a different domain (static C-family IR, variable/field liveness, synthetic and curated CFG benchmarks). The scientific takeaway we adopt is methodological: end-to-end impact metrics matter, yet they must not be numerically mixed with analyzer wall-clock milliseconds.
+Muzeel~\cite{kupoluyi2022muzeel} eliminates unused JavaScript \emph{functions} on mobile web pages via post-load interaction emulation. \autoref{fig:vs_muzeel} juxtaposes accuracy-related scores, corpus scale, runtime, and implementation-complexity proxies for \textsc{ModernPDE} and Muzeel side by side. \textsc{ModernPDE} shares the goal of removing unused computation but operates in a different domain (static C-family IR, variable/field liveness, synthetic and curated CFG benchmarks). The scientific takeaway we adopt is methodological: end-to-end impact metrics matter, yet they must not be numerically mixed with analyzer wall-clock milliseconds.
 
 \begin{figure}[t]
 \centering
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_muzeel_paper_metrics.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel}: selected paper-reported percentage metrics.}
-  \label{fig:muzeelmetrics}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_muzeel_corpus_scale.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel}: reported corpus scale.}
-  \label{fig:muzeelcorpus}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_muzeel_elimination_savings.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel}: reported elimination savings.}
-  \label{fig:muzeelsave}
-\end{minipage}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_muzeel_similarity_vs_lacuna.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel} versus Lacuna structural similarity.}
-  \label{fig:muzeelsim}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/muzeel_dce_and_speedup.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel}: DCE rate and page-load speedup view.}
-  \label{fig:muzeeldce}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/muzeel_bytes_eliminated.png}
-  \captionof{figure}{Muzeel~\cite{kupoluyi2022muzeel}: reported bytes eliminated.}
-  \label{fig:muzeelbytes}
-\end{minipage}
+\includegraphics[width=0.92\linewidth]{plots/artifact_vs_muzeel.png}
+\caption{ModernPDE vs Muzeel~\cite{kupoluyi2022muzeel}: accuracy, scale, runtime, and complexity metrics shown side by side (not a head-to-head benchmark).}
+\label{fig:vs_muzeel}
 \end{figure}
 
 \paragraph{Polyhedral dead-iteration elimination (DIE).}
-Bastoul et al.~\cite{bastoul2025dead} remove loop iterations that do not contribute to a required output data space. \autoref{fig:diellama} recalls their application note on LLaMa prompt-processing. DIE and \textsc{ModernPDE} are complementary: DIE targets iteration spaces inside polyhedral schedules; we target path-ratio classification of definitions on general CFGs. Both refine classical statement-level DCE, but neither's numeric claims transfer to the other without matching IR and workloads.
+Bastoul et al.~\cite{bastoul2025dead} remove loop iterations that do not contribute to a required output data space. \autoref{fig:vs_die} places their reported LLaMa application note alongside \textsc{ModernPDE} classifier accuracy and artifact complexity. DIE and \textsc{ModernPDE} are complementary: DIE targets iteration spaces inside polyhedral schedules; we target path-ratio classification of definitions on general CFGs. Both refine classical statement-level DCE, but neither's numeric claims transfer to the other without matching IR and workloads.
 
 \begin{figure}[t]
 \centering
-\begin{minipage}[t]{0.48\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_die_llama_time_reduction.png}
-  \captionof{figure}{DIE~\cite{bastoul2025dead}: reported LLaMa prompt-processing time reduction.}
-  \label{fig:diellama}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.48\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_conceptual_dce_roles.png}
-  \captionof{figure}{Conceptual roles of adjacent dead-code research lines.}
-  \label{fig:roles}
-\end{minipage}
+\includegraphics[width=0.92\linewidth]{plots/artifact_vs_die.png}
+\caption{ModernPDE vs DIE~\cite{bastoul2025dead}: accuracy, speedup note, runtime, and complexity juxtaposition (independent analyses).}
+\label{fig:vs_die}
 \end{figure}
 
 \paragraph{Microbenchmarks that \emph{prevent} DCE (AutoJMH).}
-AutoJMH~\cite{rodriguez2016autojmh} generates JMH payloads that resist DCE and constant folding so timed code actually executes. \autoref{fig:autojmhreach}--\autoref{fig:autojmhreject} summarize reach, expert similarity ablations, Collections.sort timings, and rejection reasons from that work. The relationship to \textsc{ModernPDE} is intentionally inverse: AutoJMH \emph{defeats} DCE/CF for measurement fidelity, whereas we \emph{detect} deadness (and implement SCCP-style constant propagation) for optimization. Table~3-style ablations in AutoJMH nonetheless reinforce a point we rely on experimentally: if constants are folded or sinks removed too aggressively, observed behavior diverges from the intended program---hence our conservative stance when path sets are incomplete.
+AutoJMH~\cite{rodriguez2016autojmh} generates JMH payloads that resist DCE and constant folding so timed code actually executes. \autoref{fig:vs_autojmh} contrasts expert-match accuracy, loop reach, timing scale, and artifact complexity with \textsc{ModernPDE}. The relationship is intentionally inverse: AutoJMH \emph{defeats} DCE/CF for measurement fidelity, whereas we \emph{detect} deadness (and implement SCCP-style constant propagation) for optimization. Table~3-style ablations in AutoJMH nonetheless reinforce a point we rely on experimentally: if constants are folded or sinks removed too aggressively, observed behavior diverges from the intended program---hence our conservative stance when path sets are incomplete.
 
 \begin{figure}[t]
 \centering
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_autojmh_extraction_reach.png}
-  \captionof{figure}{AutoJMH~\cite{rodriguez2016autojmh}: extraction reach over Java loops.}
-  \label{fig:autojmhreach}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_autojmh_expert_similarity.png}
-  \captionof{figure}{AutoJMH~\cite{rodriguez2016autojmh}: expert timing similarity ablations.}
-  \label{fig:autojmhexpert}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_autojmh_collections_sort_table1.png}
-  \captionof{figure}{AutoJMH~\cite{rodriguez2016autojmh}: Collections.sort timings (ns).}
-  \label{fig:autojmhsort}
-\end{minipage}
+\includegraphics[width=0.92\linewidth]{plots/artifact_vs_autojmh.png}
+\caption{ModernPDE vs AutoJMH~\cite{rodriguez2016autojmh}: accuracy, scale, timing, and complexity juxtaposition (units differ by design).}
+\label{fig:vs_autojmh}
 \end{figure}
 
-\begin{figure}[t]
-\centering
-\begin{minipage}[t]{0.48\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_autojmh_rejection_reasons.png}
-  \captionof{figure}{AutoJMH~\cite{rodriguez2016autojmh}: rejection reasons for failed extractions.}
-  \label{fig:autojmhreject}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.48\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_overview_three_papers.png}
-  \captionof{figure}{Overview of metric comparability against three adjacent papers.}
-  \label{fig:overviewcmp}
-\end{minipage}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_modernpde_vs_muzeel_comparability.png}
-  \captionof{figure}{Metric comparability audit versus Muzeel~\cite{kupoluyi2022muzeel}.}
-  \label{fig:cmpmuzeel}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_modernpde_vs_die_comparability.png}
-  \captionof{figure}{Metric comparability audit versus DIE~\cite{bastoul2025dead}.}
-  \label{fig:cmpdie}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.32\textwidth}
-  \centering
-  \includegraphics[width=\linewidth]{plots/compare_modernpde_vs_autojmh_comparability.png}
-  \captionof{figure}{Metric comparability audit versus AutoJMH~\cite{rodriguez2016autojmh}.}
-  \label{fig:cmpautojmh}
-\end{minipage}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.92\linewidth]{plots/compare_comparability_panels.png}
-\caption{Per-article metric comparability panels (independent analyses; not head-to-head runtimes).}
-\label{fig:cmppanels}
-\end{figure}
-
-\autoref{fig:overviewcmp}--\autoref{fig:cmppanels} summarize a structured comparability audit: almost no metrics are \emph{directly} comparable across artifacts, a minority are \emph{partially} comparable at the concept level (deadness granularity, constant propagation vs anti-constant-folding), and the remainder are paper-only or code-only. This audit is itself a contribution to honest evaluation practice.
+\autoref{fig:vs_muzeel}--\autoref{fig:vs_autojmh} summarize a structured comparability audit: almost no metrics are \emph{directly} comparable across artifacts, a minority are \emph{partially} comparable at the concept level (deadness granularity, constant propagation vs anti-constant-folding), and the remainder are paper-only or code-only. This audit is itself a contribution to honest evaluation practice.
 
 \subsection{Limitations}
 \paragraph{Analysis and language.}
 The front-end covers a substantial C-family subset; full C++, Python, or Rust require additional parsers. Reflection, dynamic loading, and concurrency are approximated conservatively, which can inflate liveness and reduce recall (\autoref{sec:results}).
 
 \paragraph{Experimental scope.}
-Headline accuracy aggregates manual labels, oracle labels, and synthetic challenges---protocols with different epistemic strength (\autoref{sec:eval}). We do not claim equivalence to industrial DCE on production corpora (Muzeel, LLVM, etc.); \autoref{fig:overviewcmp}--\autoref{fig:cmppanels} document that cross-artifact metrics are largely incomparable. Scalability beyond 50\,kLOC relies on extrapolation (\autoref{fig:scalability}), not measured runs at 250\,kLOC. End-to-end \emph{speedup after transformation} is not measured in the artifact; samples demonstrate classification only.
+Headline accuracy aggregates manual labels, oracle labels, and synthetic challenges---protocols with different epistemic strength (\autoref{sec:eval}). We do not claim equivalence to industrial DCE on production corpora (Muzeel, LLVM, etc.); \autoref{fig:vs_muzeel}--\autoref{fig:vs_autojmh} document that cross-artifact metrics are largely incomparable. Scalability beyond 50\,kLOC relies on extrapolation (\autoref{fig:scalability}), not measured runs at 250\,kLOC. End-to-end \emph{speedup after transformation} is not measured in the artifact; samples demonstrate classification only.
 
 \paragraph{Parameter sensitivity.}
 Thresholds $\tau_1,\tau_2$ were tuned on a held-out micro-suite (\autoref{sec:algorithms}). Deployments with different optimization policies (aggressive sinking vs.\ report-only) may need retuning; band-boundary definitions remain sensitive to small path-set changes.
 
 \subsection{Practical Role}
-\textsc{ModernPDE} is a research test-bed and teaching vehicle, complementary to formal verification of PDE transformations~\cite{rinard2026nexis} and to recent dead-iteration elimination~\cite{bastoul2025dead}. \autoref{fig:roles} sketches the division of labor: Muzeel eliminates unused web functions dynamically; DIE removes unused polyhedral iterations; AutoJMH prevents DCE in microbenchmarks; \textsc{ModernPDE} classifies path-partial variable and field deadness statically.
+\textsc{ModernPDE} is a research test-bed and teaching vehicle, complementary to formal verification of PDE transformations~\cite{rinard2026nexis} and to recent dead-iteration elimination~\cite{bastoul2025dead}. \autoref{fig:vs_muzeel}--\autoref{fig:vs_autojmh} sketch the division of labor: Muzeel eliminates unused web functions dynamically; DIE removes unused polyhedral iterations; AutoJMH prevents DCE in microbenchmarks; \textsc{ModernPDE} classifies path-partial variable and field deadness statically.
 
 % ============================================================
 % THREATS TO VALIDITY
@@ -1173,7 +1067,7 @@ Implementation bugs could inflate accuracy or deflate runtime. We mitigate with 
 The 19-program suite spans CFG idioms, OOP, recursion, and synthetic scale, yet cannot represent all industrial domains (network stacks, GPU kernels, interpreted languages). Results at 50\,kLOC may not predict behavior on pathological CFGs with deep nesting unbounded by our loop policy. Extrapolation to 100\,kLOC (\autoref{fig:scalability}) assumes continued slow growth of $P'$---an assumption supported by, but not proven beyond, the challenge suite.
 
 \paragraph{Construct validity.}
-Precision/recall treat five-way $\mathrm{class}(d)$ labels as ground truth. Manual labels introduce subjectivity; oracle labels inherit any unsoundness in exhaustive enumeration; synthetic challenges embed labels by construction, yielding near-perfect accuracy there while contributing differently to the aggregate 96.2\,\%/91.4\,\% scores. We do not measure downstream optimization quality (code size after sinking, runtime speedup). Comparability panels (\autoref{fig:cmpmuzeel}--\autoref{fig:cmppanels}) explicitly mark cross-paper metrics as partially or not comparable, reducing the threat of apples-to-oranges claims.
+Precision/recall treat five-way $\mathrm{class}(d)$ labels as ground truth. Manual labels introduce subjectivity; oracle labels inherit any unsoundness in exhaustive enumeration; synthetic challenges embed labels by construction, yielding near-perfect accuracy there while contributing differently to the aggregate 96.2\,\%/91.4\,\% scores. We do not measure downstream optimization quality (code size after sinking, runtime speedup). Pairwise comparison panels (\autoref{fig:vs_muzeel}--\autoref{fig:vs_autojmh}) explicitly mark cross-paper metrics as partially or not comparable, reducing the threat of apples-to-oranges claims.
 
 \paragraph{Conclusion validity.}
 Each contribution bullet in \autoref{sec:intro} maps to evidence: pipeline (\autoref{sec:design} + artifact footprint figures), context merging and field model (RQ1/\autoref{tab:accuracy}), scalability techniques (RQ3/\autoref{fig:phases}, \autoref{fig:scalability}), and empirical prevalence (RQ2/\autoref{fig:liveness}). Claims about industrial speedup or external case studies were removed in favor of in-suite illustrative samples (\autoref{sec:results}).
