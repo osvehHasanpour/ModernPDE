@@ -2,32 +2,25 @@
 
 %\documentclass[sigplan,screen]{acmart}
 
-\usepackage{float}
-%\usepackage[linesnumbered, ruled, vlined]{algorithm2e}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{amsmath}
-%\usepackage[sorting=none]{biblatex}
+\usepackage{amsmath,amsfonts,mathtools,newtxmath}
 \usepackage{balance}
-%\usepackage{amssymb}
-\usepackage{newtxmath}
 \usepackage{listings}
-\usepackage{hyperref}
-\usepackage{xcolor} 
+\usepackage{xcolor}
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{adjustbox}
-\newcommand{\kms}{km\,s$^{-1}$}
-\newcommand{\msun}{$M_\odot}
-
-
-\usepackage{booktabs,algorithm2e,subcaption}
+\usepackage{algorithm2e,subcaption}
 \usepackage{enumitem,microtype,pgfplots,pgfplotstable,placeins,tikz}
-\usepackage{amsfonts,mathtools}
-\usetikzlibrary{shapes,arrows,positioning,shadows,backgrounds,fit,calc,decorations.pathreplacing}
+\usepackage{hyperref}
+\usetikzlibrary{shapes,arrows.meta,positioning,shadows,backgrounds,fit,calc,decorations.pathreplacing}
 \pgfplotsset{compat=1.18}
+\setlist[itemize]{leftmargin=*,itemsep=2pt,topsep=3pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=3pt,parsep=0pt}
 
 
 % Unified ModernPDE / ACM TACO visual palette (use ONLY these):
@@ -134,10 +127,23 @@
 %%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
 %%  June 03--05, 2018, Woodstock, NY}
 \acmISBN{979-8-4007-1921-9/25/06}
-\setlength{\abovecaptionskip}{6pt}
+% ---- Float / caption polish (ACM TACO) ----
+\setlength{\abovecaptionskip}{4pt}
 \setlength{\belowcaptionskip}{2pt}
-\captionsetup{font=small,labelfont=bf,justification=centering,skip=6pt}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\captionsetup{
+  font=small,
+  labelfont=bf,
+  labelsep=period,
+  justification=justified,
+  singlelinecheck=false,
+  skip=4pt
+}
 \captionsetup[subfigure]{font=scriptsize,labelfont=bf,justification=centering}
+\captionsetup[table]{position=top,skip=3pt}
+\captionsetup[figure]{position=bottom,skip=4pt}
 
 % ---- Autoref names (ACM TACO style) ----
 \providecommand{\figureautorefname}{Figure}
@@ -199,25 +205,21 @@ Partial dead code elimination (PDE) removes computations that are live on some e
 
 \section{Introduction}
 \label{sec:intro}
-\paragraph{Research problem.}
-We study \emph{interprocedural, path-aware partial dead code elimination (PDE)}~\cite{knoop1994partial}: given a program, classify every definition by the fraction of feasible execution paths on which it is used, and identify candidates for safe elimination or sinking. Classical dead-code elimination (DCE) removes only computations that are unused on \emph{all} paths, whereas partial redundancy elimination (PRE)~\cite{morel1979global,kennedy1999partial} targets computations that are redundant on some paths. PDE occupies the space between these extremes. It asks a finer question---on what fraction of feasible paths is a definition used?---and then eliminates the definition, sinks it toward its uses, or leaves it unchanged when the live-path fraction is high. The central research question is therefore not whether dead code exists, but whether path-partial liveness can be \emph{measured at scale} with sufficient precision for sound optimization across procedures and heap fields.
 
-This finer question has substantial practical impact. In control-intensive software---validators, protocol parsers, game engines, and middleware---many intermediate results are required only under uncommon tags, error branches, or feature flags. A definition that is dead on nine of ten paths still survives classical DCE, yet it taxes instruction caches, register pressure, and energy on the common path. Conversely, treating every rarely used definition as fully dead is unsafe: removing it would break the rare path. Path-aware classification is therefore both an optimization opportunity and a soundness obligation.
+Compilers routinely eliminate computations that are unused on every execution path, yet many costly definitions are only \emph{partially} unused: they are live on uncommon branches and dead on the hot path. Classical dead-code elimination (DCE) retains such definitions because each is live somewhere; classical partial redundancy elimination (PRE)~\cite{morel1979global,kennedy1999partial} targets redundancy rather than path-fractional liveness. \emph{Partial dead code elimination (PDE)}~\cite{knoop1994partial} occupies the middle ground: it asks what fraction of feasible paths use a definition, then eliminates it, sinks it toward its uses, or leaves it unchanged when the live-path fraction is high. The research challenge is not whether partial deadness exists---experience with validators, protocol parsers, game engines, and middleware suggests that it does---but whether path-partial liveness can be \emph{measured at scale}, with enough precision for sound optimization across procedures and heap fields.
 
-Despite more than three decades of research, PDE remains difficult to apply at industrial scale for three tightly coupled reasons. First, \emph{path explosion}: the number of simple paths in a control-flow graph (CFG) grows exponentially with the number of branches and loops (after unrolling or summarization), so exhaustive path enumeration quickly becomes intractable~\cite{ball2001slam,henzinger2002blast}. Second, \emph{interprocedural coupling}: deep call chains and mutually recursive modules force the analysis to reason about definitions that cross function boundaries; a context-insensitive call graph over-approximates callees and pollutes liveness sets, while a fully cloning context-sensitive graph may itself explode. Third, \emph{heap structure}: modern languages allocate objects whose fields have independent liveness. Field-insensitive models collapse an object into a single abstract cell, so a live field keeps an entire partially dead object alive and destroys precision~\cite{chatterjee2005interprocedural}.
-
-Existing solutions typically choose one corner of this design space. Classical formulations~\cite{knoop1994partial,bodik1998efficient} remain intraprocedural and path-aware only within a single function. Summary-based interprocedural PDE~\cite{chatterjee2005interprocedural} scales better but loses path distinctions across calls. Demand-driven and profile-guided variants~\cite{takimoto2012demand,pathprofile2025} reduce work but either answer queries rather than whole-program classification, or depend on representative workloads. Recent polyhedral dead-iteration elimination~\cite{bastoul2025dead} removes unused loop iterations when an output data space is known, which is complementary to---but distinct from---variable- and field-level PDE on general CFGs. Adjacent lines of work such as dynamic JavaScript DCE (Muzeel~\cite{kupoluyi2022muzeel}) and microbenchmark generators that \emph{prevent} DCE (AutoJMH~\cite{rodriguez2016autojmh}) address different problems---runtime web elimination and measurement fidelity---but reinforce that ``deadness'' is granular and context-dependent.
+\paragraph{Why scale is hard.}
+Three obstacles have kept PDE largely confined to single-function or summary-based settings for more than three decades. First, \emph{path explosion}: the number of simple paths in a control-flow graph (CFG) grows exponentially with branching and loop structure, so exhaustive enumeration quickly becomes intractable~\cite{ball2001slam,henzinger2002blast}. Second, \emph{interprocedural coupling}: deep call chains and mutual recursion force the analysis to reason about definitions that cross function boundaries; a context-insensitive call graph over-approximates callees and pollutes liveness sets, while a fully cloning context-sensitive graph may itself explode. Third, \emph{heap structure}: modern languages allocate objects whose fields have independent liveness. Field-insensitive models collapse an object into a single abstract cell, so a live field keeps an entire partially dead object alive and destroys precision~\cite{chatterjee2005interprocedural}. Existing solutions typically occupy one corner of this design space: classical PDE~\cite{knoop1994partial,bodik1998efficient} is path-aware within a function; summary-based interprocedural PDE~\cite{chatterjee2005interprocedural} scales better but loses path distinctions across calls; demand-driven and profile-guided variants~\cite{takimoto2012demand,pathprofile2025} reduce work but either answer queries rather than whole-program classification, or depend on representative workloads. Adjacent lines---polyhedral dead-iteration elimination~\cite{bastoul2025dead}, dynamic JavaScript DCE~\cite{kupoluyi2022muzeel}, and microbenchmark generators that \emph{prevent} DCE~\cite{rodriguez2016autojmh}---reinforce that deadness is granular and context-dependent, yet they do not solve variable- and field-level PDE on general CFGs.
 
 \paragraph{Research gap.}
-No prior PDE framework simultaneously satisfies four requirements that industrial and research compilers increasingly expect: (i)~whole-program \emph{path-ratio} classification rather than a single may-live bit; (ii)~interprocedural precision without exponential context cloning; (iii)~field-granularity heap modeling; and (iv)~engineering that makes path enumeration tractable on CFGs with thousands of nodes. \autoref{tab:comparison} summarizes how prior approaches cover subsets of this space. The gap is not a new PDE theory per se---Knoop et al.'s bit-vector formulation remains foundational~\cite{knoop1994partial}---but an \emph{integrated, scalable realization} of path-aware PDE that connects front-end IR, context-sensitive call graphs, field-sensitive memory, and lazy path analysis in one reproducible pipeline.
+No prior PDE framework simultaneously provides (i)~whole-program \emph{path-ratio} classification rather than a single may-live bit; (ii)~interprocedural precision without exponential context cloning; (iii)~field-granularity heap modeling; and (iv)~engineering that keeps path enumeration tractable on CFGs with thousands of nodes. \autoref{tab:comparison} summarizes how prior approaches cover subsets of this space. The gap is not a new PDE theory---Knoop et al.'s bit-vector formulation remains foundational~\cite{knoop1994partial}---but an \emph{integrated, scalable realization} that connects front-end IR, context-sensitive call graphs, field-sensitive memory, and lazy path analysis in one reproducible pipeline.
 
-\paragraph{Proposed approach.}
-This paper presents \textsc{ModernPDE}, a modular static-analysis framework built on three principles that address the three obstacles above: (1)~context-sensitive call graphs with equivalence-based context merging, so interprocedural precision remains affordable; (2)~field-granularity memory modeling on top of points-to information, so heap liveness is tracked per field rather than per object; and (3)~lazy path enumeration with caching, incremental updates, sparse propagation, and priority worklists, so path awareness does not imply exhaustive enumeration. Relative to intraprocedural and summary-based baselines (\autoref{sec:eval}), the novelty lies in \emph{combining} these dimensions while retaining measured precision/recall, not in replacing classical PDE semantics.
+\paragraph{This paper: \textsc{ModernPDE}.}
+We present \textsc{ModernPDE}, a modular static-analysis framework whose novelty lies in \emph{combining} three design principles that address the obstacles above while retaining classical PDE soundness obligations. First, context-sensitive call graphs with equivalence-based context merging keep interprocedural precision affordable. Second, field-granularity memory modeling on points-to information tracks heap liveness per field rather than per object. Third, lazy path enumeration with caching, incremental updates, sparse propagation, and priority worklists makes path awareness practical without exhaustive materialization. Relative to intraprocedural and summary-based baselines (\autoref{sec:eval}), the contribution is this integrated realization---not a replacement of classical PDE semantics.
 
 \paragraph{Contributions.}
-This work makes the following contributions:
-\begin{itemize}[leftmargin=*,itemsep=1pt]
-\item A unified, end-to-end analysis pipeline that connects a source front-end, CFG/SSA construction, context-sensitive call graphs, field-sensitive memory modeling, and a five-way path-aware PDE classifier.
+\begin{itemize}
+\item A unified end-to-end pipeline connecting a source front-end, CFG/SSA construction, context-sensitive call graphs, field-sensitive memory modeling, and a five-way path-aware PDE classifier (\autoref{fig:pipeline}).
 \item A summary-based context-merging strategy that collapses equivalent calling contexts and keeps the number of analyzed contexts polynomial in practice.
 \item A field-sensitive memory model that distinguishes per-field liveness for heap-allocated structures, enabling PDE on object-oriented idioms that defeat field-insensitive DCE.
 \item Five engineering techniques---result caching, lazy path enumeration, incremental CFG updates, sparse fact propagation, and priority worklist scheduling---that reduce analysis time by 78\,\% relative to an exhaustive path baseline.
@@ -225,18 +227,20 @@ This work makes the following contributions:
 \item An open-source release intended as both a research vehicle and a teaching artifact for path-aware optimization.
 \end{itemize}
 
-\paragraph{Paper organization.}
-\autoref{sec:related} surveys related PDE and path-sensitive analysis. \autoref{sec:problem} formalizes inputs, outputs, and soundness constraints. \autoref{sec:algorithms} presents the three core algorithms and scalability techniques. \autoref{sec:design} describes the end-to-end pipeline and data contracts. \autoref{sec:eval}--\autoref{sec:results} report the experimental protocol and analyze accuracy, liveness distribution, runtime, and challenge behavior. \autoref{sec:complexity} states asymptotic bounds; \autoref{sec:discussion} discusses implications, adjacent dead-code research, and limitations; \autoref{sec:threats} lists threats to validity.
+\paragraph{Organization.}
+\autoref{sec:related} surveys related PDE and path-sensitive analysis. \autoref{sec:problem} formalizes the problem and soundness stance. \autoref{sec:algorithms} presents the core algorithms and scalability techniques. \autoref{sec:design} describes the layered pipeline. \autoref{sec:eval}--\autoref{sec:results} report the experimental protocol and results. \autoref{sec:complexity} states asymptotic bounds; \autoref{sec:discussion} discusses implications and limitations; \autoref{sec:threats} lists threats to validity; \autoref{sec:conclusion} concludes.
 
 \section{Related Work}
 \label{sec:related}
+We situate \textsc{ModernPDE} relative to classical PDE, interprocedural summaries, demand-driven and profile-guided variants, and adjacent dead-code research.
+
 Classical PDE originates in the bit-vector code-motion framework of Knoop et al.~\cite{knoop1994partial}. Bodik et al.~\cite{bodik1998efficient} improved efficiency with region-based analysis, while Chatterjee et al.~\cite{chatterjee2005interprocedural} extended PDE to object-oriented programs through type-based summaries. Demand-driven formulations~\cite{takimoto2012demand} answer targeted queries rather than whole-program classification; path-profile-guided variants~\cite{pathprofile2025} rely on representative workloads. Path-sensitive software model checkers such as SLAM~\cite{ball2001slam} and BLAST~\cite{henzinger2002blast} motivate our pruning strategy, although their goal is verification rather than optimization.
 
 Complementary lines refine deadness at other granularities. Bastoul et al.~\cite{bastoul2025dead} eliminate unused polyhedral loop iterations when an output data space is known. Rinard~\cite{rinard2026nexis} studies machine-checked proofs of PDE transformations. Dynamic JavaScript DCE~\cite{kupoluyi2022muzeel} and microbenchmark generators that \emph{prevent} DCE~\cite{rodriguez2016autojmh} address adjacent but distinct problems. \autoref{tab:comparison} positions \textsc{ModernPDE} along interprocedural, field-sensitive, context-sensitive, and open-source axes relative to prior PDE approaches.
 
 \begin{table}[t]
 \centering\small
-\caption{Feature comparison of representative PDE approaches. ``Lim.'' denotes limited or partial support.}
+\caption{Feature comparison of representative PDE approaches. ``Lim.'' denotes limited or partial support; Inter.\ =\ interprocedural; Ctx\ =\ context-sensitive; Scal.\ =\ reported scalable engineering; OS\ =\ open-source artifact.}
 \label{tab:comparison}
 \begin{tabular}{lcccccc}
 \toprule
@@ -257,13 +261,14 @@ Rinard & 2026 & Yes & No & No & Lim. & No \\
 % ============================================================
 \section{Problem Definition}
 \label{sec:problem}
+This section formalizes the classification problem that \textsc{ModernPDE} solves, starting from a concrete motivating example and then stating inputs, outputs, and soundness constraints.
 
 \subsection{Motivating Example}
 \autoref{fig:motivating} shows a simplified e-commerce validation routine that always computes a full metadata record. On the common \texttt{STANDARD} path, only amount and merchant are used; tax, shipping, and loyalty fields are never read. Classical DCE retains the entire computation because each field is live on at least one path. A path-aware optimizer can classify \texttt{m.tax}, \texttt{m.ship}, and \texttt{m.loyalty} as partially dead at the definition site and sink (or specialize) the expensive calls behind the corresponding branch, preserving semantics while removing work from the hot path.
 
 \begin{figure}[t]
 \centering
-\begin{lstlisting}[language=C, caption={Motivating example illustrating partially dead metadata-field computations.}, label={fig:motivating}]
+\begin{lstlisting}[language=C, caption={Motivating example: partially dead metadata-field computations.}, label={fig:motivating}]
 void validateTransaction(Txn t) {
   Metadata m;
   // always computed
@@ -350,6 +355,7 @@ Computing $\rho(d)$ exactly requires reasoning over $\mathcal{P}_d$, whose cardi
 % ============================================================
 \section{Algorithms}
 \label{sec:algorithms}
+We present the three core algorithms that realize the problem statement in \autoref{sec:problem}: path-aware PDE classification, context-sensitive call-graph construction, and field-sensitive memory modeling, followed by the scalability substrate that makes them practical.
 
 \subsection{Path-Aware PDE Detection}
 \autoref{alg:pde} is the classification core. It first obtains a set of \emph{relevant} paths $\mathcal{P}$ under calling context $\mathcal{C}$ (lazy enumeration; see below), then computes a per-path liveness set $\mathcal{L}_p$ by a backward walk along $p$ that marks names used before redefinition. Aggregating over paths yields $\rho(d)$ and the five-way label. Definitions with $\rho(d)<\tau_2$ enter the candidate set $\mathcal{P}_{dead}$ for elimination or sinking.
@@ -395,7 +401,7 @@ $\mathcal{P}\leftarrow\EnumPaths(G,\mathcal{C})$\;
   }
 }
 \Return{$\mathcal{P}_{dead}$}\;
-\caption{Path-aware PDE detection (classification core)}
+\caption{Path-aware PDE detection (classification core).}
 \label{alg:pde}
 \end{algorithm}
 \end{algobox}
@@ -449,7 +455,7 @@ $Summaries\leftarrow\emptyset$\;
   }
 }
 \Return{$CG_{cs}$}\;
-\caption{Context-sensitive call-graph construction with equivalence merging}
+\caption{Context-sensitive call-graph construction with equivalence merging.}
 \label{alg:callgraph}
 \end{algorithm}
 \end{algobox}
@@ -488,7 +494,7 @@ $\mathcal{M}\leftarrow\emptyset$\;
   }
 }
 \Return{$\mathcal{M}$}\;
-\caption{Field-sensitive memory modeling}
+\caption{Field-sensitive memory modeling.}
 \label{alg:memory}
 \end{algorithm}
 \end{algobox}
@@ -527,163 +533,132 @@ An exhaustive implementation materializes all simple paths, runs backward livene
 % ============================================================
 \section{System Design}
 \label{sec:design}
-
-\textsc{ModernPDE} is organized as a five-layer pipeline---Front-End, IR, Static Analysis, Optimization, and Experimental Evaluation---with a cross-cutting scalability substrate (\autoref{fig:pipeline}). Solid arrows carry typed intermediate artifacts; dashed arrows denote scalability services that accelerate IR, analysis, and path enumeration without changing classification semantics.
+Having defined the algorithms, we now describe how they compose into a layered analyzer. \textsc{ModernPDE} is organized as a five-layer pipeline---Front-End, IR, Static Analysis, Optimization, and Experimental Evaluation---with a cross-cutting scalability substrate (\autoref{fig:pipeline}). Solid arrows carry typed intermediate artifacts; dashed arrows denote scalability services that accelerate IR, analysis, and path enumeration without changing classification semantics.
 
 \begin{figure}[t]
 \centering
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-  >=stealth,
-  node distance=0.28cm and 0.32cm,
-  % ---- block styles ----
-  blk/.style={
-    rectangle, rounded corners=2.5pt, draw=#1!75!black, fill=#1!14,
-    align=center, font=\scriptsize\bfseries,
-    minimum height=0.78cm, inner xsep=5pt, inner ysep=3pt,
-    line width=0.7pt
+  >=Latex,
+  font=\sffamily\scriptsize,
+  box/.style={
+    rectangle, rounded corners=2pt, draw=#1!70!black, fill=#1!12,
+    align=center, minimum height=0.72cm, minimum width=1.55cm,
+    inner xsep=3pt, inner ysep=2pt, line width=0.6pt
   },
-  sub/.style={
-    rectangle, rounded corners=2pt, draw=#1!55!black, fill=#1!6,
-    align=center, font=\scriptsize,
-    minimum height=0.52cm, inner xsep=4pt, inner ysep=2pt,
-    line width=0.55pt
+  core/.style={
+    rectangle, rounded corners=2.5pt, draw=chartRed!80!black, fill=chartRed!20,
+    align=center, minimum height=0.78cm, minimum width=1.9cm,
+    inner xsep=4pt, inner ysep=2pt, line width=1.1pt, font=\sffamily\scriptsize\bfseries
   },
-  novelty/.style={
-    rectangle, rounded corners=3pt, draw=chartRed!85!black, fill=chartRed!18,
-    align=center, font=\scriptsize\bfseries,
-    minimum height=0.92cm, inner xsep=6pt, inner ysep=3pt,
-    line width=1.15pt
+  lab/.style={
+    rectangle, rounded corners=1.5pt, fill=#1!85!black, text=white,
+    align=center, font=\sffamily\tiny\bfseries,
+    minimum width=1.35cm, minimum height=1.35cm, inner sep=1pt
   },
-  layerlab/.style={
-    rectangle, rounded corners=2pt, fill=#1!88!black, text=white,
-    font=\scriptsize\bfseries, align=center,
-    minimum width=1.55cm, minimum height=1.55cm,
-    inner sep=2pt, line width=0pt
-  },
-  band/.style={
-    rectangle, rounded corners=4pt, draw=#1!70!black, fill=#1!7,
-    line width=0.85pt, inner sep=6pt
-  },
-  flow/.style={->, thick, draw=#1!80!black, line width=0.85pt},
-  soft/.style={->, densely dashed, draw=#1!65!black, line width=0.7pt},
-  xlink/.style={->, densely dotted, draw=chartDarkBlue!70, line width=0.65pt}
+  art/.style={font=\sffamily\tiny\itshape, text=chartDarkBlue!75},
+  flow/.style={->, thick, draw=#1!75!black, line width=0.75pt},
+  soft/.style={->, densely dashed, draw=chartPurple!70!black, line width=0.65pt},
+  xlink/.style={->, densely dotted, draw=chartDarkBlue!60, line width=0.55pt},
+  band/.style={rectangle, rounded corners=3pt, draw=#1!55!black, fill=#1!5, line width=0.7pt, inner sep=5pt}
 ]
 
-% ========================= Layer labels (left) =========================
-\node[layerlab=chartBlue]     (L1) {L1\\Front-\\End};
-\node[layerlab=chartOrange, below=0.42cm of L1] (L2) {L2\\IR};
-\node[layerlab=chartGreen,  below=0.42cm of L2] (L3) {L3\\Static\\Analysis};
-\node[layerlab=chartRed,    below=0.42cm of L3] (L4) {L4\\Optimi-\\zation};
-\node[layerlab=chartTeal,   below=0.42cm of L4] (L5) {L5\\Experi-\\mental\\Eval.};
+% ---- Layer labels ----
+\node[lab=chartBlue] (L1) {L1\\Front-End};
+\node[lab=chartOrange, below=0.55cm of L1] (L2) {L2\\IR};
+\node[lab=chartGreen,  below=0.55cm of L2] (L3) {L3\\Static\\Analysis};
+\node[lab=chartRed,    below=0.55cm of L3] (L4) {L4\\Optimiza-\\tion};
+\node[lab=chartTeal,   below=0.55cm of L4] (L5) {L5\\Evaluation};
 
-% ========================= L1 Front-End =========================
-\node[blk=chartBlue, right=0.45cm of L1] (src) {Source};
-\node[blk=chartBlue, right=of src] (lex) {Lexer};
-\node[blk=chartBlue, right=of lex] (par) {Parser};
-\node[blk=chartBlue, right=of par] (ast) {AST};
-\node[sub=chartBlue, below=0.18cm of lex] (tok) {Tokens + locations};
-\node[sub=chartBlue, below=0.18cm of par] (err) {Panic recovery};
+% ---- L1 ----
+\node[box=chartBlue, right=0.4cm of L1] (src) {Source};
+\node[box=chartBlue, right=0.22cm of src] (lex) {Lexer};
+\node[box=chartBlue, right=0.22cm of lex] (par) {Parser};
+\node[box=chartBlue, right=0.22cm of par] (ast) {AST};
+\node[art, below=0.08cm of ast] (a1) {tokens, locations, panic recovery};
 
-% ========================= L2 IR =========================
-\node[blk=chartOrange, right=0.45cm of L2] (cfg) {CFG Builder};
-\node[blk=chartOrange, right=of cfg] (ssa) {SSA Form};
-\node[blk=chartOrange, right=of ssa] (du) {DU Chains};
-\node[sub=chartOrange, below=0.18cm of cfg] (bb) {Basic blocks};
-\node[sub=chartOrange, below=0.18cm of ssa] (phi) {$\phi$-functions};
-\node[sub=chartOrange, below=0.18cm of du] (reach) {Reaching defs};
+% ---- L2 ----
+\node[box=chartOrange, right=0.4cm of L2] (cfg) {CFG};
+\node[box=chartOrange, right=0.22cm of cfg] (ssa) {SSA};
+\node[box=chartOrange, right=0.22cm of ssa] (du) {DU Chains};
+\node[art, below=0.08cm of du] (a2) {$G{=}(V,E)$, $\phi$-nodes, reaching defs};
 
-% ========================= L3 Static Analysis =========================
-\node[blk=chartGreen, right=0.45cm of L3] (cha) {CHA / VCA};
-\node[blk=chartGreen, right=of cha] (cg) {Ctx-Sensitive\\Call Graph};
-\node[blk=chartGreen, right=of cg] (pts) {Points-to};
-\node[blk=chartGreen, right=of pts] (mem) {Field-Sensitive\\Memory};
-\node[sub=chartGreen, below=0.18cm of cg] (ctx) {Context merge};
-\node[sub=chartGreen, below=0.18cm of pts] (alias) {Alias sets};
-\node[sub=chartGreen, below=0.18cm of mem] (fld) {Per-field cells};
-% Interprocedural bracket label (text only, no extra package)
-\node[font=\scriptsize\itshape, text=chartGreen!70!black, above=0.06cm of cg]
-  (iproc) {Interprocedural analysis};
+% ---- L3 ----
+\node[box=chartGreen, right=0.4cm of L3] (cha) {CHA / VCA};
+\node[box=chartGreen, right=0.22cm of cha] (cg) {Ctx.\ Call Graph};
+\node[box=chartGreen, right=0.22cm of cg] (pts) {Points-to};
+\node[box=chartGreen, right=0.22cm of pts] (mem) {Field Memory};
+\node[art, below=0.08cm of mem] (a3) {$CG_{cs}$, $PT$, $\mathcal{M}$ (per-field cells)};
 
-% ========================= L4 Optimization (novelty) =========================
-\node[novelty, right=0.45cm of L4] (pde) {PDE Engine\\$\rho(d)$ classifier};
-\node[blk=chartRed, right=0.38cm of pde] (path) {Path\\Enumeration};
-\node[blk=chartRed, right=of path] (lazy) {Lazy DFS\\+ prune};
-\node[blk=chartRed, right=of lazy] (cls) {5-way\\Class};
-\node[blk=chartRed, right=of cls] (cand) {$\mathcal{P}_{dead}$\\Candidates};
-\node[sub=chartRed, below=0.18cm of path] (plive) {Path liveness};
-\node[sub=chartRed, below=0.18cm of lazy] (fixpt) {Fixed-point cut-off};
-\node[sub=chartRed, below=0.18cm of cls] (thr) {$\tau_1{=}0.25$, $\tau_2{=}0.75$};
-\node[font=\scriptsize\bfseries, text=chartRed!80!black, above=0.05cm of pde]
-  (novlab) {Core novelty};
+% ---- L4 (novelty) ----
+\node[core, right=0.4cm of L4] (pde) {PDE Engine\\$\rho(d)$};
+\node[box=chartRed, right=0.22cm of pde] (path) {Path Enum.};
+\node[box=chartRed, right=0.22cm of path] (lazy) {Lazy DFS};
+\node[box=chartRed, right=0.22cm of lazy] (cls) {5-way Class};
+\node[box=chartRed, right=0.22cm of cls] (cand) {$\mathcal{P}_{dead}$};
+\node[font=\sffamily\tiny\bfseries, text=chartRed!75!black, above=0.02cm of pde] {core novelty};
+\node[art, below=0.08cm of cand] (a4) {labels, $\rho(d)$, path witnesses};
 
-% ========================= L5 Experimental Evaluation =========================
-\node[blk=chartTeal, right=0.45cm of L5] (bench) {Benchmark Suite\\(19 programs)};
-\node[blk=chartTeal, right=of bench] (oracle) {Manual / Oracle\\Labels};
-\node[blk=chartTeal, right=of oracle] (met) {Metrics\\P / R / F1};
-\node[blk=chartTeal, right=of met] (rt) {Runtime \&\\Scalability};
-\node[sub=chartTeal, below=0.18cm of bench] (chal) {Samples + challenges};
-\node[sub=chartTeal, below=0.18cm of met] (rho) {$\rho$ distribution};
-\node[sub=chartTeal, below=0.18cm of rt] (cache) {Cache hit rates};
+% ---- L5 ----
+\node[box=chartTeal, right=0.4cm of L5] (bench) {Benchmarks};
+\node[box=chartTeal, right=0.22cm of bench] (oracle) {Oracles};
+\node[box=chartTeal, right=0.22cm of oracle] (met) {P / R / F1};
+\node[box=chartTeal, right=0.22cm of met] (rt) {Runtime};
+\node[art, below=0.08cm of rt] (a5) {19 programs, challenges, cache stats};
 
-% ========================= Cross-cutting scalability =========================
-\coordinate (scalL) at ($(L5.south west)+(-0.05,-0.72)$);
-\coordinate (scalR) at ($(cand.south east)+(0.15,-0.72)$);
-\node[band=chartPurple, fit=(scalL)(scalR), minimum height=0.78cm,
-  label={[font=\scriptsize\bfseries, text=chartPurple!80!black]left:}]
-  (scal) {};
-\node[font=\scriptsize\bfseries, text=chartPurple!85!black, anchor=west]
-  at ($(scal.west)+(0.18,0)$)
-  {Scalability substrate: Caching $\cdot$ Lazy enumeration $\cdot$ Incremental CFG $\cdot$ Sparse propagation $\cdot$ Priority worklist};
+% ---- Scalability substrate ----
+\coordinate (sL) at ($(L5.south west)+(-0.05,-0.78)$);
+\coordinate (sR) at ($(cand.south east)+(0.35,-0.78)$);
+\node[band=chartPurple, fit=(sL)(sR), minimum height=0.62cm] (scal) {};
+\node[font=\sffamily\tiny\bfseries, text=chartPurple!80!black, anchor=west]
+  at ($(scal.west)+(0.15,0)$)
+  {Scalability substrate:\ Caching $\cdot$ Lazy enumeration $\cdot$ Incremental CFG $\cdot$ Sparse propagation $\cdot$ Priority worklist};
 
-% ========================= Layer bands (background) =========================
+% ---- Background bands ----
 \begin{scope}[on background layer]
-  \node[band=chartBlue,   fit=(L1)(ast)(tok)(err),   inner ysep=7pt, inner xsep=5pt] {};
-  \node[band=chartOrange, fit=(L2)(cfg)(du)(bb)(reach), inner ysep=7pt, inner xsep=5pt] {};
-  \node[band=chartGreen,  fit=(L3)(cha)(mem)(ctx)(fld)(iproc), inner ysep=7pt, inner xsep=5pt] {};
-  \node[band=chartRed,    fit=(L4)(pde)(cand)(plive)(thr)(novlab),
-    inner ysep=8pt, inner xsep=5pt, draw=chartRed!80!black, line width=1.05pt, fill=chartRed!5] {};
-  \node[band=chartTeal,   fit=(L5)(bench)(rt)(chal)(cache), inner ysep=7pt, inner xsep=5pt] {};
+  \node[band=chartBlue,   fit=(L1)(ast)(a1), inner ysep=4pt, inner xsep=4pt] {};
+  \node[band=chartOrange, fit=(L2)(du)(a2),  inner ysep=4pt, inner xsep=4pt] {};
+  \node[band=chartGreen,  fit=(L3)(mem)(a3), inner ysep=4pt, inner xsep=4pt] {};
+  \node[band=chartRed, fit=(L4)(cand)(a4),
+    inner ysep=5pt, inner xsep=4pt, draw=chartRed!70!black, line width=0.95pt, fill=chartRed!4] {};
+  \node[band=chartTeal,   fit=(L5)(rt)(a5),  inner ysep=4pt, inner xsep=4pt] {};
 \end{scope}
 
-% ========================= Primary data-flow arrows =========================
-\draw[flow=chartBlue] (src)--(lex); \draw[flow=chartBlue] (lex)--(par); \draw[flow=chartBlue] (par)--(ast);
-\draw[flow=chartBlue] (lex)--(tok); \draw[flow=chartBlue] (par)--(err);
+% ---- Intra-layer flows ----
+\draw[flow=chartBlue] (src)--(lex)--(par)--(ast);
+\draw[flow=chartOrange] (cfg)--(ssa)--(du);
+\draw[flow=chartGreen] (cha)--(cg)--(pts)--(mem);
+\draw[flow=chartRed] (pde)--(path)--(lazy)--(cls)--(cand);
+\draw[flow=chartTeal] (bench)--(oracle)--(met)--(rt);
 
-\draw[flow=chartOrange] (ast.south) -- ++(0,-0.12) -| (cfg.north);
-\draw[flow=chartOrange] (cfg)--(ssa); \draw[flow=chartOrange] (ssa)--(du);
-\draw[flow=chartOrange] (cfg)--(bb); \draw[flow=chartOrange] (ssa)--(phi); \draw[flow=chartOrange] (du)--(reach);
+% ---- Inter-layer ----
+\draw[flow=chartOrange] (ast.south) -- ++(0,-0.08) -| (cfg.north);
+\draw[flow=chartGreen]  (du.south)  -- ++(0,-0.08) -| (cha.north);
+\draw[flow=chartRed]    (mem.south) -- ++(0,-0.08) -| (pde.north);
+\draw[flow=chartTeal]   (cand.south)-- ++(0,-0.08) -| (bench.north);
 
-\draw[flow=chartGreen] (du.south) -- ++(0,-0.12) -| (cha.north);
-\draw[flow=chartGreen] (cha)--(cg); \draw[flow=chartGreen] (cg)--(pts); \draw[flow=chartGreen] (pts)--(mem);
-\draw[flow=chartGreen] (cg)--(ctx); \draw[flow=chartGreen] (pts)--(alias); \draw[flow=chartGreen] (mem)--(fld);
+% ---- Cross links into PDE ----
+\draw[xlink] (cfg.east) to[bend left=14] node[midway, above, font=\sffamily\tiny, text=chartDarkBlue!70, sloped] {CFG} (path.north);
+\draw[xlink] (du.east)  to[bend left=20] node[midway, above, font=\sffamily\tiny, text=chartDarkBlue!70, sloped] {DU} (pde.north east);
+\draw[xlink] (cg.south) to[bend left=6]  node[midway, right, font=\sffamily\tiny, text=chartDarkBlue!70] {$CG_{cs}$} (pde.north);
 
-\draw[flow=chartRed] (mem.south) -- ++(0,-0.12) -| (pde.north);
-\draw[flow=chartRed] (pde)--(path); \draw[flow=chartRed] (path)--(lazy);
-\draw[flow=chartRed] (lazy)--(cls); \draw[flow=chartRed] (cls)--(cand);
-\draw[flow=chartRed] (path)--(plive); \draw[flow=chartRed] (lazy)--(fixpt); \draw[flow=chartRed] (cls)--(thr);
+% ---- Scalability services ----
+\draw[soft] (scal.north) ++(-2.8,0) -- ++(0,0.28) -| (cfg.south);
+\draw[soft] (scal.north) ++(0.0,0)  -- ++(0,0.28) -| (cg.south);
+\draw[soft] (scal.north) ++(3.2,0)  -- ++(0,0.28) -| (lazy.south);
 
-\draw[flow=chartTeal] (cand.south) -- ++(0,-0.12) -| (bench.north);
-\draw[flow=chartTeal] (bench)--(oracle); \draw[flow=chartTeal] (oracle)--(met); \draw[flow=chartTeal] (met)--(rt);
-\draw[flow=chartTeal] (bench)--(chal); \draw[flow=chartTeal] (met)--(rho); \draw[flow=chartTeal] (rt)--(cache);
-
-% Cross-layer artifact links (CFG / DU / Call Graph → PDE Engine)
-\draw[xlink] (cfg.east) to[bend left=12] node[midway, above, font=\tiny, text=chartDarkBlue!80, sloped] {CFG} (path.north);
-\draw[xlink] (du.east)  to[bend left=18] node[midway, above, font=\tiny, text=chartDarkBlue!80, sloped] {DU} (pde.north east);
-\draw[xlink] (cg.south east) to[bend left=8] node[midway, right, font=\tiny, text=chartDarkBlue!80] {$CG_{cs}$} (pde.north);
-
-% Scalability services (dashed upward into L2--L4)
-\draw[soft=chartPurple] (scal.north) ++(-3.2,0) -- ++(0,0.35) -| (cfg.south);
-\draw[soft=chartPurple] (scal.north) ++(0.2,0)  -- ++(0,0.35) -| (cg.south);
-\draw[soft=chartPurple] (scal.north) ++(3.6,0)  -- ++(0,0.35) -| (lazy.south);
+% ---- Legend ----
+\node[anchor=north west, font=\sffamily\tiny, align=left, text=chartDarkBlue!80]
+  at ($(scal.south west)+(0,-0.12)$)
+  {Legend:\ solid\,=\,data flow;\ dotted\,=\,cross-layer artifacts into PDE;\ dashed\,=\,scalability services.\quad
+   Highlighted L4 hosts the path-aware $\rho(d)$ classifier (\autoref{alg:pde}).};
 
 \end{tikzpicture}%
 }
-\caption{\textbf{\textsc{ModernPDE} layered architecture.}
-L1 produces an AST; L2 lowers it to CFG, SSA, and DU chains; L3 builds an interprocedural context-sensitive call graph and field-sensitive memory model; L4 hosts the path-aware PDE Engine (core novelty: usage-ratio $\rho(d)$ with lazy path enumeration); L5 maps benchmarks to accuracy, liveness, and scalability metrics.
-Solid arrows denote primary data flow; dotted arrows denote cross-layer artifacts into the PDE Engine; dashed purple arrows denote scalability-substrate services.}
+\caption{\textsc{ModernPDE} layered architecture. L1 produces an AST; L2 lowers it to CFG, SSA, and DU chains; L3 builds a context-sensitive call graph and field-sensitive memory model; L4 hosts the path-aware PDE engine (usage-ratio $\rho(d)$ with lazy enumeration); L5 maps benchmarks to accuracy and scalability metrics. Solid arrows denote primary data flow; dotted arrows denote cross-layer artifacts into the PDE engine; dashed purple arrows denote scalability-substrate services.}
 \label{fig:pipeline}
 \end{figure}
+\FloatBarrier
 
 \paragraph{L1---Front-End.}
 A custom lexer and recursive-descent parser produce a source-annotated abstract syntax tree (AST). The lexer records token locations used later for diagnostic mapping from IR definitions back to source. The parser implements panic-mode error recovery so a single syntax error does not abort whole-program analysis---an important property for large challenge inputs. Incremental reparsing re-lexes only the edited region when the source changes, feeding L2's incremental CFG rebuild. The frontend intentionally covers a practical subset of C-family syntax used by the evaluation suite (functions, structured control flow, basic OOP constructs such as \texttt{new} and virtual calls) rather than a full ISO language grammar.
@@ -712,18 +687,21 @@ Each layer publishes a typed artifact: tokens and AST (L1); CFG, SSA, DU chains 
 
 \paragraph{End-to-end data flow.}
 Source text flows downward through IR and static analysis into the PDE Engine; candidates and labels flow into L5 evaluation. \autoref{tab:benchmarks} programs exercise each layer: \texttt{cfg\_*} samples stress L2 path shape; \texttt{oop.cpp} stresses L3; \texttt{challenge\_*} programs stress L4 aggregation at scale. The pipeline therefore links algorithm design (\autoref{sec:algorithms}) directly to the benchmarks and figures in \autoref{sec:results}.
+
+\FloatBarrier
 % ============================================================
 % EXPERIMENTAL EVALUATION
 % ============================================================
 \section{Experimental Evaluation}
 \label{sec:eval}
+We next describe the benchmark suite, research questions, baselines, and measurement environment used to evaluate the claims in \autoref{sec:intro}.
 
 \subsection{Benchmarks}
 We evaluate on 19 programs spanning control-flow complexity, recursion, OOP, and scale (\autoref{tab:benchmarks}), from 200\,LOC micro-benchmarks to a 50\,kLOC challenge---far beyond the single-function scope of classical PDE~\cite{knoop1994partial,bodik1998efficient}. The suite comprises 14 curated samples under \texttt{tests/samples/} (CFG idioms, \texttt{partial.cpp}, \texttt{oop.cpp}, recursion variants) plus five generated challenges (\texttt{challenge\_500}--\texttt{challenge\_50000}) and master-challenge drivers. Together they stress every pipeline layer identified in \autoref{sec:design}: L2 normalization (\texttt{cfg\_*} family), L3 virtual dispatch (\texttt{oop.cpp}), and L4 path aggregation at scale (\texttt{challenge\_50000.cpp}).
 
 \begin{table}[t]
 \centering\footnotesize
-\caption{Benchmark suite used in the evaluation (LOC, CFG nodes, and function counts).}
+\caption{Benchmark suite (LOC, CFG nodes, and function counts). Representative programs are listed; the full suite comprises 19 programs.}
 \label{tab:benchmarks}
 \begin{tabular}{lrrr}
 \toprule
@@ -773,10 +751,11 @@ Intel Xeon E5-2650 v4 (12 cores, 2.2\,GHz), 64\,GB RAM, Ubuntu 22.04, GCC 11.4.0
 % ============================================================
 \section{Results and Analysis}
 \label{sec:results}
+We answer RQ1--RQ4 in turn, then discuss residual errors, artifact structure, and illustrative samples.
 
 \subsection{Accuracy}
 \paragraph{RQ1.}
-\autoref{tab:accuracy} and \autoref{fig:accuracy} show that \textsc{ModernPDE} reaches \textbf{96.2\,\% precision} and \textbf{91.4\,\% recall} (F1\,=\,93.7\,\%), an absolute gain of more than 11 F1 points over summary-based PDE and far above intraprocedural PDE. This confirms that combining context sensitivity with path awareness---absent in classical formulations~\cite{knoop1994partial,morel1979global}---is essential for precision at scale. Differences are significant ($p<0.01$, paired $t$-test over per-program F1 scores, $n{=}19$).
+\autoref{tab:accuracy} and \autoref{fig:accuracy} show that \textsc{ModernPDE} reaches 96.2\,\% precision and 91.4\,\% recall (F1\,=\,93.7\,\%), an absolute gain of more than 11 F1 points over summary-based PDE and far above intraprocedural PDE. This confirms that combining context sensitivity with path awareness---absent in classical formulations~\cite{knoop1994partial,morel1979global}---is essential for precision at scale. Differences are significant ($p<0.01$, paired $t$-test over per-program F1 scores, $n{=}19$).
 
 \autoref{fig:accuracy} visualizes the same three approaches as \autoref{tab:accuracy}. Precision rises sharply from intraprocedural to summary-based to \textsc{ModernPDE}; recall follows the same ordering but with a narrower gap between summary-based and our method. The asymmetry is informative: residual errors are predominantly \emph{false LIVE} (missed elimination candidates), not false DEAD. That pattern is exactly what a conservative may-analysis with incomplete path merging should produce (\autoref{sec:problem})---safe for optimization, but explaining the 8.6\,percentage-point recall gap.
 
@@ -787,7 +766,7 @@ The precision advantage comes from fewer false DEAD reports: context merging pre
 
 \begin{table}[t]
 \centering\small
-\caption{Precision, recall, and F1 against labeled ground truth for three PDE approaches.}
+\caption{Precision, recall, and F1 against labeled ground truth.}
 \label{tab:accuracy}
 \begin{tabular}{lccc}
 \toprule
@@ -805,26 +784,26 @@ Summary-Based PDE~\cite{chatterjee2005interprocedural} & 85.1\,\% & 74.6\,\% & 7
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig4_accuracy_metrics.png}
-  \captionof{figure}{Accuracy metrics (precision, recall, F1) across PDE approaches.}
+  \captionof{figure}{Accuracy metrics across PDE approaches.}
   \label{fig:accuracy}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig1_pde_classification.png}
-  \captionof{figure}{Distribution of five-way liveness labels ($n{=}800$ definitions).}
+  \captionof{figure}{Five-way liveness label distribution ($n{=}800$).}
   \label{fig:liveness}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig3_phase_comparison.png}
-  \captionof{figure}{Per-layer wall time with and without the scalability substrate.}
+  \captionof{figure}{Per-layer wall time with and without scalability substrate.}
   \label{fig:phases}
 \end{minipage}
 \end{figure}
 
 \subsection{Liveness Distribution}
 \paragraph{RQ2.}
-\autoref{fig:liveness} shows that \textbf{42.1\,\%} of variables are PARTIALLY DEAD---the dominant class---while fully DEAD and LIVE each account for only $\approx$10.5\,\%. MOSTLY DEAD and MOSTLY LIVE occupy the remaining mass near the $\tau_1$ and $\tau_2$ boundaries. This distribution justifies path-aware optimization far beyond what pure DCE or classical PRE~\cite{morel1979global,kennedy1999partial} can capture: the majority of definitions are neither always useless nor always necessary. It also aligns with the motivation of recent dead-iteration work~\cite{bastoul2025dead}, which similarly observes that ``partial'' unused computation is common once structure finer than a whole statement is considered.
+\autoref{fig:liveness} shows that 42.1\,\% of variables are PARTIALLY DEAD---the dominant class---while fully DEAD and LIVE each account for only $\approx$10.5\,\%. MOSTLY DEAD and MOSTLY LIVE occupy the remaining mass near the $\tau_1$ and $\tau_2$ boundaries. This distribution justifies path-aware optimization far beyond what pure DCE or classical PRE~\cite{morel1979global,kennedy1999partial} can capture: the majority of definitions are neither always useless nor always necessary. It also aligns with the motivation of recent dead-iteration work~\cite{bastoul2025dead}, which similarly observes that ``partial'' unused computation is common once structure finer than a whole statement is considered.
 
 The histogram aggregates $n{=}800$ labeled definitions across the benchmark suite. The modal PARTIALLY DEAD band is a direct consequence of Equation~(3): programs with balanced control-flow splits (as in \texttt{partial.cpp}, where \texttt{reward} is used on only one branch of \texttt{rand()\%2}) land near $\rho=0.5$. Classical DCE would retain such definitions because they are live on at least one path; \textsc{ModernPDE} instead surfaces them as first-class optimization targets.
 
@@ -843,13 +822,13 @@ Most benchmarks finish in under 70\,ms; the 50\,kLOC challenge needs only $\appr
 \begin{minipage}[t]{0.48\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig5_runtime_per_testcase.png}
-  \captionof{figure}{Wall-clock analysis time per benchmark program.}
+  \captionof{figure}{Wall-clock analysis time per program.}
   \label{fig:runtime}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.48\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig2_scalability.png}
-  \captionof{figure}{Scalability of \textsc{ModernPDE} versus exhaustive enumeration (log--log).}
+  \captionof{figure}{\textsc{ModernPDE} versus exhaustive enumeration (log--log).}
   \label{fig:scalability}
 \end{minipage}
 \end{figure}
@@ -859,19 +838,19 @@ Most benchmarks finish in under 70\,ms; the 50\,kLOC challenge needs only $\appr
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/fig6_pipeline_breakdown.png}
-  \captionof{figure}{Share of optimized analysis time by pipeline layer.}
+  \captionof{figure}{Share of optimized analysis time by layer.}
   \label{fig:pipelinecost}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/pde_challenge_accuracy.png}
-  \captionof{figure}{Classifier accuracy on synthetic challenge suites.}
+  \captionof{figure}{Classifier accuracy on synthetic challenges.}
   \label{fig:chalacc}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/pde_challenge_label_mix.png}
-  \captionof{figure}{Five-way label mix on synthetic challenge suites.}
+  \captionof{figure}{Five-way label mix on synthetic challenges.}
   \label{fig:challabels}
 \end{minipage}
 \end{figure}
@@ -893,7 +872,7 @@ Most benchmarks finish in under 70\,ms; the 50\,kLOC challenge needs only $\appr
 \begin{minipage}[t]{0.48\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/a_scalability_wall_ms.png}
-  \captionof{figure}{Median wall time versus synthetic variable count (500 / 5k / 50k).}
+  \captionof{figure}{Median wall time versus synthetic variable count.}
   \label{fig:ascalems}
 \end{minipage}
 \end{figure}
@@ -911,22 +890,20 @@ No configuration reached perfect recall (\autoref{tab:accuracy}). The remaining 
 We observed \emph{no} systematic false-DEAD spike on \texttt{oop.cpp} or \texttt{mutual\_recursive.cpp}, suggesting field sensitivity and context merging succeed on the OOP/recursion samples in the suite. Failures concentrate instead on programs where summary-based PDE also loses recall---supporting the interpretation that path loss, not heap modeling, dominates residual error.
 
 \subsection{Artifact Footprint and Code Structure}
-Beyond end-to-end accuracy, we report the structure of the open-source artifact itself. \autoref{fig:codesize}--\autoref{fig:cyclomatic} characterize implementation size and complexity. Physical LOC is dominated by analysis sources rather than drivers; file counts show a balanced split between headers and translation units; directory-level LOC concentrates in \texttt{src/} and \texttt{tests/}; and cyclomatic-proxy hotspots (parser, field-sensitive analysis, SCCP) match the phases that perform the heaviest branching. \autoref{fig:footprint} summarizes evaluation surface area (CTest targets, sample inputs, and code size), supporting the claim that the release is a usable research and teaching artifact rather than a single-shot experiment script.
-
-\autoref{fig:codesize} decomposes lines of code by category (code, comments, blank), showing that implementation effort concentrates in executable analysis logic rather than documentation-only bulk. \autoref{fig:filecounts} confirms a conventional C++ layout (headers plus translation units) suitable for modular testing. \autoref{fig:locdir} maps LOC to directories: \texttt{src/} and \texttt{tests/} together account for most code, aligning with the pipeline split in \autoref{fig:pipeline}. \autoref{fig:cyclomatic} identifies \texttt{FieldSensitiveAnalysis.cpp} and \texttt{Parser.cpp} as the highest branching-complexity files---expected, because Phase~1 parsing and Phase~3 field modeling contain the richest case splits. \autoref{fig:footprint} ties these metrics to the evaluation harness (14 CTest targets, 14 sample inputs), linking artifact structure to reproducibility claims in \autoref{sec:threats}.
+Beyond end-to-end accuracy, we report the structure of the open-source artifact. \autoref{fig:codesize}--\autoref{fig:footprint} characterize size, layout, and evaluation surface area. Physical LOC concentrates in analysis sources; headers and translation units are balanced; \texttt{src/} and \texttt{tests/} dominate directory-level volume; and cyclomatic-proxy hotspots (\texttt{FieldSensitiveAnalysis.cpp}, \texttt{Parser.cpp}) match Phase~1 parsing and Phase~3 field modeling. The evaluation harness exposes 14 CTest targets and 14 sample inputs, supporting reproducibility claims in \autoref{sec:threats}.
 
 \begin{figure}[t]
 \centering
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/code_size.png}
-  \captionof{figure}{Artifact lines of code by category (code, comment, blank).}
+  \captionof{figure}{Artifact lines of code by category.}
   \label{fig:codesize}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/code_file_counts.png}
-  \captionof{figure}{Translation-unit and header counts in the open-source artifact.}
+  \captionof{figure}{Translation-unit and header counts.}
   \label{fig:filecounts}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.32\textwidth}
@@ -942,13 +919,13 @@ Beyond end-to-end accuracy, we report the structure of the open-source artifact 
 \begin{minipage}[t]{0.48\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/code_cyclomatic_top_files.png}
-  \captionof{figure}{Highest cyclomatic-complexity proxy among analysis sources.}
+  \captionof{figure}{Highest cyclomatic-complexity proxy among sources.}
   \label{fig:cyclomatic}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.48\textwidth}
   \centering
   \includegraphics[width=\linewidth]{plots/modernpde_evaluation_footprint.png}
-  \captionof{figure}{Evaluation footprint (tests, samples, and code size).}
+  \captionof{figure}{Evaluation footprint (tests, samples, code size).}
   \label{fig:footprint}
 \end{minipage}
 \end{figure}
@@ -969,6 +946,7 @@ Relative to the classical line of work~\cite{knoop1994partial,knoop1992lazy,more
 % ============================================================
 \section{Complexity Analysis}
 \label{sec:complexity}
+We summarize asymptotic costs that explain the empirical curves in \autoref{sec:results}.
 
 Let $P$ be the number of retained paths after lazy enumeration, $E$ the number of CFG edges, $C$ the number of contexts after merging, $V$ the number of CFG nodes, $D$ the number of definitions, and $F$ the average number of fields per symbolic object.
 
@@ -993,6 +971,7 @@ The formal model uses $|\mathcal{P}|$ (or $P'$ after lazy cut-off) as the path d
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
+We interpret the empirical findings, relate them to adjacent dead-code research, and state limitations.
 
 \subsection{Strengths}
 The experiments support four strengths tied to measurable outcomes:
@@ -1014,8 +993,8 @@ Muzeel~\cite{kupoluyi2022muzeel} eliminates unused JavaScript \emph{functions} o
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\linewidth]{plots/artifact_vs_muzeel.png}
-\caption{ModernPDE vs Muzeel~\cite{kupoluyi2022muzeel}: accuracy, scale, runtime, and complexity metrics shown side by side (not a head-to-head benchmark).}
+\includegraphics[width=\linewidth]{plots/artifact_vs_muzeel.png}
+\caption{\textsc{ModernPDE} versus Muzeel~\cite{kupoluyi2022muzeel}: accuracy, scale, runtime, and complexity (juxtaposition, not a head-to-head benchmark).}
 \label{fig:vs_muzeel}
 \end{figure}
 
@@ -1024,8 +1003,8 @@ Bastoul et al.~\cite{bastoul2025dead} remove loop iterations that do not contrib
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\linewidth]{plots/artifact_vs_die.png}
-\caption{ModernPDE vs DIE~\cite{bastoul2025dead}: accuracy, speedup note, runtime, and complexity juxtaposition (independent analyses).}
+\includegraphics[width=\linewidth]{plots/artifact_vs_die.png}
+\caption{\textsc{ModernPDE} versus DIE~\cite{bastoul2025dead}: accuracy, speedup note, runtime, and complexity (independent analyses).}
 \label{fig:vs_die}
 \end{figure}
 
@@ -1034,8 +1013,8 @@ AutoJMH~\cite{rodriguez2016autojmh} generates JMH payloads that resist DCE and c
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\linewidth]{plots/artifact_vs_autojmh.png}
-\caption{ModernPDE vs AutoJMH~\cite{rodriguez2016autojmh}: accuracy, scale, timing, and complexity juxtaposition (units differ by design).}
+\includegraphics[width=\linewidth]{plots/artifact_vs_autojmh.png}
+\caption{\textsc{ModernPDE} versus AutoJMH~\cite{rodriguez2016autojmh}: accuracy, scale, timing, and complexity (units differ by design).}
 \label{fig:vs_autojmh}
 \end{figure}
 
@@ -1059,6 +1038,7 @@ Thresholds $\tau_1,\tau_2$ were tuned on a held-out micro-suite (\autoref{sec:al
 % ============================================================
 \section{Threats to Validity}
 \label{sec:threats}
+We summarize threats to internal, external, construct, and statistical validity.
 
 \paragraph{Internal validity.}
 Implementation bugs could inflate accuracy or deflate runtime. We mitigate with 14 CTest regression targets, Phase~7/Phase~8 equivalence checks, and manual inspection of micro-benchmarks (\texttt{dead.cpp}, \texttt{partial.cpp}). Baseline implementations share the same front-end/IR, isolating analysis differences, but remain reimplementations of published algorithms rather than third-party tools.
