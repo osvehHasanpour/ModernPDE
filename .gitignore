@@ -40,7 +40,3 @@ Thumbs.db
 # Archives
 project.zip
 project/
-
-# PDFs except committed papers
-*.pdf
-!docs/papers/*.pdf
