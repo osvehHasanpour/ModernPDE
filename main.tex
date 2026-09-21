@@ -4,8 +4,6 @@
 
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 \usepackage{amsmath,amsfonts,mathtools,newtxmath}
 \usepackage{balance}
 \usepackage{listings}
@@ -14,13 +12,29 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{adjustbox}
-\usepackage{algorithm2e,subcaption}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{subcaption}
 \usepackage{enumitem,microtype,pgfplots,pgfplotstable,placeins,tikz}
 \usepackage{hyperref}
 \usetikzlibrary{shapes,arrows.meta,positioning,shadows,backgrounds,fit,calc,decorations.pathreplacing}
 \pgfplotsset{compat=1.18}
 \setlist[itemize]{leftmargin=*,itemsep=2pt,topsep=3pt,parsep=0pt}
 \setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=3pt,parsep=0pt}
+\renewcommand{\algorithmcfname}{Algorithm}
+\renewcommand{\algorithmautorefname}{Algorithm}
+\SetAlgoInsideSkip{smallskip}
+\SetAlgoSkip{smallskip}
+\SetAlgoNlRelativeSize{-1}
+\SetAlCapSkip{0.6em}
+\SetAlgoCaptionSeparator{.~}
+\SetAlCapNameFnt{\small\bfseries}
+\SetAlCapFnt{\small\bfseries}
+\SetAlFnt{\small\ttfamily}
+\SetKwComment{Comment}{/*~}{~*/}
+\DontPrintSemicolon
+\IncMargin{0.8em}
+\SetInd{0.5em}{0.7em}
+
 
 
 % Unified ModernPDE / ACM TACO visual palette (use ONLY these):
@@ -178,7 +192,7 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-Partial dead code elimination (PDE) removes computations that are live on some execution paths and dead on others. Scaling PDE to large interprocedural programs remains difficult because of path explosion, calling-context growth, and imprecise heap modeling. This paper presents \textsc{ModernPDE}, a modular static-analysis framework that combines field-sensitive dataflow analysis, context-sensitive call-graph construction, and path-aware classification. Scalability is obtained through result caching, lazy path enumeration, incremental updates, sparse propagation, and priority-based worklist scheduling. We evaluate the framework on 19 programs ranging from 200 to 50\,000 lines of code. \textsc{ModernPDE} attains 96.2\,\% precision and 91.4\,\% recall, outperforming intraprocedural PDE (72.3\,\%\,/\,61.7\,\%) and summary-based PDE (85.1\,\%\,/\,74.6\,\%). Relative to an exhaustive path baseline, analysis time decreases by 78\,\%, and scalability tests exhibit near-linear growth up to 100\,000 lines (extrapolated). Across the studied programs, 42.1\,\% of variables are partially dead, underscoring the practical value of path-aware PDE. The implementation is released as open source.
+Partial dead code elimination (PDE) removes computations that are live on some execution paths and dead on others. Scaling PDE to large interprocedural programs remains difficult because of path explosion, context growth, and imprecise heap modeling. This paper presents \textsc{ModernPDE}, a modular static-analysis framework that combines field-sensitive dataflow analysis, context-sensitive call-graph construction, and path-aware classification. Scalability is achieved through result caching, lazy path enumeration, incremental updates, sparse propagation, and priority-based worklist scheduling. We evaluate the framework on 19 programs ranging from 200 to 50\,000 lines of code. \textsc{ModernPDE} attains 96.2\,\% precision and 91.4\,\% recall, outperforming intraprocedural PDE (72.3\,\%\,/\,61.7\,\%) and summary-based PDE (85.1\,\%\,/\,74.6\,\%). Relative to an exhaustive path baseline, analysis time decreases by 78\,\%, and scalability tests show near-linear growth up to 100\,000 lines (extrapolated). Across the studied programs, 42.1\,\% of variables are partially dead, underscoring the practical value of path-aware PDE. The implementation is released as open source.
 \end{abstract}
 
 \begin{CCSXML}
@@ -206,24 +220,24 @@ Partial dead code elimination (PDE) removes computations that are live on some e
 \section{Introduction}
 \label{sec:intro}
 
-Compilers routinely eliminate computations that are unused on every execution path, yet many costly definitions are only \emph{partially} unused: they are live on uncommon branches and dead on the hot path. Classical dead-code elimination (DCE) retains such definitions because each is live somewhere; classical partial redundancy elimination (PRE)~\cite{morel1979global,kennedy1999partial} targets redundancy rather than path-fractional liveness. \emph{Partial dead code elimination (PDE)}~\cite{knoop1994partial} occupies the middle ground: it asks what fraction of feasible paths use a definition, then eliminates it, sinks it toward its uses, or leaves it unchanged when the live-path fraction is high. The research challenge is not whether partial deadness exists---experience with validators, protocol parsers, game engines, and middleware suggests that it does---but whether path-partial liveness can be \emph{measured at scale}, with enough precision for sound optimization across procedures and heap fields.
+Compilers routinely eliminate computations that are unused on every execution path, yet many costly definitions are only \emph{partially} unused: they are live on uncommon branches and dead on the hot path. Classical dead-code elimination (DCE) retains such definitions because each one is live somewhere; classical partial redundancy elimination (PRE)~\cite{morel1979global,kennedy1999partial} targets redundancy rather than path-fractional liveness. \emph{Partial dead code elimination (PDE)}~\cite{knoop1994partial} occupies the middle ground: it asks which fraction of feasible paths use a definition, then eliminates it, sinks it toward its uses, or leaves it unchanged when the live-path fraction is high. The core challenge is not whether partial deadness exists---experience with validators, protocol parsers, game engines, and middleware suggests that it does---but whether path-partial liveness can be \emph{measured at scale}, with sufficient precision for sound optimization across procedures and heap fields.
 
 \paragraph{Why scale is hard.}
-Three obstacles have kept PDE largely confined to single-function or summary-based settings for more than three decades. First, \emph{path explosion}: the number of simple paths in a control-flow graph (CFG) grows exponentially with branching and loop structure, so exhaustive enumeration quickly becomes intractable~\cite{ball2001slam,henzinger2002blast}. Second, \emph{interprocedural coupling}: deep call chains and mutual recursion force the analysis to reason about definitions that cross function boundaries; a context-insensitive call graph over-approximates callees and pollutes liveness sets, while a fully cloning context-sensitive graph may itself explode. Third, \emph{heap structure}: modern languages allocate objects whose fields have independent liveness. Field-insensitive models collapse an object into a single abstract cell, so a live field keeps an entire partially dead object alive and destroys precision~\cite{chatterjee2005interprocedural}. Existing solutions typically occupy one corner of this design space: classical PDE~\cite{knoop1994partial,bodik1998efficient} is path-aware within a function; summary-based interprocedural PDE~\cite{chatterjee2005interprocedural} scales better but loses path distinctions across calls; demand-driven and profile-guided variants~\cite{takimoto2012demand,pathprofile2025} reduce work but either answer queries rather than whole-program classification, or depend on representative workloads. Adjacent lines---polyhedral dead-iteration elimination~\cite{bastoul2025dead}, dynamic JavaScript DCE~\cite{kupoluyi2022muzeel}, and microbenchmark generators that \emph{prevent} DCE~\cite{rodriguez2016autojmh}---reinforce that deadness is granular and context-dependent, yet they do not solve variable- and field-level PDE on general CFGs.
+Three obstacles have kept PDE largely confined to single-function and summary-based settings for decades. First, \emph{path explosion}: the number of simple paths in a control-flow graph (CFG) grows exponentially with branching and loop structure, so exhaustive enumeration quickly becomes intractable~\cite{ball2001slam,henzinger2002blast}. Second, \emph{interprocedural coupling}: deep call chains and mutual recursion force the analysis to reason about definitions that cross function boundaries; a context-insensitive call graph over-approximates callees and pollutes liveness sets, whereas a fully context-cloned graph may itself explode. Third, \emph{heap structure}: modern languages allocate objects whose fields may have independent liveness. Field-insensitive models collapse an object into a single abstract cell, so a live field keeps an entire partially dead object alive and destroys precision~\cite{chatterjee2005interprocedural}. Existing solutions occupy different corners of this design space: classical PDE~\cite{knoop1994partial,bodik1998efficient} is path-aware within a function; summary-based interprocedural PDE~\cite{chatterjee2005interprocedural} scales better but loses path distinctions across calls; and demand-driven or profile-guided variants~\cite{takimoto2012demand,pathprofile2025} reduce work but either answer targeted queries rather than whole-program classification or depend on representative workloads. Related lines of work---polyhedral dead-iteration elimination~\cite{bastoul2025dead}, dynamic JavaScript DCE~\cite{kupoluyi2022muzeel}, and microbenchmark generators that \emph{prevent} DCE~\cite{rodriguez2016autojmh}---reinforce that deadness is granular and context-dependent, yet they do not solve variable- and field-level PDE on general CFGs.
 
 \paragraph{Research gap.}
-No prior PDE framework simultaneously provides (i)~whole-program \emph{path-ratio} classification rather than a single may-live bit; (ii)~interprocedural precision without exponential context cloning; (iii)~field-granularity heap modeling; and (iv)~engineering that keeps path enumeration tractable on CFGs with thousands of nodes. \autoref{tab:comparison} summarizes how prior approaches cover subsets of this space. The gap is not a new PDE theory---Knoop et al.'s bit-vector formulation remains foundational~\cite{knoop1994partial}---but an \emph{integrated, scalable realization} that connects front-end IR, context-sensitive call graphs, field-sensitive memory, and lazy path analysis in one reproducible pipeline.
+No prior PDE framework simultaneously provides (i)~whole-program \emph{path-ratio} classification rather than a single may-live bit; (ii)~interprocedural precision without exponential context cloning; (iii)~field-granularity heap modeling; and (iv)~engineering that keeps path enumeration tractable on CFGs with thousands of nodes. \autoref{tab:comparison} summarizes how prior approaches cover subsets of this space. The gap is not a new PDE theory---Knoop et al.'s bit-vector formulation remains foundational~\cite{knoop1994partial}---but an \emph{integrated, scalable realization} that connects front-end IR, context-sensitive call graphs, field-sensitive memory, and lazy path analysis in a single reproducible pipeline.
 
 \paragraph{This paper: \textsc{ModernPDE}.}
-We present \textsc{ModernPDE}, a modular static-analysis framework whose novelty lies in \emph{combining} three design principles that address the obstacles above while retaining classical PDE soundness obligations. First, context-sensitive call graphs with equivalence-based context merging keep interprocedural precision affordable. Second, field-granularity memory modeling on points-to information tracks heap liveness per field rather than per object. Third, lazy path enumeration with caching, incremental updates, sparse propagation, and priority worklists makes path awareness practical without exhaustive materialization. Relative to intraprocedural and summary-based baselines (\autoref{sec:eval}), the contribution is this integrated realization---not a replacement of classical PDE semantics.
+We present \textsc{ModernPDE}, a modular static-analysis framework whose novelty lies in \emph{combining} three design principles that address the obstacles above while retaining classical PDE soundness obligations. First, context-sensitive call graphs with equivalence-based context merging keep interprocedural precision affordable. Second, field-granularity memory modeling on points-to information tracks heap liveness per field rather than per object. Third, lazy path enumeration with caching, incremental updates, sparse propagation, and priority worklists makes path awareness practical without exhaustive materialization. Relative to intraprocedural and summary-based baselines (\autoref{sec:eval}), the paper contributes this integrated realization rather than a replacement of classical PDE semantics.
 
 \paragraph{Contributions.}
 \begin{itemize}
-\item A unified end-to-end pipeline connecting a source front-end, CFG/SSA construction, context-sensitive call graphs, field-sensitive memory modeling, and a five-way path-aware PDE classifier (\autoref{fig:pipeline}).
-\item A summary-based context-merging strategy that collapses equivalent calling contexts and keeps the number of analyzed contexts polynomial in practice.
+\item A unified end-to-end pipeline connecting the source front-end, CFG/SSA construction, context-sensitive call graphs, field-sensitive memory modeling, and a five-way path-aware PDE classifier (\autoref{fig:pipeline}).
+\item A context-merging strategy that collapses equivalent calling contexts while keeping the number of analyzed contexts tractable in practice.
 \item A field-sensitive memory model that distinguishes per-field liveness for heap-allocated structures, enabling PDE on object-oriented idioms that defeat field-insensitive DCE.
 \item Five engineering techniques---result caching, lazy path enumeration, incremental CFG updates, sparse fact propagation, and priority worklist scheduling---that reduce analysis time by 78\,\% relative to an exhaustive path baseline.
-\item An empirical study on 19 programs (200 to 50\,kLOC; \autoref{tab:benchmarks}) showing that 42.1\,\% of variables are partially dead, and that \textsc{ModernPDE} attains 96.2\,\% precision and 91.4\,\% recall, outperforming intraprocedural and summary-based PDE.
+\item An empirical study on 19 programs (200 to 50\,kLOC; \autoref{tab:benchmarks}) showing that 42.1\,\% of variables are partially dead and that \textsc{ModernPDE} attains 96.2\,\% precision and 91.4\,\% recall, outperforming intraprocedural and summary-based PDE.
 \item An open-source release intended as both a research vehicle and a teaching artifact for path-aware optimization.
 \end{itemize}
 
